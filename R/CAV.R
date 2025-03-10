@@ -224,7 +224,7 @@ CAV <- function(Data,
   if (class(Group) == "list") {
 
     #agg_clad_plot = list()
-    agg_fan_plot = vector("list", length(Group))
+    agg_fan_plot = list()
 
     for (i in 1:length(Group)) {
 
@@ -349,6 +349,9 @@ CAV <- function(Data,
   Morphotree$k_medoid_plot <- k_plot
   Morphotree$dendro <- dendro
   #Morphotree$agg_clad_plot <- agg_clad_plot
+  agg_fan_plot <- Filter(Negate(is.null), agg_fan_plot)
+  names(agg_fan_plot) <- names(Group)
+
   Morphotree$agg_plot <- agg_fan_plot
   return(Morphotree)
 } # End of CAV function
