@@ -1347,8 +1347,6 @@ c_TQ2 <- function(plsr.results, Y_pred, ncomp, Y_test = NULL) {
 #' When no ncomp specified, returns single R2 value; otherwise returns R2
 #' for each component up to ncomp.
 #'
-#' @keywords internal
-#'
 #' @seealso \code{\link{Bio.VIP}} \code{\link{AABA}}
 #'
 #' @importFrom stats cor
@@ -1406,7 +1404,9 @@ c_R2 <- function(Y_actual, Y_pred, ncomp = NULL) {
 #' data contexts, normalizes negative R2 (poor fits for the multivariate data) and
 #' finds the maximum R2 that is between 0 and 1. If no result is found (poor model
 #' performance), 0 is selected.
+#'
 #' @keywords internal
+#'
 #' @export
 
 m_R2 <- function(observed, predicted) {
