@@ -9,7 +9,8 @@ ASCG(
   Groups,
   color = NULL,
   coord_name = NULL,
-  subset = NULL,
+  coord_subset = NULL,
+  subset = FALSE,
   Mesh = NULL,
   include_whole = TRUE,
   save_plots = TRUE,
@@ -35,9 +36,12 @@ Group list.}
 \item{coord_name}{an optional vector containing the names for each landmark
 in the landmark configuration.}
 
-\item{subset}{An optional vector specifying the subset or group names associated
-with each landmark in the landmark configuration. If provided, the resulting
+\item{coord_subset}{An optional vector specifying the subset or group names associated
+with each landmark in the landmark configuration.If provided, the resulting
 interactive figure will allow toggling between these landmark subsets.}
+
+\item{subset}{A logical value to individually conduct regression tests on each
+subsetted landmark group in coord_subset. Default is NULL.}
 
 \item{Mesh}{an optional 3D mesh file (.ply format), preferably the center shape
 of the landmark array, to be thin plate spline warped into the group mean shapes.}
@@ -64,8 +68,10 @@ directory. This folder will contain plotly objects for each group vector in the
 Group argument list. If a mesh object is provided, the function will also store
 warped meshes for each group value in the grouping vector.
 \itemize{
-\item{Group            list object each containing a plotly plot object}
-\item{Subsetted_Group  list object each containing a plotly plot object with subsetted landmarks}
+\item{Group_Shape         list object each containing a plotly plot object for each Group}
+\item{Group_stats         list object each summary statistics of allometric influence on shape by group}
+\item{Group_subset_stats  list object each summary statistics of allometric influence on shape by group by subsetted region}
+\item{whole_Shape         list object each containing a plotly plot object of the allometric influence on all individauls irregardless of group}
 }
 }
 \description{
