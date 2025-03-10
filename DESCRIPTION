@@ -20,7 +20,7 @@ RoxygenNote: 7.3.2
 Imports:
     ade4,
     ape,
-    BiocParallel,
+    BiocParallel (>= 1.38.0),
     BiocManager,
     brew,
     caret,
@@ -45,7 +45,7 @@ Imports:
     lavaan,
     magick,
     MASS,
-    mixOmics,
+    mixOmics (>= 6.28.0),
     Morpho,
     parallel,
     phylogram,
@@ -69,8 +69,12 @@ Imports:
     utils,
     vegan,
     writexl
-    usethis::use_package("BiocParallel", type = "Imports", min_version = TRUE)
-    usethis::use_package("mixOmics", type = "Imports", min_version = TRUE)
+    usethis::use_package ("BiocParallel"),
+    type = "Imports",
+    min_version = TRUE)
+    usethis::use_package ("mixOmics"),
+    type = "Imports",
+    min_version = TRUE
 Suggests:
     testthat (>= 3.0.0),
     knitr,
