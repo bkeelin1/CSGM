@@ -18,12 +18,18 @@ a numeric value containing the coefficient of determination
 Calculates appropriate R2 based on data characteristics:
 \enumerate{
 \item Correlation-based R2 for PCA/ranked data
-\item Regularized trace-based R2 with Ledoit-Wolf shrinkage for high-dimensional data (p > n)
-\item Trace-based R2 for standard multivariate data
+\item Regularized trace-based R2 with Ledoit-Wolf shrinkage
+\item Pillai's Trace-based R2 for multivariate data
 \item Determinant based approach
+\item Pseudo (Eigen) determinant R2 for multivariate data
+\item Averaged R2
 }
 }
 \details{
-A function to conduct
+A function to calculate the coefficient of determination for multivariate
+data. This function conducts all six methodologies for different multivariate
+data contexts, normalizes negative R2 (poor fits for the multivariate data) and
+finds the maximum R2 that is between 0 and 1. If no result is found (poor model
+performance), 0 is selected.
 }
 \keyword{internal}

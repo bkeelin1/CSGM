@@ -1390,16 +1390,22 @@ c_R2 <- function(Y_actual, Y_pred, ncomp = NULL) {
 #'
 #' @description Calculates appropriate R2 based on data characteristics:
 #' 1. Correlation-based R2 for PCA/ranked data
-#' 2. Regularized trace-based R2 with Ledoit-Wolf shrinkage for high-dimensional data (p > n)
-#' 3. Trace-based R2 for standard multivariate data
+#' 2. Regularized trace-based R2 with Ledoit-Wolf shrinkage
+#' 3. Pillai's Trace-based R2 for multivariate data
 #' 4. Determinant based approach
+#' 5. Pseudo (Eigen) determinant R2 for multivariate data
+#' 6. Averaged R2
 #'
 #' @param observed Matrix of observed values
 #' @param predicted Matrix of predicted values
 #'
 #' @return a numeric value containing the coefficient of determination
 #'
-#' @details A function to conduct
+#' @details A function to calculate the coefficient of determination for multivariate
+#' data. This function conducts all six methodologies for different multivariate
+#' data contexts, normalizes negative R2 (poor fits for the multivariate data) and
+#' finds the maximum R2 that is between 0 and 1. If no result is found (poor model
+#' performance), 0 is selected.
 #' @keywords internal
 #' @export
 
