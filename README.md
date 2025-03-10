@@ -35,8 +35,10 @@ devtools::install_github("bkeelin1/CSGM", build_vignettes = TRUE, dependencies =
 library(CSGM)
 # CSGM function to extract vignette in file directory
 get_vignette("CSGM-Workflow")
-load("CSGM-Workflow.Rmd")
+file.edit("CSGM-Workflow.Rmd")
 ```
+
+Note: When the Vignette opens, please look in the Script (top left) Panel and click the button "Visual" to view this vignette in a more visually appealing mode.
 
 ------------------------------------------------------------------------
 
