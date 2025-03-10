@@ -69,6 +69,8 @@ Imports:
     utils,
     vegan,
     writexl
+    usethis::use_package("BiocParallel", type = "Imports", min_version = TRUE)
+    usethis::use_package("mixOmics", type = "Imports", min_version = TRUE)
 Suggests:
     testthat (>= 3.0.0),
     knitr,
