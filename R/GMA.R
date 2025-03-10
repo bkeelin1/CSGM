@@ -45,13 +45,6 @@
 #' permutated hierarchical cluster analysis should be performed and subsequently
 #' applied as an apriori weighting of individuals based on morphological shape
 #' dissimilarity in a principal component analysis. Default is set to FALSE.
-#' @param method a character string indicating the distance matrix method that
-#' should be applied on the data when w_morpho_pca = TRUE. Options include: "manhattan",
-#' "euclidean", "canberra", "clark", "bray", "kulczynski", "jaccard", "gower",
-#' "altGower", "morisita", "horn", "mountford", "raup", "binomial", "chao", "cao",
-#' "mahalanobis", "chisq", "chord", "hellinger", "aitchison", or "robust.aitchison".
-#' Please see the *vegdist* "method" argument from the **vegan** package for more
-#' details.
 #' @param pca_centering character ("OLS", "OLS+align", "GLS", "GLS+align")
 #' selecting which method of centering technique the user would prefer a principal
 #' component analysis should center the Procrustes landmark (and/or Procrustes residuals)
@@ -643,12 +636,6 @@ GMA <- function(Landmarks,
   cluster = do.call(CAV, CAV_parameters)
   dendro_resid = cluster$dendro
   GMA_Output$morphotree$resid <- cluster
-
-  #CAV_parameters = modifyList(CAV_parameters, list(Data = Data, Dir_name = "Procrustes Distances"))
-  #cluster = do.call(CAV, CAV_parameters)
-  #dendro = cluster$dendro
-  #GMA_Output$morphotree$cluster <- cluster
-
 
   if (bilat_sym == TRUE) { # Hierarchical cluster generation when bilateral symmetry analysis is desired
 
