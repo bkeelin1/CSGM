@@ -1,7 +1,5 @@
 # *CSGM* - A Toolkit to Conduct Cross-Sectional Geometric Morphometric Analyses
 
-
-
 ## Description
 
 Cross-sectional geometric morphometrics (CSGM) is an interdisciplinary method in biological anthropology to study the relationships between shape and biomechanical function in contexts such as developmental biology, behavioral plasticity, and evolutionary morphology. As such, CSGM research compares complex, multidimensional shape data from multiple skeletal regions to multivariate, and often multicollinear, biomechanical variables. Thus, we developed the CSGM package in R to provide a statistically holistic framework and rigorous hypothesis model testing approach to facilitate a complete statistical data analysis of biological data. 
@@ -10,7 +8,7 @@ The CSGM package offers an innovative and comprehensive toolkit to automate an e
 
 # Installation Instructions:
 
----
+------------------------------------------------------------------------
 
 ## NOTE: Due to dependency issues, you will need to install additional packages prior to installing CSGM. Please copy and paste these lines of code to install these necessary packages:
 
@@ -34,14 +32,17 @@ devtools::install_github("bkeelin1/CSGM", build_vignettes = TRUE, dependencies =
 ## Follow along in RStudio or Posit Cloud and use this README through the vignette CSGM-Workflow
 
 ```{r}
-vignette("CSGM-Workflow", package = "CSGM")
+library(CSGM)
+# CSGM function to extract vignette in file directory
+get_vignette("CSGM-Workflow")
+load("CSGM-Workflow.Rmd")
 ```
 
----
+------------------------------------------------------------------------
 
 # Visualizing the CSGM Workflow
 
-![Standard workflow for using the CSGM package. This workflow can be categorized in four phases: data importing and transformations, exploratory data analysis, hypothesis testing, and summarizing as well as interpreting the results. ](vignettes/images/CSGM_Workflow.png){alt="CSGM Workflow"}
+![CSGM Workflow](vignettes/images/CSGM_Workflow.png)
 
 ```{r}
 library(CSGM)
@@ -259,7 +260,7 @@ Notes:
 
 ### Create Hypothesis Models
 
-![Figure 2. Workflow for this hypothesis test that the posterior mandibular corpus is biomechanically integrated with the symphysis.](vignettes/images/CSGM_Models.png){alt="Figure 2. Workflow for this hypothesis test that the posterior mandibular corpus is biomechanically integrated with the symphysis."}
+![Figure 2. Workflow for this hypothesis test that the posterior mandibular corpus is biomechanically integrated with the symphysis.](vignettes/images/CSGM_Models.png)
 
 ### Create the Hypothesis Model following the structure in Figure 2.
 
