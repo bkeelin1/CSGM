@@ -11,7 +11,7 @@
 #'
 #' @export
 
-extract_vignette <- function(vignette_name = "CSGM-Workflow", dest_dir = getwd()) {
+get_vignette <- function(vignette_name = "CSGM-Workflow", dest_dir = getwd()) {
   # Find vignette path
   vignette_path <- system.file("doc", paste0(vignette_name, ".Rmd"), package = "CSGM")
   if (vignette_path == "") {
