@@ -105,7 +105,7 @@
 #' data tranformation. If a subset is provided, the function will only perform
 #' the data transformation on the selected variables.
 #'
-#' @param method an optional character string used only when data transformation
+#' @param dt_method an optional character string used only when data transformation
 #' for the response and/or predictor variable is set to an option with "procdist".
 #' The default is "procdist". If default is changed, the function will overwrite the
 #' procdist iteration and perform a distance matrix from the following methods:

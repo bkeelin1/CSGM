@@ -90,14 +90,6 @@ can be passed through here.}
 desires to have Procrustes residuals calculated to be separately performed on
 tests and PCA. Default is set to FALSE.}
 
-\item{method}{a character string indicating the distance matrix method that
-should be applied on the data when w_morpho_pca = TRUE. Options include: "manhattan",
-"euclidean", "canberra", "clark", "bray", "kulczynski", "jaccard", "gower",
-"altGower", "morisita", "horn", "mountford", "raup", "binomial", "chao", "cao",
-"mahalanobis", "chisq", "chord", "hellinger", "aitchison", or "robust.aitchison".
-Please see the \emph{vegdist} "method" argument from the \strong{vegan} package for more
-details.}
-
 \item{curves}{An optional curve matrix via the \code{gen_curves} function to
 ensure equidistant semilandmark points.}
 

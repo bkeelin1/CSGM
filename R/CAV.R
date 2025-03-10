@@ -167,7 +167,7 @@ CAV <- function(Data,
     dt_params = names(formals(DT))
     dt_parameters = modifyList(list(Predictor = Data,
                                     Pred_transform = "procdist",
-                                    method = method), args) %>%
+                                    dt_method = method), args) %>%
                           .[intersect(names(.), dt_params)]
     Euc_dist = do.call(DT,dt_parameters)$Predictor
   }

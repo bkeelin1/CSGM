@@ -113,11 +113,7 @@ in the data table, matrix, or array to subset the predictor variables for this
 data tranformation. If a subset is provided, the function will only perform
 the data transformation on the selected variables.}
 
-\item{subset}{an optional logical indicating whether only a subset of the variables
-in either the response and/or predictor variables should be considered in the
-data transformation.}
-
-\item{method}{an optional character string used only when data transformation
+\item{dt_method}{an optional character string used only when data transformation
 for the response and/or predictor variable is set to an option with "procdist".
 The default is "procdist". If default is changed, the function will overwrite the
 procdist iteration and perform a distance matrix from the following methods:
@@ -126,6 +122,10 @@ procdist iteration and perform a distance matrix from the following methods:
 "cao", "mahalanobis", "chisq", "chord", "hellinger", "aitchison", or
 "robust.aitchison". Please see the \emph{vegdist} "method" argument from the
 \strong{vegan} package for more details on distance matrix calculations.}
+
+\item{subset}{an optional logical indicating whether only a subset of the variables
+in either the response and/or predictor variables should be considered in the
+data transformation.}
 }
 \value{
 a nested list object with the following structure:
