@@ -105,7 +105,14 @@
 #'     ) # all other arguments are optional. Colors are generated automatically.
 #' }
 #'
-SCG <- function(Data, Groups, color = NULL, coord_name = NULL, subset = NULL, key = NULL, Mesh = NULL) {
+
+SCG <- function(Data,
+                Groups,
+                color = NULL,
+                coord_name = NULL,
+                subset = NULL,
+                key = NULL,
+                Mesh = NULL) {
 
   Dir <- getwd()
   if(!is.null(key)) {
@@ -140,18 +147,20 @@ SCG <- function(Data, Groups, color = NULL, coord_name = NULL, subset = NULL, ke
     coord_name = rep(1:dim(coords)[1])
   }
 
+  Group_shapes = vector("list", length(Groups))
+
   for (j in seq_along(Groups)) {
     if("character" %in% class(Groups[[j]][[1]]) || "factor" %in% class(Groups[[j]][[1]]) ||
        "logical" %in% class(Groups[[j]][[1]])) {
       group_name <- names(Groups[[j]])
       dif_groups <- unlist(na.omit(unique(Groups[[j]])))
       split_groups = list()
-      for(g in seq_along(unique(Groups[[j]][[1]]))) {
-        index = which(Groups[[j]] == unique(Groups[[j]][[1]])[g])
+      for(g in seq_along(unique(Groups[[j]]))) {
+        index = which(Groups[[j]] == unique(Groups[[j]])[g])
         split_groups[[g]] <- coords[,,index]
       }
       split_groups <- Filter(function(x) !(is.array(x) && length(x) == 0), split_groups)
-      split_groups <- lapply(na.omit(split_groups), mshape)
+      split_groups <- lapply(na.omit(split_groups), geomorph::mshape)
       for(g in seq_along(split_groups)){
         split_groups[[g]] <- array(split_groups[[g]], dim = c(dim(split_groups[[g]])[1], dim(split_groups[[g]])[2], 1))
         if(!is.null(Mesh)) {
@@ -175,11 +184,12 @@ SCG <- function(Data, Groups, color = NULL, coord_name = NULL, subset = NULL, ke
         mesh2ply(max.shape, filename = paste("Max", "_Shape_", names(Group[[j]]), ".ply", sep = ""))
       }
     }
-    Group_shapes <- lolshape(split_groups, ID = dif_groups, coord_name = coord_name, color = color,
-                             title = paste("Shape Differences Between Means of Group:", group_name), k, subset = subset)
+    Group_shapes[[j]] <- lolshape(split_groups, ID = dif_groups, coord_name = coord_name, color = color,
+                             title = paste("Shape Differences Between Means of Group:", group_name), subset = subset)
 
-    saveWidget(Group_shapes, file.path(path, paste0(group_name, ".html", collapse = "")), selfcontained = TRUE)
+    saveWidget(Group_shapes[[j]], file.path(path, paste0(group_name, ".html", collapse = "")), selfcontained = TRUE)
   } # end of j for loop
 
   setwd(Dir)
-} # end of ISG function
+  return(Group_shapes)
+} # end of SCG function

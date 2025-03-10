@@ -137,19 +137,51 @@ Notes:
 allo = ASCG(output, # GMA_object
             Group, # list object of grouping vectors
             coord_name = dimnames(Corpus_Land)[[1]], # names for the landmarks
-            subset = paste(rep(c("LM1M2", "LP3P4", "Symphysis", "RP3P4", "RM1M2"), each = 118)), # landmark subsets
+            coord_subset = paste(rep(c("LM1M2", "LP3P4", "Symphysis", 
+                                       "RP3P4", "RM1M2"), each = 118)), 
             key = "Allometric Shapes") 
+
+# View overall allometric influence on all individuals in the sample
+## Statistics
+allo$Allo.size.reg$table
+## Shape
+allo$whole_shape
+
+# View allometric influence of study sample by skeletal collection
+
+# allo is the output
+# Group_stats is the statistics
+# the first [[1]] is for Group 1 in the list
+# the second bracket is the specific group in the group you want
+
+## Statistics
+# St. Gregory's Priory
+allo$Group_stats[[1]][[1]]$`Collection.St. Gregrory Priory`$table
+#SMU
+allo$Group_stats[[1]][[2]]$Collection.SMU$table
+#UP 
+allo$Group_stats[[1]][[3]]$Collection.UP$table
+
+# all groups interactively
+allo$Group_shape
+
 
 ```
 
 ### View Morphological shape changes by Collection
 
 ```{r Group_Shape,echo=TRUE,eval=FALSE}
-Group_shapes = SCG(output, 
+Group_shapes = SCG(output,
                    Group,
                    coord_name = dimnames(Corpus_Land)[[1]],
-                   subset = paste(rep(c("LM1M2", "LP3P4", "Symphysis", "RP3P4", "RM1M2"), each = 118)),
-                   key = "Allometric Shapes")
+                   subset = paste(rep(c("LM1M2", "LP3P4", "Symphysis", 
+                                        "RP3P4", "RM1M2"), each = 118)),
+                   key = "Group Shapes")
+
+# View the Group Differences
+
+Group_shapes[[1]]
+
 ```
 
 ## Procrustes Shape (A)symmetry Analysis

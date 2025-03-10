@@ -28,9 +28,12 @@
 #' @param coord_name an optional vector containing the names for each landmark
 #' in the landmark configuration.
 #'
-#' @param subset An optional vector specifying the subset or group names associated
-#' with each landmark in the landmark configuration. If provided, the resulting
+#' @param coord_subset An optional vector specifying the subset or group names associated
+#' with each landmark in the landmark configuration.If provided, the resulting
 #' interactive figure will allow toggling between these landmark subsets.
+#'
+#' @param subset A logical value to individually conduct regression tests on each
+#' subsetted landmark group in coord_subset. Default is NULL.
 #'
 #' @param Mesh an optional 3D mesh file (.ply format), preferably the center shape
 #' of the landmark array, to be thin plate spline warped into the group mean shapes.
@@ -98,18 +101,23 @@
 #' Group argument list. If a mesh object is provided, the function will also store
 #' warped meshes for each group value in the grouping vector.
 #' \itemize{
-#'    \item{Group            list object each containing a plotly plot object}
-#'    \item{Subsetted_Group  list object each containing a plotly plot object with subsetted landmarks}
+#'    \item{Group_Shape         list object each containing a plotly plot object for each Group}
+#'    \item{Group_stats         list object each summary statistics of allometric influence on shape by group}
+#'    \item{Group_subset_stats  list object each summary statistics of allometric influence on shape by group by subsetted region}
+#'    \item{whole_Shape         list object each containing a plotly plot object of the allometric influence on all individauls irregardless of group}
 #' }
 #'
 #' @author Brian Anthony Keeling
 #'
 #' @seealso \code{\link{plotly}} \code{\link{gpagen}} \code{\link{GMA}}
 #'
-#' @importFrom geomorph gpagen arrayspecs mshape warpRefMesh
+#' @importFrom geomorph gpagen arrayspecs mshape warpRefMesh procD.lm
 #' @importFrom Morpho mesh2ply
 #' @importFrom grDevices png dev.off
 #' @importFrom htmlwidgets saveWidget
+#' @importFrom foreach foreach %dopar%
+#' @importFrom parallel detectCores
+#' @importFrom dplyr %>%
 #'
 #' @export
 #'
@@ -155,7 +163,8 @@ ASCG <- function(GMA_object,
                  Groups,
                  color = NULL,
                  coord_name = NULL,
-                 subset = NULL,
+                 coord_subset = NULL,
+                 subset = FALSE,
                  Mesh = NULL,
                  include_whole = TRUE,
                  save_plots = TRUE,
@@ -208,14 +217,14 @@ ASCG <- function(GMA_object,
     reg <- summary(procD.lm(coords ~ log(Size), data = Data))
     regressions$Allo.size.reg <- reg
     reg_data <- procD.lm(coords ~ log(Size), data = Data)
-    if(!is.null(subset)) {
-      for(s in seq_along(unique(subset))) {
-        subdex = which(subset == unique(subset)[[s]])
+    if(!isTRUE(subset)) {
+      for(s in seq_along(unique(coord_subset))) {
+        subdex = which(coord_subset == unique(coord_subset)[[s]])
         sub_data = list(coords = coords[subdex,,], Size = Size)
         sub_reg_results <- summary(procD.lm(coords ~ log(Size), data = sub_data))
 
         regressions$Subset_Reg[[s]] <- sub_reg_results[[1]]
-        names(regressions$Subset_Reg)[s] <- paste("Total.Sample", ".Subset.", unique(subset)[s], sep = "")
+        names(regressions$Subset_Reg)[s] <- paste("Total.Sample", ".Subset.", unique(coord_subset)[s], sep = "")
       }
     }
     coords.fitted = arrayspecs(reg_data$fitted, dim(coords)[1], k)
@@ -238,7 +247,7 @@ ASCG <- function(GMA_object,
 
     Size.Shape = lolshape(allo.shape, ID = c(paste("Large Ind:", big), paste("Small Ind:", small)), color = color,
                             coord_name = coord_name, title = "Allometrically Influenced Shape Changes",
-                            subset = subset)
+                            subset = coord_subset)
     if(isTRUE(save_plots)) {
       saveWidget(Size.Shape, file = "Allometrically Influenced Shape Changes.html", selfcontained = TRUE)
     }
@@ -249,8 +258,9 @@ ASCG <- function(GMA_object,
     doParallel::registerDoParallel(cores = detectCores() - 2)
   }
 
-  allo.parallel = foreach(j = 1:length(Groups), .combine = 'rbind', .export = c("lolshape"), .packages =
-                            c("geomorph", "Morpho", "doParallel", "tidyverse", "RColorBrewer", "plotly", "htmlwidgets")) %dopar% {
+
+  allo.parallel = foreach(j = 1:length(Groups), .packages =
+                            c("geomorph", "Morpho", "doParallel", "tidyverse", "RColorBrewer", "plotly", "htmlwidgets", "CSGM")) %dopar% {
 
     if("character" %in% class(Groups[[j]][[1]]) || "factor" %in% class(Groups[[j]][[1]]) ||
        "logical" %in% class(Groups[[j]][[1]])) {
@@ -271,19 +281,19 @@ ASCG <- function(GMA_object,
           Size = GMA_object$Csize[index]
         }
         Data = list(coords, Size)
-        reg_by_group[[g]] <- summary(procD.lm(coords ~ log(Size), data = Data))
+        reg_by_group[[g]]$summary <- summary(procD.lm(coords ~ log(Size), data = Data))
         names(reg_by_group[[g]]) <- paste(names(Groups)[j], ".",na.omit(unique(Groups[[j]]))[g], sep = "")
         r.pred[[g]] <- procD.lm(coords ~ log(Size), data = Data)
-        if(!is.null(subset)) {
-          subset_reg_by_group = vector("list", length(unique(subset)))
-          for(s in seq_along(unique(subset))) {
-            subdex = which(subset == unique(subset)[[s]])
+        if(!isTRUE(subset)) {
+          subset_reg_by_group = vector("list", length(unique(coord_subset)))
+          for(s in seq_along(unique(coord_subset))) {
+            subdex = which(coord_subset == unique(coord_subset)[[s]])
             sub_data = list(coords = coords[subdex,,], Size = Size)
             sub_reg_results <- summary(procD.lm(coords ~ log(Size), data = sub_data))
-            subset_reg_by_group[[s]][[g]] <- sub_reg_results
+            subset_reg_by_group[[s]][[g]]$summary <- sub_reg_results
             names(subset_reg_by_group[[s]][[g]]) <- paste(names(Groups)[j], ".",
                                                           na.omit(unique(Groups[[j]]))[g], ".",
-                                                          unique(subset)[s], sep = "")
+                                                          unique(coord_subset)[s], sep = "")
           }
         }
         coords.fit = arrayspecs(r.pred[[g]]$fitted, dim(coords)[1], k)
@@ -304,7 +314,7 @@ ASCG <- function(GMA_object,
 
         allo.shape = lolshape(allo.shape, ID = c(paste("Large Ind:", big), paste("Small Ind:", small)),
                                 title = paste("Allometric Shape Changes", names(Groups[[j]]), "_",
-                                              name),  subset = subset, color = color)
+                                              name),  subset = coord_subset, color = color)
         if(isTRUE(save_plots)) {
           saveWidget(allo.shape, paste("Allometric Shape Changes", names(Groups)[j], "-",
                      name, ".html", sep = ""), selfcontained = TRUE)
@@ -323,18 +333,18 @@ ASCG <- function(GMA_object,
         Size = GMA_object$Csize[index]
       }
       Data = list(coords = coords, Size = Size, Group = na.omit(Groups[[j]][[1]][index]))
-      reg_by_group[[1]] <- summary(procD.lm(coords ~ log(Size) * Group, data = Data))
+      reg_by_group[[1]]$summary <- summary(procD.lm(coords ~ log(Size) * Group, data = Data))
       names(reg_by_group) <- paste(names(Groups)[j], sep = "")
       r.pred <- procD.lm(coords ~ log(Size) * Group, data = Data)
       coords.fit = arrayspecs(r.pred$fitted, dim(coords)[1], k)
-      if(!is.null(subset)) {
-        subset_reg_by_group = vector("list", length(unique(subset)))
-        for(s in seq_along(unique(subset))) {
-          subdex = which(subset == unique(subset)[[s]])
+      if(!isTRUE(subset)) {
+        subset_reg_by_group = vector("list", length(unique(coord_subset)))
+        for(s in seq_along(unique(coord_subset))) {
+          subdex = which(coord_subset == unique(coord_subset)[[s]])
           sub_data = list(coords = coords[subdex,,], Size,
                           Group = na.omit(Groups[[j]])[[1]][index])
-          subset_reg_by_group[[s]] <- summary(procD.lm(coords ~ log(Size), data = sub_data))
-          names(subset_reg_by_group)[s] <- paste(names(Groups)[j], ".", unique(subset)[s], sep = "")
+          subset_reg_by_group[[s]]$summary <- summary(procD.lm(coords ~ log(Size), data = sub_data))
+          names(subset_reg_by_group)[s] <- paste(names(Groups)[j], ".", unique(coord_subset)[s], sep = "")
         }
       }
       big = which(data.frame(r.pred$X)[4] == max(data.frame(r.pred$X)[4]))
@@ -353,79 +363,66 @@ ASCG <- function(GMA_object,
       allo.shape = lapply(allo.list, function(x) { array(x, dim = c(dim(x)[1], dim(x)[2], 1)) })
 
       allo.shape = lolshape(allo.shape, ID = c(paste("Large Ind:", big), paste("Small Ind:", small)), color = color,
-                              title = paste("Allometric Shape Changes", ".", names(Groups[[j]])), subset = subset)
+                              title = paste("Allometric Shape Changes", ".", names(Groups[[j]])), subset = coord_subset)
+
 
       if(isTRUE(save_plots)) {
 
         saveWidget(allo.shape, paste("Allometric Shape Changes_", names(Groups)[j], ".html", sep = ""), selfcontained = TRUE)
       }
     }
-    if(!is.null(subset)) {
-      return(list(reg_by_group = reg_by_group, subset_reg_by_group = subset_reg_by_group))
+    if(!isTRUE(subset)) {
+      return(list(shape = allo.shape, reg_by_group = reg_by_group, subset_reg_by_group = subset_reg_by_group))
     } else {
-      return(list(reg_by_group = reg_by_group))
+      return(list(shape = allo.shape, reg_by_group = reg_by_group))
     }
   } # end of j foreach parallel loop
   closeAllConnections()
   #___________________________________________________________________________
-  place = list()
-  for(a in 1:nrow(allo.parallel)) {
-    place[[a]] <- allo.parallel[a,1]
-    #place[[a]] <- unlist(place[[a]], recursive = FALSE)
-    place[[a]] <- Filter(function(x) !is.null(x), place[[a]])
-    place[[a]][[1]] <- Filter(function(x) !is.null(x), place[[a]][[1]])
-    #place[[a]][[1]] <- unlist(place[[a]][[1]], recursive = FALSE)
-    # place[[a]][[1]] <- place[[a]][[1]][class(place[[a]][[1]]) %in% "anova"]
-    place[[a]] <- place[[a]][[1]]
-    names(place)[a] <- names(Groups[[a]])
-  }
-  for(a in seq_along(place)) {
-    for(b in seq_along(place[[a]])) {
-      names(place[[a]])[b] <- names(place[[a]][[b]])[1]
-      place[[a]][[b]] <- place[[a]][[b]][[1]]
-    }
-  }
 
-  names(place) <- names(Groups)
 
-  if(!is.null(subset)) {
+  process_parallel_results <- function(parallel_results) {
 
-    place2 = list()
-    for(a in 1:nrow(allo.parallel)) {
-      place2[[a]] <- allo.parallel[a,2]
-      #place2[[a]] <- unlist(place2[[a]], recursive = FALSE)
-      place2[[a]] <- Filter(function(x) !is.null(x), place2[[a]])
-      place2[[a]][[1]] <- Filter(function(x) !is.null(x), place2[[a]][[1]])
-      #place2[[a]][[1]] <- unlist(place2[[a]][[1]], recursive = FALSE)
-      # place2[[a]][[1]] <- place2[[a]][[1]][class(place2[[a]][[1]]) %in% "anova"]
-      place2[[a]] <- place2[[a]][[1]]
-      names(place2)[a] <- names(Groups[[a]])
-
-    }
-    for(a in seq_along(place2)) {
-      for(b in seq_along(place2[[a]])) {
-        place2[[a]][[b]] <- Filter(function(x) !is.null(x), place2[[a]][[b]])
-        names(place2[[a]])[b] <- names(place2[[a]][[b]])[1]
-        place2[[a]][[b]] <- place2[[a]][[b]][[1]]
+    shapes <- lapply(parallel_results, function(result) {
+      if (is.list(result) && "shape" %in% names(result)) {
+        return(result$shape)
       }
-    }
-    for(a in seq_along(place2)) {
-      for(b in seq_along(place2[[a]])) {
-        names(place2[[a]])[b] <- names(place2[[a]][[b]])[1]
-        place2[[a]][[b]] <- place2[[a]][[b]][[1]]
-      }
-    }
+      return(NULL)
+    })
+    shapes <- Filter(Negate(is.null), shapes)
 
-    names(place2) <- names(Groups)
-
-    for(j in seq_along(Groups)) {
-      for(s in seq_along(subset)) {
-        names(place2)[j] <- na.omit(unique(Groups[[j]]))[s]
+    reg_by_group <- lapply(parallel_results, function(result) {
+      if (is.list(result) && "reg_by_group" %in% names(result)) {
+        return(result$reg_by_group)
       }
-    }
+      return(NULL)
+    })
+    reg_by_group <- Filter(Negate(is.null), reg_by_group)
+
+    subset_reg_by_group <- lapply(parallel_results, function(result) {
+      if (is.list(result) && "subset_reg_by_group" %in% names(result)) {
+        return(result$subset_reg_by_group)
+      }
+      return(NULL)
+    })
+    subset_reg_by_group <- Filter(Negate(is.null), subset_reg_by_group)
+
+    return(list(
+      shape = shapes,
+      reg_by_group = reg_by_group,
+      subset_reg_by_group = subset_reg_by_group
+    ))
   }
-  regressions$Group <- place
-  regressions$Subsetted_Group <- place2
+
+  results <- process_parallel_results(allo.parallel)
+
+  regressions$Group_shape <- results$shape
+  regressions$Group_stats <- results$reg_by_group
+  regressions$Group_subset_stats <- results$subset_reg_by_group
+  if(isTRUE(include_whole)) {
+    regressions$whole_shape <- Size.Shape
+  }
+
   #_____________________________________________________________________________
   setwd(Dir)
   return(regressions)
