@@ -123,7 +123,7 @@ output <- GMA(Corpus_Land,  # Complete landmark configuration
 output$morphotree$resid$k_medoid_plot
 
 #view the agglomerative cluster plot
-output$morphotree$resid$agg_plot
+do.call(ape::plot.phylo, output$morphotree$resid$agg_plot$Collection)
 ```
 
 ### View Weighted PCA plots of Procrustes Landmarks

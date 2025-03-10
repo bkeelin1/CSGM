@@ -73,7 +73,7 @@
 #' @importFrom pvclust pvclust
 #' @importFrom RColorBrewer brewer.pal
 #' @importFrom factoextra fviz_cluster
-#' @importFrom grDevices png dev.off
+#' @importFrom grDevices png dev.off recordPlot
 #' @importFrom ape as.phylo plot.phylo Ntip Nnode
 #' @importFrom geomorph two.d.array gm.prcomp
 #' @importFrom ggpubr theme_pubclean
@@ -171,6 +171,8 @@ CAV <- function(Data,
                           .[intersect(names(.), dt_params)]
     Euc_dist = do.call(DT,dt_parameters)$Predictor
   }
+
+  Euc_dist = as.dist(Euc_dist)
 
   # Hierarchical Cluster Generation
   m <- c( "average", "single", "complete", "ward", "weighted")
@@ -302,13 +304,13 @@ CAV <- function(Data,
         graphics.off()
       }
 
-      agg_fan_plot[[i]] <- plot(dendro,
-                                edge.color = edge_colors,
-                                tip.color = Group_col,
-                                edge.width = 3,
-                                cex = 0.7,
-                                type = "fan",
-                                main = "Fan of Morphometric Shape Distances")
+      agg_fan_plot[[i]] <- list(x = dendro,
+                            edge.color = edge_colors,
+                            tip.color = Group_col,
+                            edge.width = 3,
+                            cex = 0.7,
+                            type = "fan",
+                            main = "Fan of Morphometric Shape Distances")
 
       fan_plot_path <- paste0(Directory,"/plot_fan_", group_name, ".png", sep = "")
 

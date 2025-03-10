@@ -266,6 +266,7 @@ DT <- function(Response = NULL,
             } # end of mahalanobis distances
 
             if(method != "procdist" & method != "mahalanobis") {
+              Dataset = data.frame(geomorph::two.d.array(Dataset))
               Euc_dist = vegdist(Dataset, method = method)
               Dataset_dist = Euc_dist
               Dataset = as.dist(Dataset_dist)
@@ -344,7 +345,7 @@ DT <- function(Response = NULL,
           } else if (startsWith(transform, "bgpca")) {
             #print(paste("Dataset transformation of 3D array data via BGPCA of data selected."))
 
-            Dataset = data.frame(two.d.array(Dataset))
+            Dataset = data.frame(geomorph::two.d.array(Dataset))
             Res_o = Dataset
             Res_dim = dim(Dataset)[2]
             Res_p = dim(Dataset)[1]
