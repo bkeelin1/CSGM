@@ -14,6 +14,7 @@ The CSGM package offers an innovative and comprehensive toolkit to automate an e
 
 ## NOTE: Due to dependency issues, you will need to install additional packages prior to installing CSGM. Please copy and paste these lines of code to install these necessary packages:
 
+```{r}
 **if (!requireNamespace("BiocManager", quietly = TRUE))
 install.packages("BiocManager")**
 
@@ -22,20 +23,21 @@ BiocManager::install("BiocParallel")
 BiocManager::install("mixOmics")
 
 install.packages("devtools")
-
----
-
-## Install the CSGM package from GitHub! :D
-
-```{r}
-devtools::install_github("bkeelin1/CSGM", build_vignettes = TRUE)
 ```
 
-## You can also follow along and use this README through the vignette CSGM-Workflow
+## Now Install the CSGM package from GitHub! :D
+
+```{r}
+devtools::install_github("bkeelin1/CSGM", build_vignettes = TRUE, dependencies = TRUE)
+```
+
+## Follow along in RStudio or Posit Cloud and use this README through the vignette CSGM-Workflow
 
 ```{r}
 vignette("CSGM-Workflow", package = "CSGM")
 ```
+
+---
 
 # Visualizing the CSGM Workflow
 
