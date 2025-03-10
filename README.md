@@ -10,7 +10,7 @@ The CSGM package offers an innovative and comprehensive toolkit to automate an e
 
 # [Installation Instructions:]{.underline} 
 
-## NOTE: If you do not have BiocManager or mixOmics on your R system, please install them following these codes. These are necessary for the package.
+## NOTE: Due to dependency issues, you will need to install additional packages prior to installing CSGM. Please copy and paste these lines of code to install these necessary packages:
 
 **if (!requireNamespace("BiocManager", quietly = TRUE))
 install.packages("BiocManager")**
