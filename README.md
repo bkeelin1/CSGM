@@ -1,16 +1,45 @@
----
---- title: "CSGM-Workflow" author: "Brian Anthony Keeling" date: "2025-01-31" output: rmarkdown::html_vignette vignette: >   %\VignetteIndexEntry{CSGM-Workflow}   %\VignetteEngine{knitr::rmarkdown}   %\VignetteEncoding{UTF-8} ---
+# *CSGM* - A Toolkit to Conduct Cross-Sectional Geometric Morphometric Analyses
+
+## 
+
+## Description
+
+Cross-sectional geometric morphometrics (CSGM) is an interdisciplinary method in biological anthropology to study the relationships between shape and biomechanical function in contexts such as developmental biology, behavioral plasticity, and evolutionary morphology. As such, CSGM research compares complex, multidimensional shape data from multiple skeletal regions to multivariate, and often multicollinear, biomechanical variables. Thus, we developed the CSGM package in R to provide a statistically holistic framework and rigorous hypothesis model testing approach to facilitate a complete statistical data analysis of biological data. 
+
+The CSGM package offers an innovative and comprehensive toolkit to automate an entire geometric morphometric and biological analysis from start to finish. This package addresses the data complexity issues within CSGM studies which often require repetitive analyses and inter/intra-bone analyses by providing a holistic statistical approach to functionally test hypotheses and analyze complex multivariate data with only a few functions. This multimodal approach combines geometric morphometric analysis, correlation, covariation, and regression analyses to offer novel insights into the relationships between complex geometric and biological data. By applying a hypothesis model approach, the CSGM package allows researchers to organize multiple hypothesis testing across multivariate dataset comparisons. The functions within this package also offer accessible and interactive visualizations to easily interpret data relationships. Therefore, this package offers numerous ways to accessibly study geometric morphometrics and interpret complex data relationships needed to answer complex questions in human biology.
+
+# [Installation Instructions:]{.underline} 
+
+## NOTE: If you do not have BiocManager or mixOmics on your R system, please install them following these codes. These are necessary for the package.
+
+**if (!requireNamespace("BiocManager", quietly = TRUE))
+install.packages("BiocManager")**
+
+BiocManager::install("BiocParallel")
+
+BiocManager::install("mixOmics")
+
+install.packages("devtools")
+
 ---
 
-```{r setup, include=FALSE} knitr::opts_chunk$set(echo = TRUE)}
+## Install the CSGM package from GitHub! :D
+
+```{r}
+devtools::install_github("bkeelin1/CSGM", build_vignettes = TRUE)
+```
+
+## You can also follow along and use this README through the vignette CSGM-Workflow
+
+```{r}
+vignette("CSGM-Workflow", package = "CSGM")
 ```
 
 # Visualizing the CSGM Workflow
 
-![CSGM Workflow](vignettes/images/CSGM_Workflow.png){alt="CSGM Workflow"}
+![Standard workflow for using the CSGM package. This workflow can be categorized in four phases: data importing and transformations, exploratory data analysis, hypothesis testing, and summarizing as well as interpreting the results. ](vignettes/images/CSGM_Workflow.png){alt="CSGM Workflow"}
 
 ```{r}
-
 library(CSGM)
 ```
 
