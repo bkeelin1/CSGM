@@ -175,21 +175,21 @@ CAV <- function(Data,
   # Hierarchical Cluster Generation
   m <- c( "average", "single", "complete", "ward", "weighted")
   names(m) <- c("average", "single", "complete", "ward.D2", "mcquitty")
-  ac <- function(x) {agnes(Euc_dist, method = x)$ac}
+  ac <- function(x) {cluster::agnes(Euc_dist, method = x)$ac}
   models = purrr::map_dbl(m, ac)
   choice <- names(which.max(models))
-  clust = pvclust(as.matrix(Euc_dist), method.hclust = choice, weight = TRUE,
+  clust = pvclust::pvclust(as.matrix(Euc_dist), method.hclust = choice, weight = TRUE,
                   nboot = nboot, parallel=parallel, iseed=1, quiet=TRUE)
 
   # K-Medoids Cluster Generation
   kchoice = c(1,2,3,4,5,6,7,8,9,10)
   for(k in 2:10) {
-    pam_clust = pam(Euc_dist, k = k, metric = method, nstart = 25, pamonce = TRUE, diss = TRUE)
+    pam_clust = cluster::pam(Euc_dist, k = k, metric = method, nstart = 25, pamonce = TRUE, diss = TRUE)
     pam_clust$data <- as.matrix(Euc_dist)
     kchoice[k] = pam_clust$silinfo$avg.width
   }
   kchoice = which.max(kchoice)
-  pam_clust = pam(Euc_dist, k = kchoice, metric = method, nstart = 25, pamonce = TRUE, diss = TRUE)
+  pam_clust = cluster::pam(Euc_dist, k = kchoice, metric = method, nstart = 25, pamonce = TRUE, diss = TRUE)
   pam_clust$data <- as.matrix(Euc_dist)
 
   hclust = clust$hclust
