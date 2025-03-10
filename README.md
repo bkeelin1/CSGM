@@ -1,6 +1,6 @@
 # *CSGM* - A Toolkit to Conduct Cross-Sectional Geometric Morphometric Analyses
 
-## 
+
 
 ## Description
 
@@ -8,10 +8,13 @@ Cross-sectional geometric morphometrics (CSGM) is an interdisciplinary method in
 
 The CSGM package offers an innovative and comprehensive toolkit to automate an entire geometric morphometric and biological analysis from start to finish. This package addresses the data complexity issues within CSGM studies which often require repetitive analyses and inter/intra-bone analyses by providing a holistic statistical approach to functionally test hypotheses and analyze complex multivariate data with only a few functions. This multimodal approach combines geometric morphometric analysis, correlation, covariation, and regression analyses to offer novel insights into the relationships between complex geometric and biological data. By applying a hypothesis model approach, the CSGM package allows researchers to organize multiple hypothesis testing across multivariate dataset comparisons. The functions within this package also offer accessible and interactive visualizations to easily interpret data relationships. Therefore, this package offers numerous ways to accessibly study geometric morphometrics and interpret complex data relationships needed to answer complex questions in human biology.
 
-# [Installation Instructions:]{.underline} 
+# Installation Instructions:
+
+---
 
 ## NOTE: Due to dependency issues, you will need to install additional packages prior to installing CSGM. Please copy and paste these lines of code to install these necessary packages:
 
+```{r}
 **if (!requireNamespace("BiocManager", quietly = TRUE))
 install.packages("BiocManager")**
 
@@ -20,20 +23,21 @@ BiocManager::install("BiocParallel")
 BiocManager::install("mixOmics")
 
 install.packages("devtools")
-
----
-
-## Install the CSGM package from GitHub! :D
-
-```{r}
-devtools::install_github("bkeelin1/CSGM", build_vignettes = TRUE)
 ```
 
-## You can also follow along and use this README through the vignette CSGM-Workflow
+## Now Install the CSGM package from GitHub! :D
+
+```{r}
+devtools::install_github("bkeelin1/CSGM", build_vignettes = TRUE, dependencies = TRUE)
+```
+
+## Follow along in RStudio or Posit Cloud and use this README through the vignette CSGM-Workflow
 
 ```{r}
 vignette("CSGM-Workflow", package = "CSGM")
 ```
+
+---
 
 # Visualizing the CSGM Workflow
 
