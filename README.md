@@ -22,9 +22,13 @@ NOTE: Do **NOT** Update Rvcg to version 0.25 as this version is currently bugged
 
 ```{r}
 # NOTE: DO NOT UPDATE Rvcg package to version 0.25 unless you already have it!
-
 install.packages("BiocManager") # To install Bio Manager package
+```
 
+```{r}
+# NOTE: DO NOT UPDATE Rvcg package to version 0.25 unless you already have it!
+
+# Type n and click enter to not update Rvcg to version 0.25
 BiocManager::install("BiocParallel") # To install required dependency 1
 
 BiocManager::install("mixOmics") # To install required dependency 2
