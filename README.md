@@ -13,14 +13,13 @@ The CSGM package offers an innovative and comprehensive toolkit to automate an e
 ## NOTE: Due to dependency issues, you will need to install additional packages prior to installing CSGM. Please copy and paste these lines of code to install these necessary packages:
 
 ```{r}
-**if (!requireNamespace("BiocManager", quietly = TRUE))
-install.packages("BiocManager")**
+install.packages("devtools") # to install GitHub packages
 
-BiocManager::install("BiocParallel")
+install.packages("BiocManager") # To install Bio Manager package
 
-BiocManager::install("mixOmics")
+BiocManager::install("BiocParallel") # To install required dependency 1
 
-install.packages("devtools")
+BiocManager::install("mixOmics") # To install required dependency 2
 ```
 
 ## Now Install the CSGM package from GitHub! :D
