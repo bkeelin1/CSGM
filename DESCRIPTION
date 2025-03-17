@@ -19,7 +19,7 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Imports:
     Imports:
-    ade4 (>= 1.7),
+    ade4 (>= 1.7.23),
     ape,
     BiocParallel (>= 1.38.0),
     BiocManager,

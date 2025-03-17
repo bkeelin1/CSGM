@@ -15,6 +15,8 @@ The CSGM package offers an innovative and comprehensive toolkit to automate an e
 ```{r}
 install.packages("devtools") # to install GitHub packages
 
+install.packages("ade4") # Package needed for Data Transformation
+
 install.packages("BiocManager") # To install Bio Manager package
 
 BiocManager::install("BiocParallel") # To install required dependency 1
