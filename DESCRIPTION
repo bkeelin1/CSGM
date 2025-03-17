@@ -58,7 +58,7 @@ Imports:
     randomForest,
     RColorBrewer,
     readr,
-    Rvcg,
+    Rvcg (>= 0.24),
     stats,
     stringr,
     tidyr,
