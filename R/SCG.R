@@ -165,7 +165,7 @@ SCG <- function(Data,
         split_groups[[g]] <- array(split_groups[[g]], dim = c(dim(split_groups[[g]])[1], dim(split_groups[[g]])[2], 1))
         if(!is.null(Mesh)) {
           shape = warpRefMesh(Center, split_groups[[g]], mesh = Mesh)
-          mesh2ply(shape, filename = paste(dif_groups[g], "_Shape_", names(Group[[j]]), ".ply", sep = ""))
+          Morpho::mesh2ply(shape, filename = paste(dif_groups[g], "_Shape_", names(Group[[j]]), ".ply", sep = ""))
         }
       }
     } else {
@@ -179,9 +179,9 @@ SCG <- function(Data,
       })
       if(!is.null(Mesh)) {
         min.shape = warpRefMesh(Center, split_groups$Min, mesh = Mesh)
-        mesh2ply(min.shape, filename = paste("Min", "_Shape_", names(Group[[j]]), ".ply", sep = ""))
+        Morpho::mesh2ply(min.shape, filename = paste("Min", "_Shape_", names(Group[[j]]), ".ply", sep = ""))
         max.shape = warpRefMesh(Center, split_groups$Max, mesh = Mesh)
-        mesh2ply(max.shape, filename = paste("Max", "_Shape_", names(Group[[j]]), ".ply", sep = ""))
+        Morpho::mesh2ply(max.shape, filename = paste("Max", "_Shape_", names(Group[[j]]), ".ply", sep = ""))
       }
     }
     Group_shapes[[j]] <- lolshape(split_groups, ID = dif_groups, coord_name = coord_name, color = color,

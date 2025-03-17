@@ -112,9 +112,9 @@
 #' @seealso \code{\link{plotly}} \code{\link{gpagen}} \code{\link{GMA}}
 #'
 #' @importFrom geomorph gpagen arrayspecs mshape warpRefMesh procD.lm
-#' @importFrom Morpho mesh2ply
 #' @importFrom grDevices png dev.off
 #' @importFrom htmlwidgets saveWidget
+#' @importFrom Morpho mesh2ply
 #' @importFrom foreach foreach %dopar%
 #' @importFrom parallel detectCores
 #' @importFrom dplyr %>%
@@ -234,11 +234,11 @@ ASCG <- function(GMA_object,
 
     if(!is.null(Mesh)) {
       big.shape = warpRefMesh(Center, allo.shape$Big, mesh = Mesh)
-      mesh2ply(big.shape, filename = paste("Large Ind", "_Allometric Shape Change", ".ply", sep = ""))
+      Morpho::mesh2ply(big.shape, filename = paste("Large Ind", "_Allometric Shape Change", ".ply", sep = ""))
       graphics.off()
       rm(big.shape)
       small.shape = warpRefMesh(Center, allo.shape$Small, mesh = Mesh)
-      mesh2ply(small.shape, filename = paste("Small Ind", "_Allometric Shape Change", ".ply", sep = ""))
+      Morpho::mesh2ply(small.shape, filename = paste("Small Ind", "_Allometric Shape Change", ".ply", sep = ""))
       graphics.off()
       rm(small.shape)
     }
@@ -303,10 +303,10 @@ ASCG <- function(GMA_object,
 
         if(!is.null(Mesh)) {
           big.shape = warpRefMesh(Mesh, Center, allo.list$big)
-          mesh2ply(big.shape, filename = paste("Large Ind", "_Allo Shape_", names(Groups)[j],"_",name,".ply", sep = ""))
+          Morpho::mesh2ply(big.shape, filename = paste("Large Ind", "_Allo Shape_", names(Groups)[j],"_",name,".ply", sep = ""))
           graphics.off()
           small.shape = warpRefMesh(Mesh, Center, allo.list$small)
-          mesh2ply(small.shape, filename = paste("Small Ind", "_Allo Shape_", names(Groups)[j],"_",name,".ply", sep = ""))
+          Morpho::mesh2ply(small.shape, filename = paste("Small Ind", "_Allo Shape_", names(Groups)[j],"_",name,".ply", sep = ""))
           graphics.off()
         }
 
@@ -353,10 +353,10 @@ ASCG <- function(GMA_object,
 
       if(!is.null(Mesh)) {
         big.shape = warpRefMesh(Mesh, Center, allo.list$big)
-        mesh2ply(big.shape, filename = paste("Large Ind", "_Allo Shape_", names(Groups)[j], ".ply", sep = ""))
+        Morpho::mesh2ply(big.shape, filename = paste("Large Ind", "_Allo Shape_", names(Groups)[j], ".ply", sep = ""))
         graphics.off()
         small.shape = warpRefMesh(Mesh, Center, allo.list$small)
-        mesh2ply(small.shape, filename = paste("Small Ind", "_Allo Shape_", names(Groups)[j], ".ply", sep = ""))
+        Morpho::mesh2ply(small.shape, filename = paste("Small Ind", "_Allo Shape_", names(Groups)[j], ".ply", sep = ""))
         graphics.off()
       }
 
