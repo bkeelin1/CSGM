@@ -15,7 +15,7 @@ The CSGM package offers an innovative and comprehensive toolkit to automate an e
 ```{r}
 install.packages("devtools") # to install GitHub packages
 
-install.packages("ade4") # Package needed for Data Transformation
+remotes::install_version("Rvcg", version = "0.24") # new V.25 is bugged with Linux
 
 install.packages("BiocManager") # To install Bio Manager package
 
