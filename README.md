@@ -10,12 +10,18 @@ The CSGM package offers an innovative and comprehensive toolkit to automate an e
 
 ------------------------------------------------------------------------
 
-## NOTE: Due to dependency issues, you will need to install additional packages prior to installing CSGM. Please copy and paste these lines of code to install these necessary packages:
+## NOTE: Due to dependency concerns, you will need to install additional packages prior to installing CSGM. Please copy and paste these lines of code to install these necessary packages:
 
 ```{r}
 install.packages("devtools") # to install GitHub packages
 
 remotes::install_version("Rvcg", version = "0.24") # new V.25 is bugged with Linux
+```
+
+NOTE: Do **NOT** Update Rvcg to version 0.25 as this version is currently bugged at installation. When asked by BiocParallel and mixOmics to update the package, type the "n" key for "none/no update" and hit enter.
+
+```{r}
+# NOTE: DO NOT UPDATE Rvcg package to version 0.25 unless you already have it!
 
 install.packages("BiocManager") # To install Bio Manager package
 
