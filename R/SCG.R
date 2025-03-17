@@ -64,7 +64,6 @@
 #' @seealso [plotly() warpRefMesh()]
 #'
 #' @importFrom geomorph mshape warpRefMesh arrayspecs
-#' @importFrom Morpho mesh2ply
 #' @importFrom htmlwidgets saveWidget
 #' @importFrom dplyr filter
 #' @importFrom stats na.omit

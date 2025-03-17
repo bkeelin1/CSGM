@@ -114,7 +114,6 @@
 #' @importFrom geomorph gpagen arrayspecs mshape warpRefMesh procD.lm
 #' @importFrom grDevices png dev.off
 #' @importFrom htmlwidgets saveWidget
-#' @importFrom Morpho mesh2ply
 #' @importFrom foreach foreach %dopar%
 #' @importFrom parallel detectCores
 #' @importFrom dplyr %>%

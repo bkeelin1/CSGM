@@ -59,6 +59,7 @@ Imports:
     RColorBrewer,
     readr,
     readxl,
+    Rvcg (== 0.24),
     stats,
     stringr,
     tidyr,
