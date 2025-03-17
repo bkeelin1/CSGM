@@ -67,7 +67,6 @@ Imports:
     writexl
 Suggests:
     testthat (>= 3.0.0),
-    Rvcg,
     knitr,
     rmarkdown
 Config/testthat/edition: 3
