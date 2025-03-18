@@ -20,15 +20,15 @@ remotes::install_version("Rvcg", version = "0.24") # new V.25 is bugged with Lin
 
 NOTE: Do **NOT** Update Rvcg to version 0.25 as this version is currently bugged at installation. When asked by BiocParallel and mixOmics to update the package, type the "n" key for "none/no update" and hit enter.
 
+g package to version 0.25 unless you already have it!
+
 ```{r}
-# NOTE: DO NOT UPDATE Rvcg package to version 0.25 unless you already have it!
+#NOTE: Be sure to update your R packages prior to installation!
 install.packages("BiocManager") # To install Bio Manager package
 ```
 
 ```{r}
-# NOTE: DO NOT UPDATE Rvcg package to version 0.25 unless you already have it!
-
-# Type n and click enter to not update Rvcg to version 0.25
+#NOTE: Be sure to update your R packages prior to installation!
 BiocManager::install("BiocParallel") # To install required dependency 1
 
 BiocManager::install("mixOmics") # To install required dependency 2
@@ -37,7 +37,9 @@ BiocManager::install("mixOmics") # To install required dependency 2
 ## Now Install the CSGM package from GitHub! :D
 
 ```{r}
-devtools::install_github("bkeelin1/CSGM", build_vignettes = TRUE, dependencies = TRUE)
+devtools::install_github("bkeelin1/CSGM", # The GitHub Location
+                         build_vignettes = TRUE, # To have the package vignette
+                         dependencies = TRUE) # To install all dependencies
 ```
 
 ## Follow along in RStudio or Posit Cloud and use this README through the vignette CSGM-Workflow
