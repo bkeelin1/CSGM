@@ -14,13 +14,7 @@ The CSGM package offers an innovative and comprehensive toolkit to automate an e
 
 ```{r}
 install.packages("devtools") # to install GitHub packages
-
-remotes::install_version("Rvcg", version = "0.24") # new V.25 is bugged with Linux
 ```
-
-NOTE: Do **NOT** Update Rvcg to version 0.25 as this version is currently bugged at installation. When asked by BiocParallel and mixOmics to update the package, type the "n" key for "none/no update" and hit enter.
-
-g package to version 0.25 unless you already have it!
 
 ```{r}
 #NOTE: Be sure to update your R packages prior to installation!
