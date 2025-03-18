@@ -26,8 +26,8 @@
 #' Please see the *vegdist* "method" argument from the **vegan** package for more
 #' details.
 #'
-#' @param ... Optional arguments to be passed into the Predictor arguments for the \link{\code{DT}}
-#' function. This is used to create distance matrices for the analysis.
+#' @param ... Optional arguments to be passed into the Predictor arguments for the
+#' \code{DT} function. This is used to create distance matrices for the analysis.
 #'
 #' @details This function accepts a data table and from it generates a distance matrix.
 #' A variety of standardized methods for distance matrix calculation are avaialble

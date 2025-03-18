@@ -39,8 +39,8 @@ should be applied on the data. Options include: "manhattan",
 Please see the \emph{vegdist} "method" argument from the \strong{vegan} package for more
 details.}
 
-\item{...}{Optional arguments to be passed into the Predictor arguments for the \link{\code{DT}}
-function. This is used to create distance matrices for the analysis.}
+\item{...}{Optional arguments to be passed into the Predictor arguments for the
+\code{DT} function. This is used to create distance matrices for the analysis.}
 }
 \value{
 a list object of the following:
