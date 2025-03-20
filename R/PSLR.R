@@ -430,24 +430,24 @@ PSLR <- function(Models,
                                                          Res_point_set = point_set[[m]][[i]][[1]][[p_subset[j,1]]],
                                                          Pred_point_set = point_set[[m]][[i]][[2]][[p_subset[j,2]]]))
 
-          Response = do.call(DT, dt_parameters)$Response
+          Response <<- do.call(DT, dt_parameters)$Response
           if(length(dim(Response)) != 3){
-            Response = as.matrix.data.frame(Response)
+            Response <<- as.matrix.data.frame(Response)
           }
 
-          Predictor = do.call(DT, dt_parameters)$Predictor
+          Predictor <<- do.call(DT, dt_parameters)$Predictor
           if(length(dim(Predictor)) != 3){
-            Predictor = as.matrix.data.frame(Predictor)
+            Predictor <<- as.matrix.data.frame(Predictor)
           }
 
           if(!is.null(subset_vips)) {
-            Predictor = as.matrix.data.frame(if(length(dim(Predictor)) == 3) Predictor[subset_vips[[m]][[i]][[j]],,] else Predictor[,subset_vips[[m]][[i]][[j]]])
+            Predictor <<- as.matrix.data.frame(if(length(dim(Predictor)) == 3) Predictor[subset_vips[[m]][[i]][[j]],,] else Predictor[,subset_vips[[m]][[i]][[j]]])
           }
 
           pslr.results[[i]][[j]]$summary <- data.frame(suppressWarnings(tryCatch({base::summary(geomorph::procD.lm(Response ~ Predictor,
                                                                                                         Parallel = TRUE, iter = 1000, RRPP = TRUE))$table},
                                                                                       error = function(e) {
-                                                                                        Predictor = as.matrix.data.frame(geomorph::gm.prcomp(Predictor)$x)
+                                                                                        Predictor <<- as.matrix.data.frame(geomorph::gm.prcomp(Predictor)$x)
 
                                                                                         base::summary(geomorph::procD.lm(Response ~ Predictor, Parallel = TRUE, iter = 1000,
                                                                                                                              RRPP = TRUE))$table
@@ -465,23 +465,23 @@ PSLR <- function(Models,
                                                      Res_point_set = NULL,
                                                      Pred_point_set = NULL))
 
-      Response = do.call(DT, dt_parameters)$Response
+      Response <<- do.call(DT, dt_parameters)$Response
       if(length(dim(Response)) != 3){
-        Response = as.matrix.data.frame(Response)
+        Response <<- as.matrix.data.frame(Response)
       }
 
-      Predictor = do.call(DT, dt_parameters)$Predictor
+      Predictor <<- do.call(DT, dt_parameters)$Predictor
       if(length(dim(Predictor)) != 3){
-        Predictor = as.matrix.data.frame(Predictor)
+        Predictor <<- as.matrix.data.frame(Predictor)
       }
       if(!is.null(all_vips)) {
-        Predictor = as.matrix.data.frame(if(length(dim(Predictor)) == 3) Predictor[all_vips[[m]][[i]],,] else Predictor[,all_vips[[m]][[i]]])
+        Predictor <<- as.matrix.data.frame(if(length(dim(Predictor)) == 3) Predictor[all_vips[[m]][[i]],,] else Predictor[,all_vips[[m]][[i]]])
       }
 
       pslr.results.all[[i]]$summary <- data.frame(suppressWarnings(tryCatch({base::summary(geomorph::procD.lm(Response ~ Predictor,
                                                                                                    Parallel = TRUE, iter = 1000, RRPP = TRUE))$table},
                                                                                  error = function(e) {
-                                                                                   Predictor = as.matrix.data.frame(geomorph::gm.prcomp(Predictor)$x)
+                                                                                   Predictor <<- as.matrix.data.frame(geomorph::gm.prcomp(Predictor)$x)
 
                                                                                    base::summary(geomorph::procD.lm(Response ~ Predictor, Parallel = TRUE, iter = 1000,
                                                                                                     RRPP = TRUE))$table
