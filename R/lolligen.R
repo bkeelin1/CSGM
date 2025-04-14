@@ -241,16 +241,17 @@ lolligen <- function(Data_PCA,
       pc_sets$PC_3_4 <- list(pcs = c(3,4), min_dim = 4)
     }
 
-    # Generate remaining sets in groups of 3
-    for(i in seq(5, n_pcs, by = 1)) {
-      if(i <= n_pcs) {
-        # 3D plot for each group of 3
-        pc_sets[[paste0("PC_", i-2, "_", i-1, "_", i)]] <-
-          list(pcs = c(i-2, i-1, i), min_dim = i)
-
-        # 2D plot for final two PCs in group
-        pc_sets[[paste0("PC_", i-1, "_", i)]] <-
-          list(pcs = c(i-1, i), min_dim = i)
+    if(n_pcs >= 5) {     
+      for(i in seq(5, n_pcs, by = 1)) {
+        if(i <= n_pcs) {
+          # 3D plot for each group of 3
+          pc_sets[[paste0("PC_", i-2, "_", i-1, "_", i)]] <-
+            list(pcs = c(i-2, i-1, i), min_dim = i)
+  
+          # 2D plot for final two PCs in group
+          pc_sets[[paste0("PC_", i-1, "_", i)]] <-
+            list(pcs = c(i-1, i), min_dim = i)
+        }
       }
     }
     return(pc_sets)
