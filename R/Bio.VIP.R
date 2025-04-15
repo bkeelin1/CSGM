@@ -849,8 +849,8 @@ Bio.VIP <- function(Models = NULL,
 
         place.group.all = vector("list", length(plots.vip.all[[i]]$Response))
 
-        for(r in seq_along(place.group)) {
-          place.group[[r]] <- scores %>%
+        for(r in seq_along(place.group.all)) {
+          place.group.all[[r]] <- scores %>%
             filter(Response == paste("t", r, sep = "")) %>%
             mutate(Predictor = factor(Predictor, levels = unique(Predictor))) %>%
             ggplot(aes(x = Predictor, y = Score)) +
