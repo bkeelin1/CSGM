@@ -633,12 +633,14 @@ GMA <- function(Landmarks,
   GMA_Output$residuals = arrayspecs(resid_data$resid, dim(GPA_data$coords)[1], k)
 
   CAV_parameters = modifyList(CAV_parameters, list(Data = data.frame(resid_data$resid), Dir_name = "Procrustes Residuals", Pred_ncomp = Pred_ncomp))
+  
   cluster = tryCatch({do.call(CAV, CAV_parameters)}, 
              error = function (e) {
                tryCatch({
                  CAV_parameters = modifyList(CAV_parameters, list(Data = data.frame(geomorph::two.d.array(GPA_data$coords)), 
                                                                   Dir_name = "Procrustes Residuals", 
-                                                                  Pred_ncomp = Pred_ncomp), method = "euclidean")
+                                                                  Pred_ncomp = Pred_ncomp, method = "euclidean")
+                                             )
                  do.call(CAV,CAV_parameters)
                }, error = function (e) {
                 print("CAV Function Failed. Cannot perform cluster analysis with data that has a standard deviation of 0. Select different method")
