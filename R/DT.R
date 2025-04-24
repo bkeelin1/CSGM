@@ -425,7 +425,7 @@ DT <- function(Response = NULL,
               Euc_dist = vegdist(Dataset, method = method)
               Dataset_dist = Euc_dist
               Dataset = as.dist(Dataset_dist)
-              colnames(Dataset) <- paste(rep("Dist",ncol(Dataset)), rep(1:ncol(Dataset)), sep = ".")
+              #colnames(Dataset) <- paste(rep("Dist",ncol(Dataset)), rep(1:ncol(Dataset)), sep = ".")
             }
 
             if(method == "procdist") {
@@ -437,7 +437,7 @@ DT <- function(Response = NULL,
               colnames(Dataset) <- paste(rep("Dist",ncol(Dataset)), rep(1:ncol(Dataset)), sep = ".")
             } # end of procdist method
             scale = FALSE
-            colnames(Dataset) <- paste(rep("Dist",ncol(Dataset)), rep(1:ncol(Dataset)), sep = ".")
+            #colnames(Dataset) <- paste(rep("Dist",ncol(Dataset)), rep(1:ncol(Dataset)), sep = ".")
 
           } else if (endsWith(transform, "+pca")) {
             #print(paste("Dataset transformation via PCA of data selected."))
@@ -529,7 +529,7 @@ DT <- function(Response = NULL,
               Euc_dist = vegdist(Dataset, method = method)
               Dataset_dist = Euc_dist
               Dataset = as.dist(Dataset_dist)
-              colnames(Dataset) <- paste(rep("Dist",ncol(Dataset)), rep(1:ncol(Dataset)), sep = ".")
+              #colnames(Dataset) <- paste(rep("Dist",ncol(Dataset)), rep(1:ncol(Dataset)), sep = ".")
             }
 
             if(method == "procdist") {
@@ -629,7 +629,7 @@ DT <- function(Response = NULL,
               Euc_dist = vegdist(Dataset, method = method)
               Dataset_dist = Euc_dist
               Dataset = as.dist(Dataset_dist)
-              colnames(Dataset) <- paste(rep("Dist",ncol(Dataset)), rep(1:ncol(Dataset)), sep = ".")
+              #colnames(Dataset) <- paste(rep("Dist",ncol(Dataset)), rep(1:ncol(Dataset)), sep = ".")
             }
 
             if(method == "procdist") {
@@ -641,7 +641,7 @@ DT <- function(Response = NULL,
               colnames(Dataset) <- paste(rep("Dist",ncol(Dataset)), rep(1:ncol(Dataset)), sep = ".")
             } # end of procdist method
             scale = FALSE
-            colnames(Dataset) <- paste(rep("Dist",ncol(Dataset)), rep(1:ncol(Dataset)), sep = ".")
+            #colnames(Dataset) <- paste(rep("Dist",ncol(Dataset)), rep(1:ncol(Dataset)), sep = ".")
 
           } else if (endsWith(transform, "+pca")) {
             #print(paste("Dataset transformation via PCA of data selected."))
