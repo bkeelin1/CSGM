@@ -774,12 +774,14 @@ GMA <- function(Landmarks,
 
   calregs <- function(GPA_data) {
     output <- list()
-    GPA_data <<- GPA_data
-    size_formula <- as.formula("coords ~ log(Csize)")
-    output$Csize <- procD.lm(size_formula, data = GPA_data)
-    output$outliers <- unique(plotOutliers(GPA_data$coords, inspect.outliers = FALSE))
-    output$dimensions <- dim(GPA_data$coords)
-
+    tryCatch({
+      GPA_data <<- GPA_data
+      size_formula <- as.formula("coords ~ log(Csize)")
+      output$Csize <- procD.lm(size_formula, data = GPA_data)
+      output$outliers <- unique(plotOutliers(GPA_data$coords, inspect.outliers = FALSE))
+      output$dimensions <- dim(GPA_data$coords)
+      }, error = function (e) {print("Centroid Size is the same in all individuals after Procrustes Registration. Please check the nature of the data.")}
+    )
     return(output)
   }
 
