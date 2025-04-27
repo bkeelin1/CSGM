@@ -184,7 +184,8 @@ CAV <- function(Data,
                   nboot = nboot, parallel=parallel, iseed=1, quiet=TRUE)
 
   # K-Medoids Cluster Generation
-  kchoice = rep(0,10)
+  kchoice = numeric(10)
+  kchoice[1] = 0
   for(k in 2:10) {
     pam_clust = cluster::pam(Euc_dist, k = k, metric = method, nstart = 25, pamonce = TRUE, diss = TRUE)
     pam_clust$data <- as.matrix(Euc_dist)
@@ -207,7 +208,7 @@ CAV <- function(Data,
   cluster_plot_path <- paste(Directory,"/plot_cluster_", "K-medoids", ".png", sep = "")
   grDevices::png(cluster_plot_path, res = 600, width = 3840, height = 2160)
   # label used to be 8
-  print(factoextra::fviz_cluster(pam_clust, pointsize = 5, repel = TRUE, alpha = 0.6, label = ID, main = "Results of K-Medoids Cluster Analysis", ggtheme = ggpubr::theme_pubclean()))
+  print(factoextra::fviz_cluster(pam_clust, pointsize = 5, repel = TRUE, alpha = 0.6, label = 8, main = "Results of K-Medoids Cluster Analysis", ggtheme = ggpubr::theme_pubclean()))
   dev.off()
 
   # Plot Generation
