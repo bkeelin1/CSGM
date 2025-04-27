@@ -184,33 +184,42 @@ CAV <- function(Data,
                   nboot = nboot, parallel=parallel, iseed=1, quiet=TRUE)
 
   # K-Medoids Cluster Generation
-  kchoice = numeric(10)
-  kchoice[1] = 0
-  for(k in 2:10) {
-    pam_clust = cluster::pam(Euc_dist, k = k, metric = method, nstart = 25, pamonce = TRUE, diss = TRUE)
+  tryCatch({
+    if(length(ID) == 10) {
+      kchoice = numeric(9)
+    } else if (length(ID) < 10) {
+      kchoice = numeric(length(ID))
+    } else {
+      kchoice = numeric(10)
+    }
+  
+    for(k in 2:length(kchoice)) {
+      pam_clust = cluster::pam(Euc_dist, k = k, metric = method, nstart = 25, pamonce = TRUE, diss = TRUE)
+      pam_clust$data <- as.matrix(Euc_dist)
+      kchoice[k] = pam_clust$silinfo$avg.width
+    }
+    kchoice = which.max(kchoice)
+    pam_clust = cluster::pam(Euc_dist, k = kchoice, metric = method, nstart = 25, pamonce = TRUE, diss = TRUE)
     pam_clust$data <- as.matrix(Euc_dist)
-    kchoice[k] = pam_clust$silinfo$avg.width
-  }
-  kchoice = which.max(kchoice)
-  pam_clust = cluster::pam(Euc_dist, k = kchoice, metric = method, nstart = 25, pamonce = TRUE, diss = TRUE)
-  pam_clust$data <- as.matrix(Euc_dist)
-
-  hclust = clust$hclust
-  hclust$labels <- ID
-  dendro <- ape::as.phylo(hclust)
-
-  k_plot <- factoextra::fviz_cluster(pam_clust, pointsize = 5, repel = TRUE, alpha = 0.6, label = 8, main = "Results of K-Medoids Cluster Analysis", ggtheme = ggpubr::theme_pubclean())
-
-  if (length(dev.list()) > 0) {
-    graphics.off()
-  }
-
-  cluster_plot_path <- paste(Directory,"/plot_cluster_", "K-medoids", ".png", sep = "")
-  grDevices::png(cluster_plot_path, res = 600, width = 3840, height = 2160)
-  # label used to be 8
-  print(factoextra::fviz_cluster(pam_clust, pointsize = 5, repel = TRUE, alpha = 0.6, label = 8, main = "Results of K-Medoids Cluster Analysis", ggtheme = ggpubr::theme_pubclean()))
-  dev.off()
-
+  
+    hclust = clust$hclust
+    hclust$labels <- ID
+    dendro <- ape::as.phylo(hclust)
+  
+    k_plot <- factoextra::fviz_cluster(pam_clust, pointsize = 5, repel = TRUE, alpha = 0.6, label = 8, main = "Results of K-Medoids Cluster Analysis", ggtheme = ggpubr::theme_pubclean())
+  
+    if (length(dev.list()) > 0) {
+      graphics.off()
+    }
+    cluster_plot_path <- paste(Directory,"/plot_cluster_", "K-medoids", ".png", sep = "")
+    grDevices::png(cluster_plot_path, res = 600, width = 3840, height = 2160)
+    # label used to be 8
+    print(factoextra::fviz_cluster(pam_clust, pointsize = 5, repel = TRUE, alpha = 0.6, label = 8, main = "Results of K-Medoids Cluster Analysis", ggtheme = ggpubr::theme_pubclean()))
+    dev.off()
+  }, error = function(e) { 
+    print("PAM analysis cannot determine the number of clusters. Consider using another distance matrix and review the nature of your data.")
+  })
+  
   # Plot Generation
 
   if (class(Group) == "data.frame" || "data.frame" %in% class(Group)) {
