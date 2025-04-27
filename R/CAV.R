@@ -276,7 +276,7 @@ CAV <- function(Data,
         names(which.max(table(valid_colors)))  # Most common color
       }
 
-      colortree <- function(tree, Group_colors) {
+      colortree2 <- function(tree, Group_colors) {
         # Initialize edge colors based on tip colors provided by Group_colors
         edge_colors <- rep("black", nrow(tree$edge))
         tip_ids <- 1:Ntip(tree)
@@ -297,6 +297,42 @@ CAV <- function(Data,
         }
         return(edge_colors)
       }  # end of color tree function
+
+      colortree <- function(tree, Group_colors) {
+        # Get tip labels
+        tip_labels <- tree$tip.label
+        
+        # Initialize edge colors based on tip colors provided by Group_colors
+        edge_colors <- rep("black", nrow(tree$edge))
+        
+        # Map colors to tips based on their labels
+        for (i in 1:Ntip(tree)) {
+          if (i <= length(Group_colors)) {
+            # Find edges leading to tips
+            tip_edges <- which(tree$edge[,2] == i)
+            if (length(tip_edges) > 0) {
+              edge_colors[tip_edges] <- Group_colors[i]
+            }
+          }
+        }
+        
+        # Apply colors to internal nodes based on descendant tips
+        for (node in (Ntip(tree) + 1):(Ntip(tree) + Nnode(tree))) {
+          descendant_tips <- getAllDescendantTips(node, tree)
+          if (length(descendant_tips) > 0) {
+            tip_colors <- Group_colors[descendant_tips]
+            if (length(tip_colors) > 0) {
+              most_common_color <- names(which.max(table(tip_colors)))
+              parent_edges <- which(tree$edge[,2] == node)
+              if (length(parent_edges) > 0) {
+                edge_colors[parent_edges] <- most_common_color
+              }
+            }
+          }
+        }
+        
+        return(edge_colors)
+      }
 
       edge_colors <- colortree(dendro, Group_col)
 
