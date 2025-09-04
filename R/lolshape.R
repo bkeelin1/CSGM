@@ -49,8 +49,7 @@
 #'    if mesh = TRUE.
 #' }
 #'
-#' @author
-#' Brian Keeling
+#' @author Keeling et al., 2025
 #'
 #' @seealso [plotly()]
 #'
