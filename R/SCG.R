@@ -63,6 +63,8 @@
 #'
 #' @seealso [plotly() warpRefMesh()]
 #'
+#' @author Keeling et al., 2025
+#'
 #' @importFrom geomorph mshape warpRefMesh arrayspecs
 #' @importFrom htmlwidgets saveWidget
 #' @importFrom dplyr filter
