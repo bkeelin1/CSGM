@@ -63,8 +63,7 @@
 #'
 #' @seealso [mantel(), bilat.symmetry()]
 #'
-#' @author(s)
-#' Brian Keeling
+#' @author Keeling et al., 2025
 #'
 #' @importFrom geomorph bilat.symmetry
 #' @importFrom vegan mantel
