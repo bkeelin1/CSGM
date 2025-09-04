@@ -38,8 +38,7 @@
 #'    \item{center      consensus (center of PCA) shape as a 2D matrix}
 #' }
 #'
-#' @author
-#' Brian Anthony Keeling
+#' @author Keeling et al., 2025
 #'
 #' @seealso \code{\link{gm.prcomp}}
 #'
