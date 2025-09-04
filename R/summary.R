@@ -13,7 +13,7 @@
 #' \code{AABA.summary} specifically designed to extract relevant statistics for
 #' the \code{AABA} function.
 #'
-#' @author Brian Anthony Keeling
+#' @author Keeling et al., 2025
 #'
 #' @seealso \code{\link{AABA}} \code{\link{GMA}} \code{\link{pred}}
 #'
