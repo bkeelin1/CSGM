@@ -41,6 +41,8 @@
 #' @seealso
 #' \code{\link{landmarks_to_array}}
 #'
+#' @author Keeling et al., 2025
+#'
 #' @importFrom readr read_csv
 #' @importFrom stringr str_extract str_replace
 #' @importFrom dplyr filter mutate arrange group_by
