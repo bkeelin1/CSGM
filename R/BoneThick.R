@@ -30,7 +30,7 @@
 #' landmarks to calculate bone thicknesses. Landmarks should be converted either
 #' before the analysis or after to a millimeter scale to ensure meaningful results.
 #'
-#' @author Brian Anthony Keeling
+#' @author Keeling et al., 2025
 #'
 #' @export
 #'
