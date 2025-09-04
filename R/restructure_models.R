@@ -30,6 +30,8 @@
 #'
 #' @seealso [procD.lm() write_xlsx() AABV() PSLR()]
 #'
+#' @author Keeling et al., 2025
+#'
 #' @importFrom writexl write_xlsx
 #' @importFrom dplyr filter mutate
 #' @importFrom utils write.csv
