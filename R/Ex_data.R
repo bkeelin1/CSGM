@@ -17,6 +17,8 @@
 #' @importFrom dplyr select rename %>%
 #' @importFrom stats na.omit
 #'
+#' @author Keeling et al., 2025
+#'
 #' @export
 #'
 #' @examples
