@@ -33,8 +33,7 @@
 #'
 #' @returns a plotly object containing a plot with group convex hulls.
 #'
-#' @author(s)
-#' Brian Keeling
+#' @author Keeling et al., 2025
 #'
 #' @seealso [plotly() chull() convhulln()]
 #'
