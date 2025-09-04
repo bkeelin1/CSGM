@@ -39,7 +39,7 @@
 #' \code{\link[ade4]{dudi.pca}} for the original PCA implementation
 #' \code{\link[geomorph]{gm.prcomp}} for the geomorph PCA implementation
 #'
-#' @author Brian Anthony Keeling
+#' @author Keeling et al., 2025
 #'
 #' @keywords internal
 #'
@@ -119,7 +119,7 @@ dudi_to_gm <- function(dudi_pca) {
 #'
 #' @importFrom stats coefficients
 #'
-#' @author Brian Anthony Keeling
+#' @author Keeling et al., 2025
 #'
 #' @keywords internal
 #'
@@ -206,7 +206,7 @@ get_coef <- function(coefficients, Predictor_names) {
 #'
 #' \code{\link[stats]{factor}} for factor handling
 #'
-#' @author Brian Anthony Keeling
+#' @author Keeling et al., 2025
 #'
 #' @keywords internal
 #'
@@ -397,7 +397,7 @@ multivariate_confusion <- function(predicted, observed, by_variable = FALSE, var
 #' @importFrom plsdepot plsreg2
 #' @importFrom mixOmics spls
 #'
-#' @author Brian Anthony Keeling
+#' @author Keeling et al., 2025
 #'
 #' @keywords internal
 #'
@@ -474,7 +474,7 @@ reverse.model <- function(Models) {
 #' eigenvalues, eigenvectors, and center landmark configuration from a Principal
 #' Component Analysis.
 #'
-#' @author Brian Anthony Keeling
+#' @author Keeling et al., 2025
 #'
 #' @importFrom geomorph arrayspecs
 #'
@@ -566,7 +566,7 @@ pcland <- function(Res_pca_scores = NULL,
 #' rule of thumb as being greater than one (the latent variable block variable
 #' contribution exceeds the mean).
 #'
-#' @author Brian Anthony Keeling
+#' @author Keeling et al., 2025
 #'
 #' @importFrom dplyr filter group_by summarise %>%
 #'
@@ -675,7 +675,7 @@ trim_scores <- function(scores,
 #'
 #' @seealso \code{\link{Bio.VIP}} \code{\link{NComp}}
 #'
-#' @author Brian Anthony Keeling
+#' @author Keeling et al., 2025
 #'
 #' @importFrom pls mvr plsr coefplot scores loadings explvar
 #' @importFrom plsdepot plsreg2
@@ -1051,7 +1051,7 @@ plsr_stats <- function(plsr.results, ncomp, vip, vip_method = "spls", cv_type = 
 #'
 #' @seealso \code{\link{Bio.VIP}} \code{\link{AABA}}
 #'
-#' @author Brian Anthony Keeling
+#' @author Keeling et al., 2025
 #'
 #' @importFrom pls mvr plsr coefplot scores loadings
 #' @importFrom plsdepot plsreg2
@@ -1149,7 +1149,7 @@ pls_it <- function(plsr.results, test_x = NULL, test_y = NULL) {
 #'
 #' @seealso \code{\link{Bio.VIP}} \code{\link{AABA}}
 #'
-#' @author Brian Anthony Keeling
+#' @author Keeling et al., 2025
 #'
 #' @importFrom stats cor
 #'
@@ -1227,7 +1227,7 @@ RSS <- function(plsr.results, ncomp) {
 #'
 #' @importFrom stats cor
 #'
-#' @author Brian Anthony Keeling
+#' @author Keeling et al., 2025
 #'
 #' @references
 #' Wold, S., Sjöström, M., & Eriksson, L. (2001). PLS-regression: a basic tool of chemometrics.
@@ -1289,7 +1289,7 @@ c_Q2 <- function(plsr.results, Y_pred, ncomp, Y_test = NULL) {
 #'
 #' @importFrom stats cor
 #'
-#' @author Brian Anthony Keeling
+#' @author Keeling et al., 2025
 #'
 #' @references
 #' Wold, S., Sjöström, M., & Eriksson, L. (2001). PLS-regression: a basic tool of chemometrics.
@@ -1351,7 +1351,7 @@ c_TQ2 <- function(plsr.results, Y_pred, ncomp, Y_test = NULL) {
 #'
 #' @importFrom stats cor
 #'
-#' @author Brian Anthony Keeling
+#' @author Keeling et al., 2025
 #'
 #' @references
 #' Wold, S., Sjöström, M., & Eriksson, L. (2001). PLS-regression: a basic tool of chemometrics.
@@ -1513,7 +1513,7 @@ m_R2 <- function(observed, predicted) {
 #'
 #' @importFrom stats cor
 #'
-#' @author Brian Anthony Keeling
+#' @author Keeling et al., 2025
 #'
 #' @references Mevik, B. H., & Wehrens, R. (2007). The pls package: principal component and partial
 #' least squares regression in R. Journal of Statistical Software, 18(2), 1-24.
@@ -1566,7 +1566,7 @@ c_TR2 <- function(Y_actual, Y_pred, ncomp = NULL) {
 #'
 #' @importFrom stats cor
 #'
-#' @author Brian Anthony Keeling
+#' @author Keeling et al., 2025
 #'
 #' @references
 #' Mevik, B. H., & Wehrens, R. (2007). The pls package: principal component and partial
@@ -1666,7 +1666,7 @@ c_RMSEP <- function(Y_actual, Y_pred, ncomp = NULL) {
 #'
 #' @seealso \code{\link{Bio.VIP}} \code{\link{AABA}}
 #'
-#' @author Brian Anthony Keeling
+#' @author Keeling et al., 2025
 #'
 #' @importFrom caret createFolds trainControl
 #' @importFrom stats runif
