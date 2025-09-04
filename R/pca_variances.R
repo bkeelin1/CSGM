@@ -43,8 +43,7 @@
 #'    \item *PCs*:   number of meaningful principal components.
 #' }
 #'
-#' @author
-#' Brian Anthony Keeling
+#' @author Keeling et al., 2025
 #'
 #' @export
 #'
