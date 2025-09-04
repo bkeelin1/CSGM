@@ -508,10 +508,6 @@ AABA <- function(Models,
 
             reg_parameters2 = modifyList(reg_parameters, dt_parameters2) %>% .[intersect(names(.),reg_params)]
 
-            print(m)
-            print(i)
-            print(j)
-
             Reg.Results[[m]]$pred.subset[[i]][[j]] <- do.call(CSGM::pred, reg_parameters2)
             closeAllConnections()
           } # j loop
@@ -527,16 +523,6 @@ AABA <- function(Models,
         dt_parameters1 = modifyList(dt_parameters1, list(VIPS = if(isTRUE(VIP_trim)) Vars[[m]][[i]] else NULL))
 
         reg_parameters1 = modifyList(reg_parameters, dt_parameters1) %>% .[intersect(names(.),reg_params)]
-
-        print(m)
-        print(i)
-        print("Made it to regular")
-
-        print(Vars[[m]][[i]])
-
-        print(reg_parameters$VIPS)
-        print(colnames(reg_parameters$Predictor))
-        print(reg_parameters$Pred_point_set)
 
         Reg.Results[[m]]$pred.all[[i]] <- do.call(CSGM::pred, reg_parameters1)
         closeAllConnections()
