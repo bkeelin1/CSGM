@@ -180,7 +180,7 @@
 #'
 #' @seealso \code{\link{cor.bio}} \code{\link{Bio.VIP}} \code{\link{pred}} \code{\link{PSLR}}
 #'
-#' @author Brian Anthony Keeling
+#' @author Keeling et al., 2025
 #'
 #' @references
 #' Placeholder
