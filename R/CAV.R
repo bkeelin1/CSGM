@@ -63,7 +63,7 @@
 #' }
 #'
 #' @author
-#' Brian Anthony Keeling
+#' Keeling et al., 2025
 #'
 #' @seealso [pam() pvclust() agnes()]
 #'
