@@ -178,7 +178,7 @@
 #'
 #' @seealso [procD.lm() DT() restructure_results() AABV()]
 #'
-#' @author Brian Anthony Keeling
+#' @author Keeling et al., 2025
 #'
 #' @importFrom geomorph procD.lm arrayspecs two.d.array
 #' @importFrom parallel detectCores makeCluster stopCluster
