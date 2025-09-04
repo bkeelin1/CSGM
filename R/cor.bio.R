@@ -177,7 +177,7 @@
 #'
 #' @seealso \code{\link{AABA}} \code{\link{Bio.VIP}} \code{\link{DT}}
 #'
-#' @author Brian Anthony Keeling
+#' @author Keeling et al., 2025
 #'
 #' @importFrom stats cor cov cov2cor var as.dist
 #' @importFrom Hmisc rcorr
