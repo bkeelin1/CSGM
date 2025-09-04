@@ -146,7 +146,7 @@
 #'    \item{Predictor:  Optional list object with transformed data (Predictor).}
 #' }
 #'
-#' @author Brian Anthony Keeling
+#' @author Keeling et al., 2025
 #'
 #' @seealso [gm.prcomp() PCA()]
 #'
