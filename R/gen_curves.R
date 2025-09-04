@@ -39,8 +39,7 @@
 #' dependent on the number of landmarks and semilandmarks in the
 #' landmark configuration.
 #'
-#' @author
-#' Brian Anthony Keeling
+#' @author Keeling et al., 2025
 #'
 #' @seealso \pkg{\link{geomorph}}
 #'
