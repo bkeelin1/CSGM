@@ -107,7 +107,7 @@
 #'    \item{whole_Shape         list object each containing a plotly plot object of the allometric influence on all individauls irregardless of group}
 #' }
 #'
-#' @author Brian Anthony Keeling
+#' @author Keeling et al., 2025
 #'
 #' @seealso \code{\link{plotly}} \code{\link{gpagen}} \code{\link{GMA}}
 #'
