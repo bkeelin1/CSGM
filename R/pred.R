@@ -161,6 +161,8 @@
 #' \code{\link[caret]{train}} for the underlying caret implementation
 #' \code{\link[e1071]{svm}} for the underlying SVM implementation
 #'
+#' @author Keeling et al., 2025
+#'
 #' @export
 #'
 #' @examples
