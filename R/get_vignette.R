@@ -9,6 +9,8 @@
 #'
 #' @return a .Rmd RMarkdown file of the package vignette in your project directory
 #'
+#' @author Keeling et al., 2025
+#'
 #' @export
 
 get_vignette <- function(vignette_name = "CSGM-Workflow", dest_dir = getwd()) {
