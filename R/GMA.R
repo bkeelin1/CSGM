@@ -216,7 +216,7 @@
 #' to optimize computational efficiency for large datasets as well as prints function
 #' progress.
 #'
-#' @author Brian Anthony Keeling
+#' @author Keeling et al., 2025
 #'
 #' @seealso \pkg{\link{cluster}} \pkg{\link{geomorph}} \pkg{\link{plotly}} \pkg{\link{psych}} \pkg{\link{pvclust}}
 #'
