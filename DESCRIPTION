@@ -1,0 +1,74 @@
+Package: CSGM
+Type: Package
+Title: Cross-Sectional Geometric Morphometrics (CSGM)
+Version: 0.1.0
+Authors@R: person(
+    "Brian", "Keeling",
+    email = "bkeelin1@binghamton.edu",
+    role = c("aut", "cre")
+  )
+Description: The CSGM package was designed to streamline the data analysis pipeline
+    when evaluating multiple models involving complex, multivariate shape and 
+    biomechanical data in parallel including the generation of interactive plots
+    using the plotly package. This package was designed to allow users to, in
+    parallel, test multiple hypotheses or models involving multiple data types.
+License: CC BY 4.0
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
+Imports:
+    ade4 (>= 1.7.23),
+    ape,
+    BiocParallel (>= 1.38.0),
+    BiocManager,
+    caret,
+    cluster,
+    corrplot,
+    doParallel,
+    dplyr,
+    e1071,
+    earth,
+    FactoMineR,
+    factoextra,
+    foreach,
+    geometry,
+    geomorph,
+    ggplot2,
+    ggpubr,
+    glmnet,
+    grDevices,
+    gtools,
+    Hmisc,
+    htmlwidgets,
+    kerndwd,
+    kernlab,
+    methods,
+    mixOmics (>= 6.28.0),
+    Morpho (>= 2.12),
+    parallel,
+    plotly,
+    pls,
+    plsdepot,
+    PMA,
+    progress,
+    psych,
+    purrr,
+    pvclust,
+    randomForest,
+    RColorBrewer,
+    readr,
+    readxl,
+    Rvcg (== 0.25),
+    stats,
+    stringr,
+    tidyr,
+    utils,
+    vegan,
+    writexl
+Suggests:
+    testthat (>= 3.0.0),
+    knitr,
+    rmarkdown
+Config/testthat/edition: 3
+VignetteBuilder: knitr

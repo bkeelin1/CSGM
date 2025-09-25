@@ -1,0 +1,41 @@
+#' @title Corpus_Land: A 3D semilandmark array countouring the shape of five cross-sectional regions along the mandibular corpus
+#'
+#' @description
+#' The Corpus_Land dataset consists of an p x k x n (landmarks, dimensions, individuals)
+#' 3D landmark array of 50 recent modern humans and 590 semilandmarks which map
+#' the internal and external cortical bone surface of five cross–sections taken
+#' along the mandibular corpus: (1) the left side first and second intermolar
+#' corpus (abbreviated as LM1-M2), (2) the left side third and fourth interpremolar
+#' corpus (abbreviated as LP3-P4), (3) the mandibular symphysis, (4) the right
+#' side third and fourth interpremolar corpus (abbreviated as RP3-P4), and (5)
+#' the right side first and second intermolar corpus (abbreviated as RM1-M2).
+#' For each cross-section, 119 equidistant semilandmarks were collected using
+#' six of the semilandmarks as anchor points: (1) external buccal alveolar shelf,
+#' (2) external basal corpus, (3) external lingual alveolar shelf, (4) internal
+#' buccal alveolar shelf, (5) internal basal corpus, (6) internal lingual alveolar
+#' shelf. When including the anchor points and semilandmarks together, the external
+#' and internal cross-sectional contours contain 60 semilandmarks each and 30 semilandmarks
+#' for the buccal and lingual sides.
+#'
+#' @format
+#' A 3D array with dimensions "600, 3, 50":
+#' \itemize{
+#'   \item{landmarks:   590 semilandmarks per specimen}
+#'   \item{dimensions:    3 (x, y, z coordinates)}
+#'   \item{specimens:   50 unique specimens}
+#' }
+#'
+#' @details
+#' The landmarks are organized sequentially by cross-section:
+#' \itemize{
+#'   \item{LM1M2 (1-118):   Left first-second molar junction}
+#'   \item{LP3P4 (119-236):   Left third-fourth premolar junction}
+#'   \item{Symphysis (237-354):   Mandibular symphysis}
+#'   \item{RP3P4 (355-472):   Right third-fourth premolar junction}
+#'   \item{RM1M2 (473-590):   Right first-second molar junction}
+#' }
+#'
+#' @usage data(Corpus_Land)
+#'
+#' @source Keeling et al., 2025
+"Corpus_Land"
