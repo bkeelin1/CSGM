@@ -686,6 +686,7 @@ cor.bio <- function(Models,
       } else {
         var_boot = c("Cor.all.Mantels")
         booted.list = vector("list", length(var_boot))
+        booted.list = vector("list", length(var_boot))
         boot_temp = vector("list", nrow(parallels))
         for(b in 1:nrow(parallels)) {
           boot_temp[[b]] <- unlist(parallels[b,1], recursive = FALSE)
@@ -693,11 +694,11 @@ cor.bio <- function(Models,
           boot_temp[[b]] <- unlist(boot_temp[[b]], recursive = FALSE)
 
         }
-        booted.list[[v]] <- boot_temp
-      }
-      names(booted.list) <- var_boot
-      list2env(booted.list, envir = environment())
-    }
+        booted.list[[1]] <- boot_temp
+        names(booted.list) <- var_boot
+        list2env(booted.list, envir = environment())
+      } # end of subsets or not
+    } # end of one or more hypothesis models
 
     #___________________________________________________________________________________________________________________________
 
