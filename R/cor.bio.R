@@ -503,11 +503,11 @@ cor.bio <- function(Models,
 
        if(ncol(x) > 100){
          nsize = 0.1
-         tsize = 0.25
+         tsize = 0.15
          lsize = 0.3
        }else if(ncol(x) > 60) {
          nsize = 0.2
-         tsize = 0.3
+         tsize = 0.25
          lsize = 0.4
        }else if(ncol(x) > 50) {
          nsize = 0.25
@@ -607,11 +607,11 @@ cor.bio <- function(Models,
 
            if(ncol(x) > 100){
              nsize = 0.1
-             tsize = 0.25
+             tsize = 0.15
              lsize = 0.3
            }else if(ncol(x) > 60) {
              nsize = 0.2
-             tsize = 0.3
+             tsize = 0.25
              lsize = 0.4
            }else if(ncol(x) > 50) {
              nsize = 0.25
@@ -688,7 +688,7 @@ cor.bio <- function(Models,
         booted.list = vector("list", length(var_boot))
         boot_temp = vector("list", nrow(parallels))
         for(b in 1:nrow(parallels)) {
-          boot_temp[[b]] <- unlist(parallels[b,v], recursive = FALSE)
+          boot_temp[[b]] <- unlist(parallels[b,1], recursive = FALSE)
           boot_temp[[b]] <- Filter(function(x) !is.null(x), boot_temp[[b]])
           boot_temp[[b]] <- unlist(boot_temp[[b]], recursive = FALSE)
 
