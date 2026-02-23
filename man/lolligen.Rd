@@ -6,7 +6,6 @@
 \usage{
 lolligen(
   Data_PCA,
-  PCs = 2,
   k = 3,
   PCA_var = NULL,
   ID = NULL,
@@ -20,7 +19,7 @@ lolligen(
 \item{Data_PCA}{a list object resembling or formed by the \emph{pca_variances} function output.}
 
 \item{k}{an integer indicating the number of dimensions in the landmark configuration
-prior to data transformation via PCA. Default value is 3.}
+prior to data transformation via PCA. k = 1 is for non-landmark data. Default value is 3.}
 
 \item{PCA_var}{an object from the \emph{pca_variances} function output.}
 

@@ -108,7 +108,6 @@ Predictor <- Biomechanics \%>\%
   select(5:93)  # Biomechanical variables
 
 # Fit sparse PLS model
-library(mixOmics)
 spls_model <- spls(Predictor, Response, ncomp = 5)
 
 # Calculate performance statistics

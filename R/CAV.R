@@ -102,7 +102,7 @@
 #'
 #' # Run the cluster analysis vizualization tool
 #'
-#' output = CAV(Data = table_corpus_land,
+#' output = CAV(Data = corpus_land,
 #'              Group = Group,
 #'              ID = ID,
 #'              nboot = 1000,
@@ -212,7 +212,7 @@ CAV <- function(Data,
       graphics.off()
     }
     cluster_plot_path <- paste(Directory,"/plot_cluster_", "K-medoids", ".png", sep = "")
-    grDevices::png(cluster_plot_path, res = 600, width = 1920, height = 1080)
+    grDevices::png(cluster_plot_path, width = 1920, height = 1080)
     # label used to be 8
     print(factoextra::fviz_cluster(pam_clust, pointsize = 5, repel = TRUE, alpha = 0.6, label = 8, main = "Results of K-Medoids Cluster Analysis", ggtheme = ggpubr::theme_pubclean()))
     dev.off()
@@ -361,7 +361,7 @@ CAV <- function(Data,
 
       fan_plot_path <- paste0(Directory,"/plot_fan_", group_name, ".png", sep = "")
 
-      grDevices::png(fan_plot_path, res = 600, width = 1920, height = 1080)
+      grDevices::png(fan_plot_path, width = 1920, height = 1080)
         par(mar = c(1, 4, 1, 1))
         plot(dendro,
              edge.color = edge_colors,
@@ -376,28 +376,12 @@ CAV <- function(Data,
       if (length(dev.list()) > 0) {
         graphics.off()
       }
-
-      #cladogram_plot_path <- paste0(Directory,"/plot_clado_", group_name, ".png", sep = "")
-
-      #grDevices::png(cladogram_plot_path, res = 600, width = 3840, height = 2160)
-      #par(mar = c(1, 0.5, 1, 1))
-      #agg_clad_plot[[i]] <-plot(dendro, edge.color = Group_col, tip.color = Group_col, edge.width = 3, cex = 0.4, type = "phylogram",
-      #     main = "Dendrogram of Morphometric Shape Distances")
-      #agg_clad_plot[[i]]
-      #legend("topleft", legend = group_val, col = palette, pch = 19, cex = 0.4)
-
-      #dev.off()
-
-      #if (length(dev.list()) > 0) {
-      #  graphics.off()
-      #}
     }
     setwd(original_wd)
   }
   Morphotree$k_medoid <- pam_clust
   Morphotree$k_medoid_plot <- k_plot
   Morphotree$dendro <- dendro
-  #Morphotree$agg_clad_plot <- agg_clad_plot
   agg_fan_plot <- Filter(Negate(is.null), agg_fan_plot)
   names(agg_fan_plot) <- names(Group)
 

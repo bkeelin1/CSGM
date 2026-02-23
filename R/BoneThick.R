@@ -32,6 +32,8 @@
 #'
 #' @author Keeling et al., 2025
 #'
+#' @importFrom geomorph two.d.array
+#'
 #' @export
 #'
 #' @examples
@@ -88,9 +90,8 @@ BoneThick <- function(External,
   if (k == 3) { # for 3D landmark configurations
 
     if (is.array(External) || is.array(Internal)) {
-      require(geomorph)
-      External = data.frame(two.d.array(External))
-      Internal = data.frame(two.d.array(Internal))
+      External = data.frame(geomorph::two.d.array(External))
+      Internal = data.frame(geomorph::two.d.array(Internal))
     } else {}
 
     if (nrow(External) == Points*3) {
@@ -118,7 +119,7 @@ BoneThick <- function(External,
       External_array[,1,] <- matrix1
       External_array[,2,] <- matrix2
       External_array[,3,] <- matrix3
-      External = data.frame(two.d.array(External_array))
+      External = data.frame(geomorph::two.d.array(External_array))
 
 
       ID = nrows(Internal) / Points
@@ -136,7 +137,7 @@ BoneThick <- function(External,
       External_array[,1,] <- matrix1
       External_array[,2,] <- matrix2
       External_array[,3,] <- matrix3
-      Internal = data.frame(two.d.array(Internal_array))
+      Internal = data.frame(geomorph::two.d.array(Internal_array))
 
     } else {}
 
@@ -228,7 +229,7 @@ BoneThick <- function(External,
       # Fill the array
       External_array[,1,] <- matrix1
       External_array[,2,] <- matrix2
-      External = data.frame(two.d.array(External_array))
+      External = data.frame(geomorph::two.d.array(External_array))
 
 
       ID = nrows(Internal) / Points
@@ -243,7 +244,7 @@ BoneThick <- function(External,
       # Fill the array
       Internal_array[,1,] <- matrix1
       Internal_array[,2,] <- matrix2
-      Internal = data.frame(two.d.array(Internal_array))
+      Internal = data.frame(geomorph::two.d.array(Internal_array))
     } else {}
 
     Obs <- nrow(External)

@@ -3,7 +3,7 @@
 #' @description
 #' Imports landmark data from various common formats used in geometric morphometrics
 #' and medical imaging. Supports multiple file formats including Dragonfly, TPS,
-#' Morphologika, NTS (Viewbox), Avizo, Mimics, and CSV files. Can handle both
+#' Morphologika, NTS (Viewbox), Avizo, Mimics, fcsv, and CSV files. Can handle both
 #' 2D and 3D landmarks and provides options for processing curves and contours.
 #'
 #' \itemize{Supported file formats:
@@ -14,12 +14,13 @@
 #'   \item {avizo:           Avizo landmark ASCII format}
 #'   \item {mimics:          Mimics Medical landmark format}
 #'   \item {simple_csv:      Simple CSV with coordinates and optional landmark names}
+#'   \item {fcsv:            3D Slicer Fudicial CSV file format}
 #' }
 #'
 #' @param directory Path to the directory containing landmark files or folders containing landmark files
 #' @param pattern File pattern to match (e.g., "\\.csv", "\\.tps")
 #' @param format Character string specifying the file format. One of "dragonfly",
-#'        "tps", "morphologika", "nts", "avizo", "mimics", or "simple_csv"
+#'        "tps", "morphologika", "nts", "avizo", "mimics", "fcsv", or "simple_csv"
 #' @param dims Integer specifying dimensions (2 or 3)
 #' @param curve_names Optional for Dragonfly file formats only. Which specific landmark curve names be extracted?
 #'
@@ -102,7 +103,15 @@
 #' landmarks <- import_land(
 #'   directory = path = file.path(.libPaths("CSGM"), "CSGM", "Example", "NTS"),
 #'   pattern = "\\.nts$",
-#'   format = "tps",
+#'   format = "nts",
+#'   dims = 3
+#' )
+#'
+#' # Import fcsv files
+#' landmarks <- import_land(
+#'   directory = path = file.path(.libPaths("CSGM"), "CSGM", "Example", "fcsv"),
+#'   pattern = "\\.fcsv$",
+#'   format = "fcsv",
 #'   dims = 3
 #' )
 #' }
@@ -117,70 +126,102 @@ import_land <- function(directory,
   # Validate inputs
   if (!dir.exists(directory)) stop("Directory does not exist")
   if (!dims %in% c(2, 3)) stop("Dimensions must be 2 or 3")
-  if (!format %in% c("dragonfly", "tps", "morphologika", "nts", "avizo", "mimics", "simple_csv")) {
+  if (!format %in% c("dragonfly", "tps", "morphologika", "nts", "avizo", "mimics", "simple_csv","fcsv")) {
     stop("Unsupported file format")
   }
 
-  test <- list.files(file.path(directory,
-                               pattern = pattern,
-                               full.names = TRUE))
+  # Check for files in the root directory first
+  # pattern is now OUTSIDE file.path so it works correctly
+  test <- list.files(directory, pattern = pattern, full.names = TRUE)
 
-  if(purrr::is_empty(test)) {
-    folders = if(is.null(folders)) list.files(directory) else folders
+  # Logic: If files exist in root, set folders to "." (current dir)
+  if(length(test) > 0) {
+    folders <- "."
   } else {
-    folders = "Land"
+    # If no files in root, default to subfolders
+    if(is.null(folders)) {
+      folders <- list.files(directory)
+    }
   }
-
 
   # Initialize results list
   results <- list()
   p_names = vector("character",0)
+  n_names = vector("character", 0)
 
   for(f in seq_along(folders)) {
 
-    files <- list.files(file.path(directory, folders[f]),
+    if(folders[f] == ".") {
+      search_path <- directory
+    } else {
+      search_path <- file.path(directory, folders[f])
+    }
+
+    files <- list.files(search_path,
                         pattern = pattern,
                         full.names = TRUE)
 
-    if (length(files) == 0) stop("No files found matching the pattern")
-
+    # Skip empty folders smoothly
+    if (length(files) == 0) {
+      if(folders[f] == ".") next
+      warning(paste("No matching files in folder:", folders[f]))
+      next
+    }
 
     file_ids <- sapply(files, extract_id)
 
-    # Sort files based on extracted IDs
-    # If all IDs are numeric, sort numerically; otherwise, sort alphanumerically
+    # Sort files
     if (!any(is.na(suppressWarnings(as.numeric(file_ids))))) {
       files <- files[order(as.numeric(file_ids))]
     } else {
-      # For mixed or character IDs, use natural sort
-      # This handles cases like "Specimen1", "Specimen2", "Specimen10" correctly
       files <- files[gtools::mixedorder(file_ids)]
     }
 
-    # Read files based on format
+    # Read files
     landmarks <- switch(format,
-                             "dragonfly" = read_dragonfly(files, dims, curve_names),
-                             "tps" = readmulti.tps(files,dims),
-                             "morphologika" = read.morphologika(files),
-                             "nts" = readmulti.nts(files),
-                             "avizo" = read_avizo(files, dims),
-                             "mimics" = read_mimics(files, dims),
-                             "simple_csv" = read_simple_csv(files, dims)
+                        "dragonfly" = read_dragonfly(files, dims, curve_names),
+                        "tps" = read_tps(files, dims),
+                        "morphologika" = geomorph::read.morphologika(files),
+                        "nts" = read_nts(files, dims),
+                        "avizo" = read_avizo(files, dims),
+                        "mimics" = read_mimics(files, dims),
+                        "simple_csv" = read_simple_csv(files, dims),
+                        "fcsv" = read_fcsv(files, dims)
     )
-    p_names = c(p_names, paste(rep(folders[[f]],dim(landmarks)[1]), dimnames(landmarks)[[1]],sep = "_"))
-    n_names = dimnames(landmarks)[[3]]
+
+    if(is.null(landmarks)) next
+
+    if (folders[f] == ".") {
+      current_p_names <- dimnames(landmarks)[[1]]
+    } else {
+      current_p_names <- paste(folders[f], dimnames(landmarks)[[1]], sep = "_")
+    }
+
+    p_names = c(p_names, current_p_names)
+
+    # Handle Observation names safely
+    obs_names <- if(length(dim(landmarks)) == 3) dimnames(landmarks)[[3]] else colnames(landmarks)
+    n_names = c(n_names, obs_names)
+
     results[[f]] <- data.frame(geomorph::two.d.array(landmarks))
     rm(landmarks)
   }
 
-  results = data.frame(results)
-  colnames(results) <- if(dims ==3) {paste(rep(c("X","Y","Z"), times = (ncol(results)/3)), rep(1:(ncol(results)/3), each = 3), sep = ".")
-                       } else { paste(rep(c("X","Y"), times = (ncol(results)/2)), rep(1:(ncol(results)/2), each = 2), sep = ".")}
+  if (length(results) == 0) stop("No landmark data could be imported.")
+
+  results <- do.call(rbind, results[!sapply(results, is.null)])
+
+  colnames(results) <- if(dims == 3) {
+    paste(rep(c("X","Y","Z"), times = (ncol(results)/3)), rep(1:(ncol(results)/3), each = 3), sep = ".")
+  } else {
+    paste(rep(c("X","Y"), times = (ncol(results)/2)), rep(1:(ncol(results)/2), each = 2), sep = ".")
+  }
 
   results = geomorph::arrayspecs(results, p = (ncol(results)/dims), k = dims)
+
   dimnames(results) <- list(Landmarks = p_names,
                             Dimensions = 1:dims,
-                            Observations = n_names)
+                            Observations = unique(n_names))
 
   return(results)
 }
@@ -521,3 +562,83 @@ landmarks_to_array <- function(landmark_data, dims, n_landmarks) {
 
   return(landmark_array)
 }
+
+#' Read 3D Slicer Fiducial CSV (.fcsv) Format Files
+#' @keywords internal
+read_fcsv <- function(files, dims) {
+  all_landmarks <- list()
+
+  for (file in files) {
+    # Read fcsv file.
+    # The format has 3 header lines marked with '#'. The data starts on line 4.
+    # Column definitions on line 3 specify x, y, z are at indices 2, 3, and 4.
+    data <- tryCatch({
+      utils::read.csv(file, skip = 3, header = FALSE, stringsAsFactors = FALSE)
+    }, error = function(e) {
+      warning(paste("Could not read file:", file, "-", e$message))
+      return(NULL)
+    })
+
+    if (is.null(data)) next
+
+    # Extract coordinates based on dimensions
+    if (dims == 3) {
+      if (ncol(data) < 4) {
+        warning(paste("File", file, "does not have enough columns for 3D data. Skipping."))
+        next
+      }
+      coords <- data[, 2:4]
+      colnames(coords) <- c("X", "Y", "Z")
+    } else {
+      if (ncol(data) < 3) {
+        warning(paste("File", file, "does not have enough columns for 2D data. Skipping."))
+        next
+      }
+      coords <- data[, 2:3]
+      colnames(coords) <- c("X", "Y")
+    }
+
+    coords$ID <- extract_id(file)
+    all_landmarks[[length(all_landmarks) + 1]] <- coords
+  }
+
+  if (length(all_landmarks) == 0) return(NULL)
+
+  combined_data <- do.call(rbind, all_landmarks) %>%
+    dplyr::filter(!is.na(ID)) %>%
+    dplyr::group_by(ID) %>%
+    dplyr::arrange(., .by_group = TRUE)
+
+  # Get dimensions
+  ID_list = na.omit(unique(combined_data$ID))
+  n = length(ID_list)
+  if (n == 0) stop("No valid landmark data found after processing.")
+  p = nrow(combined_data %>% dplyr::filter(ID == ID_list[1]))
+  k = dims
+
+  # Check for consistency across specimens
+  if (nrow(combined_data) != n * p) {
+    stop("Landmark data is inconsistent: not all specimens have the same number of landmarks.")
+  }
+
+  # Create the 3D array (p x k x n)
+  land_data_array = array(dim = c(p, k, n))
+
+  # Fill array from the sorted combined data.
+  # matrix(..., nrow = p, ncol = n) creates a p x n matrix where each column corresponds to a specimen.
+  land_data_array[, 1, ] <- matrix(combined_data$X, nrow = p, ncol = n)
+  land_data_array[, 2, ] <- matrix(combined_data$Y, nrow = p, ncol = n)
+  if (k == 3) {
+    land_data_array[, 3, ] <- matrix(combined_data$Z, nrow = p, ncol = n)
+  }
+
+  # Set dimension names
+  dimnames(land_data_array) <- list(
+    Landmarks = paste(rep("Land", p), 1:p, sep = "_"),
+    Dimensions = c(1:k),
+    Observations = ID_list
+  )
+
+  return(land_data_array)
+}
+

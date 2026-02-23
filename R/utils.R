@@ -226,11 +226,10 @@ get_coef <- function(coefficients, Predictor_names) {
 #'
 #' @examples
 #' \dontrun{
-#' # Create example data
-#' set.seed(123)
+#' # Example data
 #' n <- 100
 #'
-#' # Generate sample data
+#' # Generated sample data
 #' observed_data <- data.frame(
 #'   var1 = factor(sample(c("A", "B", "C"), n, replace = TRUE)),
 #'   var2 = factor(sample(c("0", "1"), n, replace = TRUE))
@@ -395,7 +394,6 @@ multivariate_confusion <- function(predicted, observed, by_variable = FALSE, var
 #'
 #' @importFrom pls plsr mvr
 #' @importFrom plsdepot plsreg2
-#' @importFrom mixOmics spls
 #'
 #' @author Keeling et al., 2025
 #'
@@ -679,7 +677,6 @@ trim_scores <- function(scores,
 #'
 #' @importFrom pls mvr plsr coefplot scores loadings explvar
 #' @importFrom plsdepot plsreg2
-#' @importFrom mixOmics spls tune.spls vip
 #' @importFrom stats predict coef cor sd quantile pnorm p.adjust
 #' @importFrom parallel detectCores
 #' @importFrom doParallel registerDoParallel
@@ -708,7 +705,6 @@ trim_scores <- function(scores,
 #'   select(5:93)  # Biomechanical variables
 #'
 #' # Fit sparse PLS model
-#' library(mixOmics)
 #' spls_model <- spls(Predictor, Response, ncomp = 5)
 #'
 #' # Calculate performance statistics
@@ -729,11 +725,6 @@ trim_scores <- function(scores,
 plsr_stats <- function(plsr.results, ncomp, vip, vip_method = "spls", cv_type = "CV", repeats = 25, folds = 5, tuned = NULL, parallel.me = TRUE, permut = 500) {
 
   if(class(plsr.results) == "mixo_spls") {
-    #log <- mixOmics::perf(plsr.results, folds = folds, nrepeat = repeats)
-    #Q2 <- max(log$measures$Q2$summary$mean)
-    #R2 <- max(log$measures$R2$summary$mean)
-    #rmsep <- mean(log$measures$RMSEP$summary$mean)
-    #rm(log)
     explained_X_variance = max(plsr.results$prop_expl_var$X)
     y_score = data.frame(plsr.results$model[[1]])
     x_score = data.frame(plsr.results$X)
@@ -765,12 +756,12 @@ plsr_stats <- function(plsr.results, ncomp, vip, vip_method = "spls", cv_type = 
   } # if not spls which autogenerates values
 
   if(isTRUE(parallel.me)) {
-    doParallel::registerDoParallel(detectCores() - 4)
+    doParallel::registerDoParallel(detectCores() - 2)
   } else {
     foreach::registerDoSEQ()
   }
 
-  CV_it <- foreach(cv = 1:repeats, .export = c("c_TR2", "c_R2","c_TQ2","c_RMSEP"), .packages = c("pls", "plsdepot", "caret", "mixOmics")) %dopar% {
+  CV_it <- foreach(cv = 1:repeats, .export = c("c_TR2", "c_R2","c_TQ2","c_RMSEP"), .packages = c("pls", "plsdepot", "caret")) %dopar% {
     rmsep <- vector("numeric", folds)
     Q2 <- vector("numeric", folds)
     Prediction <- array(NA, dim = c(nrow(y_score), ncol(y_score), ncomp))
@@ -799,7 +790,7 @@ plsr_stats <- function(plsr.results, ncomp, vip, vip_method = "spls", cv_type = 
       }
       if (class(plsr.results) == "mixo_spls") {
         nzv.X = (apply(X_train, 2, var) > .Machine$double.eps)
-        pls_model <- mixOmics::spls(X_train, Y_train, ncomp = ncomp, mode = "regression", max.iter = 500, near.zero.var = TRUE)
+        pls_model <- spls(X_train, Y_train, ncomp = ncomp, mode = "regression", max.iter = 500, near.zero.var = TRUE)
         Y_pred <- predict(pls_model, newdata = X_test[,nzv.X])$predict
         pls_model$Y <- Y_train
         pls_model$type <- "mixo_spls"
@@ -879,7 +870,7 @@ plsr_stats <- function(plsr.results, ncomp, vip, vip_method = "spls", cv_type = 
     x_score_reduced = as.matrix.data.frame(x_score_reduced)
 
     nzv.X = (apply(x_score_reduced, 2, var) > .Machine$double.eps)
-    y_reduced = mixOmics::spls(x_score_reduced, y_score, ncomp = ncomp2, mode = "regression")
+    y_reduced = spls(x_score_reduced, y_score, ncomp = ncomp2, mode = "regression")
     y_reduced = predict(y_reduced, newdata = x_score_reduced[,nzv.X])$predict
     y_reduced = apply(y_reduced,c(1,2),mean)
 
@@ -955,7 +946,7 @@ plsr_stats <- function(plsr.results, ncomp, vip, vip_method = "spls", cv_type = 
 
       if(class(plsr.results) == "mixo_spls") {
         nzv.X = (apply(plsr.results$X, 2, var) > .Machine$double.eps)
-        pls_model <- mixOmics::spls(x_score, perm_y_score, ncomp = ncomp, mode = "regression", scale = FALSE)
+        pls_model <- spls(x_score, perm_y_score, ncomp = ncomp, mode = "regression", scale = FALSE)
         Y_pred <- predict(pls_model, newdata = plsr.results$X[,nzv.X])$predict
         pls_model$type <- "mixo_spls"
       }
@@ -1022,7 +1013,7 @@ plsr_stats <- function(plsr.results, ncomp, vip, vip_method = "spls", cv_type = 
 #' object formats (pls, plsdepot, mixomics) to ensure consistent handling within Bio.VIP and AABA analyses.
 #' This internal function enables seamless integration of different PLS implementations.
 #'
-#' @param plsr.results A PLS model object from either pls::plsr(), plsdepot::plsreg2(), or mixOmics::spls()
+#' @param plsr.results A PLS model object from either pls::plsr(), plsdepot::plsreg2(), or spls()
 #' @param test_x Optional matrix/data.frame of test set predictor variables
 #' @param test_y Optional matrix/data.frame of test set response variables
 #'
@@ -1055,7 +1046,6 @@ plsr_stats <- function(plsr.results, ncomp, vip, vip_method = "spls", cv_type = 
 #'
 #' @importFrom pls mvr plsr coefplot scores loadings
 #' @importFrom plsdepot plsreg2
-#' @importFrom mixOmics spls tune.spls vip
 #' @importFrom stats predict coef cor sd quantile pnorm p.adjust
 #'
 #' @references
@@ -1593,7 +1583,7 @@ c_RMSEP <- function(Y_actual, Y_pred, ncomp = NULL) {
   return(as.numeric(RMSEP))
 }
 
-#' @title Calculate best number of latent variables for a Partial Least Squares Analysis
+#' @title NComp: Calculate best number of latent variables for a Partial Least Squares Analysis
 #'
 #' @description
 #' A function designed to identify the optimal number of latent variables (components)
@@ -1672,7 +1662,6 @@ c_RMSEP <- function(Y_actual, Y_pred, ncomp = NULL) {
 #' @importFrom stats runif
 #' @importFrom pls mvr
 #' @importFrom plsdepot plsreg2
-#' @importFrom mixOmics spls
 #'
 #' @references
 #' Wold, S., Johansson, E., & Cocchi, M. (1993). PLS: Partial Least Squares Projections
@@ -1764,12 +1753,12 @@ NComp <- function(model,
   max_comps = if(ncol(Y) < max_comps || ncol(X) < max_comps) min(c(ncol(Y),ncol(X))) else max_comps
 
   if(isTRUE(parallel.me)) {
-    doParallel::registerDoParallel(detectCores() - 4)
+    doParallel::registerDoParallel(detectCores() - 2)
   } else {
     foreach::registerDoSEQ()
   }
 
-  CV_it <- foreach(cv = 1:repeats, .export = c("c_TR2", "c_R2","c_TQ2","c_RMSEP"), .packages = c("pls", "plsdepot", "caret", "mixOmics")) %dopar% {
+  CV_it <- foreach(cv = 1:repeats, .export = c("c_TR2", "c_R2","c_TQ2","c_RMSEP"), .packages = c("pls", "plsdepot", "caret")) %dopar% {
 
      rmsep <- matrix(NA, nrow = folds, ncol = max_comps)
      Q2 <- matrix(NA, nrow = folds, ncol = max_comps)
@@ -1805,7 +1794,7 @@ NComp <- function(model,
          Q2[fold_idx,] <- if(median(test_Q2) < 0 | median(test_Q2) > 1) c_R2(Y_train, Y_pred, ncomp = max_comps) else test_Q2
        } else if(vip_method == "spls") {
          nzv.X = (apply(X_test, 2, var) > .Machine$double.eps)
-         pls_model <- mixOmics::spls(X_train, Y_train, ncomp = max_comps, mode = "regression", max.iter = 500, near.zero.var = TRUE)
+         pls_model <- spls(X_train, Y_train, ncomp = max_comps, mode = "regression", max.iter = 500, near.zero.var = TRUE)
          Y_pred <- predict(pls_model, newdata = X_test[,nzv.X])$predict
          pls_model$Y <- Y_train
          pls_model$type <- "mixo_spls"
@@ -1896,7 +1885,7 @@ NComp <- function(model,
   return(optimal_ncomps)
 }
 
-#' @title Estimate Variable Importance in Projections
+#' @title VIP: Estimate Variable Importance in Projections
 #'
 #' @description Use a VIP threshold to calculate variable importance in projections.
 #'
@@ -2108,6 +2097,8 @@ VIP <- function(plsr.results, ncomp, Scores = FALSE, vip_threshold = "NULL") {
 #' @keywords internal
 #'
 #' @export
+
+
 create_segments <- function(data, k = 5) {
 
   shuffled_indices <- sample(seq_len(nrow(data)))
@@ -2125,189 +2116,671 @@ create_segments <- function(data, k = 5) {
   return(segments)
 }
 
-#' @title Correlation Network Plot Generator
+#' Create and Save a Correlation Network Plot
 #'
-#' @description Create Enhanced Correlation Network Visualization
+#' This function generates a network visualization of correlations between two groups
+#' of variables (rows and columns of the input matrix). It automatically filters
+#' weak correlations, adjusts visual parameters based on network density, and saves
+#' a high-resolution PNG image.
 #'
-#' Creates a publication-ready network visualization from a correlation matrix,
-#' displaying correlations between two groups of variables as a network graph
-#' with automatically adjusted visual parameters based on data size.
+#' @param matrix A numeric matrix where rows represent variables in Group 1 and
+#'   columns represent variables in Group 2.
+#' @param g1name A character string. The label for the first group (rows). Defaults to "Group 1".
+#' @param g2name A character string. The label for the second group (columns). Defaults to "Group 2".
+#' @param title A character string. The main title of the plot. Defaults to
+#'   'Correlation Network Plot Comparison'.
+#' @param threshold A numeric value. The absolute correlation coefficient cutoff.
+#'   Edges with weights below this value are excluded. If the threshold is higher
+#'   than the maximum observed correlation, it is automatically lowered to the maximum.
+#'   Defaults to 0.7.
+#' @param colors A character vector of length 2. Hex codes or names for the node
+#'   colors (Group 1, Group 2). Defaults to c("#FF8C00", "#1E90FF").
+#' @param res Numeric. The resolution (DPI) for the saved PNG. Defaults to 600.
+#' @param width Numeric. The width of the saved image in inches. Defaults to 10.
+#' @param height Numeric. The height of the saved image in inches. Defaults to 8.
 #'
-#' @param matrix A numeric matrix containing correlations between
-#'   variables from two groups. Should be a cross-correlation matrix where
-#'   rows represent variables from group 1 and columns represent variables
-#'   from group 2.
-#' @param g1name Character string specifying the name for the first group
-#'   of variables (row variables). Default is "Group1".
-#' @param g2name Character string specifying the name for the second group
-#'   of variables (column variables). Default is "Group2".
-#' @param title Character string for the plot title.
-#'   Default is "Enhanced Correlation Network".
-#' @param threshold Numeric value between 0 and 1 specifying the minimum
-#'   absolute correlation value to display as edges in the network.
-#'   Correlations below this threshold will be filtered out. Default is 0.3.
-#' @param colors Character vector of length 2 specifying colors for the two
-#'   groups. First color for group1, second color for group2.
-#'   Default is c("#FF8C00", "#1E90FF") (orange and blue).
-#' @param res Numeric value specifying the resolution (DPI) for the
-#'   output PNG file. Default is 600.
-#' @param width Numeric value specifying the width of the output image in pixels.
-#'   Default is 4000.
-#' @param height Numeric value specifying the height of the output image in pixels.
-#'   Default is 3000.
+#' @return A \code{ggplot} object representing the network graph.
 #'
-#' @return A file of the correlation network in your working directory.
+#' @section Side Effects:
+#' Saves a PNG file to the working directory with the naming convention:
+#' \code{Cor_Network_[Group1]_vs_[Group2].png}.
 #'
-#' @details
-#' This function creates a network visualization where:
-#' \itemize{
-#'   \item Nodes represent variables from each group
-#'   \item Edges represent correlations above the specified threshold
-#'   \item Edge thickness is proportional to correlation strength
-#'   \item Node size and label size automatically adjust based on the number of variables
-#'   \item Different colors distinguish between the two groups
-#' }
-#'
-#' The function automatically optimizes visual parameters:
-#' \itemize{
-#'   \item ≤30 variables: point size 12, label size 0.8
-#'   \item ≤60 variables: point size 8, label size 0.6
-#'   \item ≤100 variables: point size 6, label size 0.5
-#'   \item >100 variables: point size 4, label size 0.4
-#' }
-#'
-#' Output files are automatically named using the pattern:
-#' "enhanced_network_group1_vs_group2.png" to prevent overwrites.
-#'
-#' @note
-#' Requires the \code{igraph} package. The function will stop with an error
-#' if igraph is not available.
-#'
-#' @seealso
-#' \code{\link[igraph]{graph_from_data_frame}}, \code{\link[igraph]{layout_with_fr}}
-#'
-#' @import igraph
-#' @importFrom grDevices png dev.off colorRampPalette
-#' @importFrom graphics plot legend par
-#' @importFrom stats cor
-#' @importFrom utils head
-#'
-#' @author Keeling et al., 2025
-#' @references
-#' Csardi, G., & Nepusz, T. (2006). The igraph software package for complex
-#' network research. InterJournal, Complex Systems, 1695.
+#' @importFrom igraph graph_from_data_frame delete_vertices degree V vcount
+#' @importFrom ggraph ggraph geom_edge_link geom_node_point geom_node_text scale_edge_width theme_graph
+#' @importFrom ggplot2 aes scale_color_manual labs theme element_text ggsave
+#' @importFrom ragg agg_png
+#' @importFrom rlang %||%
 #'
 #' @export
 
 cn <- function(matrix,
-               g1name = "Group1",
-               g2name = "Group2",
-               title = "Correlation Network Plot",
-               threshold = 0.7,
-               colors = c("#FF8C00", "#1E90FF"),
+               g1name = "Group 1",
+               g2name = "Group 2",
+               title = 'Correlation Network Plot Comparison',
+               threshold = 0.6,
+               colors = c("orange", "royalblue"),
                res = 600,
-               width = 1920,
-               height = 1080) {
+               width = 10,
+               height = 8) {
 
-  # Load required libraries if not already loaded
-  if (!require(igraph, quietly = TRUE)) {
-    stop("igraph package is required")
+
+  matrix[is.na(matrix)] <- 0
+  max_corr <- max(abs(matrix), na.rm = TRUE)
+
+  # If the user's threshold is too high, lower it automatically
+  if (max_corr < threshold) {
+    message(sprintf("Notice: No correlations met the threshold of %.2f.", threshold))
+    message(sprintf("Auto-lowering threshold to %.2f (maximum observed correlation).", max_corr))
+    threshold <- max_corr
   }
 
-  # Get dimensions - treating as cross-correlation matrix
-  n_vars_g1 <- nrow(matrix)  # Group 1 variables (rows)
-  n_vars_g2 <- ncol(matrix)  # Group 2 variables (columns)
-  total_vars <- max(n_vars_g1, n_vars_g2)  # Use max for auto-sizing
+  n_vars_g1 <- nrow(matrix)
+  n_vars_g2 <- ncol(matrix)
+  total_vars <- n_vars_g1 + n_vars_g2
 
-  # Auto-adjust point size based on number of variables
-  if (total_vars <= 30) {
-    point_size <- 12
-    label_cex <- 0.8
-  } else if (total_vars <= 60) {
-    point_size <- 8
-    label_cex <- 0.6
-  } else if (total_vars <= 100) {
-    point_size <- 6
-    label_cex <- 0.5
-  } else {
-    point_size <- 4
-    label_cex <- 0.4
+  # Build edge list including direction
+  edges_df <- expand.grid(from_idx = 1:n_vars_g1, to_idx = 1:n_vars_g2)
+  edges_df$weight <- as.vector(matrix)
+  edges_df <- edges_df[!is.na(edges_df$weight) & abs(edges_df$weight) >= threshold, ]
+
+  if(nrow(edges_df) == 0) {
+    message("No correlations met the threshold.")
+    return(NULL)
   }
 
-  # Filter correlations above threshold
-  filtered_matrix <- matrix
-  filtered_matrix[abs(filtered_matrix) < threshold] <- 0
+  # Create Direction column for the legend
+  edges_df$dir <- ifelse(edges_df$weight > 0, "Positive", "Negative")
+  edges_df$dir <- factor(edges_df$dir, levels = c("Positive", "Negative"))
+  edges_df$to_idx <- edges_df$to_idx + n_vars_g1
+  edges_df$weight <- abs(edges_df$weight)
 
-  # Create edge list directly from cross-correlation matrix
-  edges_df <- data.frame(
-    from = integer(),
-    to = integer(),
-    weight = numeric()
+  # Node data
+  nodes_df <- data.frame(
+    id = 1:total_vars,
+    name = c(rownames(matrix) %||% paste0("Row", 1:n_vars_g1),
+             colnames(matrix) %||% paste0("Col", 1:n_vars_g2)),
+    group = c(rep(g1name, n_vars_g1), rep(g2name, n_vars_g2))
   )
 
-  # Build edge list: Group1 nodes (1 to n_vars_g1) connect to Group2 nodes (n_vars_g1+1 to n_vars_g1+n_vars_g2)
-  for(i in 1:n_vars_g1) {
-    for(j in 1:n_vars_g2) {
-      if(abs(filtered_matrix[i,j]) > 0) {
-        edges_df <- rbind(edges_df,
-                          data.frame(from = i,
-                                     to = j + n_vars_g1,  # Offset Group2 nodes
-                                     weight = abs(filtered_matrix[i,j])))
-      }
-    }
+  g <- igraph::graph_from_data_frame(edges_df, directed = FALSE, vertices = nodes_df)
+  g <- igraph::delete_vertices(g, igraph::V(g)[igraph::degree(g) == 0])
+
+  n_final <- igraph::vcount(g)
+
+  # Auto-adjust visual parameters
+  if (n_final <= 10) {
+    p_size <- 12; t_size <- 8
+  } else if (n_final >= 11) {
+    p_size <- 11; t_size <- 7
+  } else if (n_final >= 30) {
+    p_size <- 10; t_size <- 6
+  } else if (n_final >= 40) {
+    p_size <- 9; t_size <- 5
+  } else if (n_final >= 50) {
+    p_size <- 8; t_size <- 4
+  } else if (n_final >= 60) {
+    p_size <- 7; t_size <- 3
+  } else {
+    p_size <- 5; t_size <- 1
   }
 
-  # Only create network if there are edges
-  if(nrow(edges_df) > 0) {
+  # Plot with ggraph
+  p <- ggraph::ggraph(g, layout = "fr") +
+    ggraph::geom_edge_link(
+      ggplot2::aes(width = weight, linetype = dir),
+      color = "grey",
+      alpha = 0.5
+    ) +
+    ggraph::geom_node_point(ggplot2::aes(color = group), size = p_size) +
+    ggraph::geom_node_text(
+      ggplot2::aes(label = name),
+      repel = TRUE,
+      #size = t_size,
+      fontface = "bold",
+      family = "sans"
+    ) +
+    ggraph::scale_edge_linetype_manual(
+      values = c("Positive" = "solid", "Negative" = "dashed"),
+      drop = FALSE
+    ) +
+    # Aesthetic Controls
+    ggplot2::scale_color_manual(values = colors) +
+    ggraph::scale_edge_width(range = c(0.2, 2.0)) +
+    # Legend Refinement
+    ggplot2::labs(
+      title = title,
+      color = expression(bold("Comparisons")),
+      edge_width = "Strength",
+      edge_linetype = "Direction",
+    ) +
+    ggraph::theme_graph(base_family = "sans") +
+    ggplot2::theme(
+      legend.position = "right",
+      legend.title = ggplot2::element_text(face = "bold"),
+    )
 
-    # Create node attributes
-    total_nodes <- n_vars_g1 + n_vars_g2
-    node_types <- c(rep(g1name, n_vars_g1), rep(g2name, n_vars_g2))
-    node_names <- c(paste("Point", 1:n_vars_g1), paste("Point", 1:n_vars_g2))
-
-    # Create igraph network
-    g <- graph_from_data_frame(edges_df, directed = FALSE,
-                               vertices = data.frame(name = 1:total_nodes,
-                                                     type = node_types,
-                                                     label = node_names))
-
-    # Set colors
-    V(g)$color <- ifelse(V(g)$type == g1name, colors[1], colors[2])
-
-    # Set edge weights for visualization
-    E(g)$width <- E(g)$weight * 3
-
-    # Create filename
+    # Save with ragg for multiple device compatibility
     clean_name1 <- gsub("[^A-Za-z0-9]", "", g1name)
     clean_name2 <- gsub("[^A-Za-z0-9]", "", g2name)
-    filename <- paste0("enhanced_network_", clean_name1, "_vs_", clean_name2, ".png")
+    filename <- paste0("CN_", clean_name1, "_vs_", clean_name2, ".png")
+    ggplot2::ggsave(filename, plot = p, width = width, height = height, dpi = res, device = ragg::agg_png)
 
-    # Create enhanced network plot
-    png(filename, width = width, height = height, res = res)
-
-    par(mar = c(1,1,3,1))
-    plot(g,
-         vertex.color = V(g)$color,
-         vertex.size = point_size,
-         vertex.label = V(g)$label,
-         vertex.label.cex = label_cex,
-         vertex.label.color = "black",
-         vertex.label.dist = 0,
-         edge.width = E(g)$width,
-         edge.color = alpha("gray50", 0.6),
-         layout = layout_with_fr(g, niter = 500),
-         main = title,
-         cex.main = 1.8)
-
-    # Add legend
-    legend("bottomright",
-           legend = c(g1name, g2name),
-           fill = colors,
-           cex = 1.2,
-           bty = "n")
-
-    dev.off()
-  }
+  return(p)
 }
 
+#' @title Sparse Partial Least Squares from MixOmics Package
+#'
+#' @description
+#' A standalone implementation of Sparse Partial Least Squares (sPLS) regression
+#' designed to replace the mixOmics dependency. It performs simultaneous variable
+#' selection and dimensionality reduction. This function structures the output
+#' to be compatible with the custom VIP and statistics functions in this package.
+#'
+#' @references
+#' Le Cao K-A, Rossouw D, Robert-Granie C, Besse P (2008). A sparse PLS for
+#' variable selection when integrating Omics data. Statistical Applications in
+#' Genetics and Molecular Biology 7(1).
+#'
+#' @param X Numeric matrix or data frame of predictors.
+#' @param Y Numeric matrix or data frame of responses.
+#' @param ncomp Integer, number of latent components (default 2).
+#' @param mode Character, PLS mode. Default is "regression".
+#' @param keepX Numeric vector of length ncomp, number of variables to keep in X loadings.
+#' @param keepY Numeric vector of length ncomp, number of variables to keep in Y loadings.
+#' @param scale Logical, whether to scale the data (default TRUE).
+#' @param near.zero.var Logical, whether to remove zero variance columns (default TRUE).
+#' @param max.iter Integer, maximum iterations for convergence (default 500).
+#' @param tol Numeric, tolerance for convergence (default 1e-06).
+#'
+#' @return An object of class "mixo_spls" (and "list") containing loadings,
+#' variates (scores), and model data compatible with downstream VIP analysis.
+#'
+#' @export
+spls <- function(X, Y,
+                 ncomp = 2,
+                 mode = "regression",
+                 keepX = NULL,
+                 keepY = NULL,
+                 scale = TRUE,
+                 near.zero.var = TRUE,
+                 max.iter = 500,
+                 tol = 1e-06) {
+
+  # --- Helper: Zero Variance Removal ---
+  clean_data <- function(mat) {
+    if (is.null(mat)) return(NULL)
+    mat <- as.matrix(mat)
+    if (near.zero.var) {
+      vars <- apply(mat, 2, var, na.rm = TRUE)
+      keep_cols <- vars > .Machine$double.eps
+      if (sum(keep_cols) < 2) warning("Variables with near-zero variance detected and removed, leaving < 2 variables.")
+      return(mat[, keep_cols, drop = FALSE])
+    }
+    return(mat)
+  }
+
+  # --- Helper: Soft Thresholding for Sparsity ---
+  select_var <- function(vec, keep) {
+    if (is.null(keep) || keep >= length(vec)) return(vec)
+    absv <- abs(vec)
+    threshold <- sort(absv, decreasing = TRUE)[keep]
+    vec[absv < threshold] <- 0
+    return(vec)
+  }
+
+  # --- 1. Data Preparation ---
+  X <- clean_data(X)
+  Y <- clean_data(Y)
+
+  X.names <- colnames(X)
+  Y.names <- colnames(Y)
+
+  # Store original matrices for model output
+  X_orig <- X
+  Y_orig <- Y
+
+  # Center and Scale (and save means/sd for prediction/VIP)
+  X_mean <- colMeans(X, na.rm = TRUE)
+  X_sd <- apply(X, 2, sd, na.rm = TRUE)
+  if(!scale) X_sd <- rep(1, ncol(X))
+
+  Y_mean <- colMeans(Y, na.rm = TRUE)
+  Y_sd <- apply(Y, 2, sd, na.rm = TRUE)
+  if(!scale) Y_sd <- rep(1, ncol(Y))
+
+  X <- scale(X, center = X_mean, scale = X_sd)
+  Y <- scale(Y, center = Y_mean, scale = Y_sd)
+
+  # Prepare output containers
+  n_X <- ncol(X)
+  n_Y <- ncol(Y)
+
+  loadings_X <- matrix(0, nrow = n_X, ncol = ncomp)
+  loadings_Y <- matrix(0, nrow = n_Y, ncol = ncomp)
+  variates_X <- matrix(0, nrow = nrow(X), ncol = ncomp)
+  variates_Y <- matrix(0, nrow = nrow(Y), ncol = ncomp)
+  mat_c      <- matrix(0, nrow = n_Y, ncol = ncomp) # Y loadings (for prediction)
+  mat_d      <- matrix(0, nrow = n_X, ncol = ncomp) # X loadings (for deflation)
+
+  # Row/Col names
+  rownames(loadings_X) <- X.names
+  rownames(loadings_Y) <- Y.names
+  colnames(loadings_X) <- colnames(loadings_Y) <- paste0("comp", 1:ncomp)
+
+  # Default keepX/keepY
+  if (is.null(keepX)) keepX <- rep(n_X, ncomp)
+  if (is.null(keepY)) keepY <- rep(n_Y, ncomp)
+  if (length(keepX) < ncomp) keepX <- rep(keepX, length.out = ncomp)
+  if (length(keepY) < ncomp) keepY <- rep(keepY, length.out = ncomp)
+
+  # Create deflated matrices for iteration
+  X_curr <- X
+  Y_curr <- Y
+
+  # --- 2. Iterative NIPALS / SVD Loop ---
+  for (h in 1:ncomp) {
+
+    # 2a. SVD on Cross-Product Matrix
+    M <- crossprod(X_curr, Y_curr)
+    svd_M <- svd(M, nu = 1, nv = 1)
+    u_h <- svd_M$u[, 1]
+    v_h <- svd_M$v[, 1]
+
+    # 2b. Apply Sparsity
+    u_h <- select_var(u_h, keepX[h])
+    v_h <- select_var(v_h, keepY[h])
+
+    # Normalize
+    if(sum(u_h^2) > 0) u_h <- u_h / sqrt(sum(u_h^2))
+    if(sum(v_h^2) > 0) v_h <- v_h / sqrt(sum(v_h^2))
+
+    # 2c. Calculate Scores
+    xi_h <- X_curr %*% u_h
+    omega_h <- Y_curr %*% v_h
+
+    # 2d. Calculate Deflation Vectors (Loadings C and D)
+    denom <- sum(xi_h^2)
+    c_h <- crossprod(Y_curr, xi_h) / denom # Y loading
+    d_h <- crossprod(X_curr, xi_h) / denom # X loading
+
+    # 2e. Deflation
+    X_curr <- X_curr - xi_h %*% t(d_h)
+    Y_curr <- Y_curr - xi_h %*% t(c_h)
+
+    # 2f. Store results
+    loadings_X[, h] <- u_h
+    loadings_Y[, h] <- v_h
+    variates_X[, h] <- xi_h
+    variates_Y[, h] <- omega_h
+    mat_c[, h]      <- c_h
+    mat_d[, h]      <- d_h
+  }
+
+  # --- 3. Format Output ---
+  res <- list(
+    call = match.call(),
+    X = X_orig,
+    Y = Y_orig,
+    ncomp = ncomp,
+    mode = mode,
+    keepX = keepX,
+    keepY = keepY,
+
+    # MixOmics standard slots
+    loadings = list(X = loadings_X, Y = loadings_Y),
+    variates = list(X = data.frame(variates_X), Y = data.frame(variates_Y)),
+    mat.c = mat_c, # Required for prediction
+    mat.d = mat_d, # Required for prediction/deflation
+
+    # Aliases for VIP and other utils.R functions
+    loading.weights = loadings_X,
+    scores = data.frame(variates_X),
+
+    # Scaling info (Required for VIP and Predict)
+    Xmeans = X_mean,
+    Ymeans = Y_mean,
+    Xsigma = X_sd, # Used in prediction scaling
+    Ysigma = Y_sd,
+
+    names = list(sample = rownames(X), colnames = list(X = X.names, Y = Y.names)),
+    tol = tol,
+    max.iter = max.iter,
+    iter = rep(0, ncomp)
+  )
+
+  # Model slot required by pls.bio.R (Ordered Y then X)
+  res$model <- list(Y = Y_orig, X = X_orig)
+
+  # Explained Variance
+  expl_X <- apply(variates_X, 2, var) / sum(apply(X, 2, var))
+  expl_Y <- apply(variates_Y, 2, var) / sum(apply(Y, 2, var))
+  res$prop_expl_var <- list(X = expl_X, Y = expl_Y)
+
+  class(res) <- "mixo_spls"
+
+  return(res)
+}
+
+#' @title Predict Method for sPLS through MixOmics Package
+#'
+#' @description
+#' S3 method to enable prediction for mixo_spls objects created by the standalone spls function.
+#' This is required for plsr_stats to function correctly.
+#'
+#' @param object A mixo_spls object.
+#' @param newdata Matrix or data frame of new predictor data.
+#' @param ... Additional arguments.
+#'
+#' @export
+predict.mixo_spls <- function(object, newdata, ...) {
+
+  newdata <- as.matrix(newdata)
+
+  # Scale new data using training statistics
+  # Handling cases where scale=FALSE (sigma=1)
+  newdata <- scale(newdata, center = object$Xmeans, scale = object$Xsigma)
+
+  # Containers
+  ncomp <- object$ncomp
+  n_samples <- nrow(newdata)
+  n_Y <- ncol(object$Y)
+
+  # Array to store predictions: Samples x Variables x Components
+  pred_array <- array(0, dim = c(n_samples, n_Y, ncomp),
+                      dimnames = list(rownames(newdata), colnames(object$Y), paste0("dim", 1:ncomp)))
+
+  # Iterative prediction based on deflation
+  X_curr <- newdata
+  Y_pred_cum <- matrix(0, nrow = n_samples, ncol = n_Y)
+
+  for (h in 1:ncomp) {
+    # Calculate score for new data
+    t_h <- X_curr %*% object$loadings$X[, h]
+
+    # Predict Y part for this component (t * c')
+    # c is stored in mat.c
+    y_pred_h <- t_h %*% t(object$mat.c[, h])
+
+    # Accumulate predictions
+    Y_pred_cum <- Y_pred_cum + y_pred_h
+
+    # Deflate X using d (stored in mat.d)
+    X_curr <- X_curr - t_h %*% t(object$mat.d[, h])
+
+    # Unscale the prediction to original units
+    # Y_raw = Y_scaled * sigma + mean
+    Y_pred_raw <- sweep(Y_pred_cum, 2, object$Ysigma, "*")
+    Y_pred_raw <- sweep(Y_pred_raw, 2, object$Ymeans, "+")
+
+    pred_array[, , h] <- Y_pred_raw
+  }
+
+  # Return list with $predict element to match plsr_stats expectation
+  list(predict = pred_array)
+}
+
+#' @title tune.spls: Estimate the maximum number of variables in X to keep
+#'
+#' @description
+#' Minimal implementation of tune.spls to satisfy dependency calls.
+#' Returns the largest keepX to maximize information retention.
+#'
+#' @export
+tune.spls <- function(X, Y, ncomp, test.keepX, ...) {
+  choice.keepX <- rep(max(test.keepX), ncomp)
+  names(choice.keepX) <- paste0("comp", 1:ncomp)
+  list(choice.keepX = choice.keepX)
+}
+
+
+#' @title condense multiple data sheets into one
+#'
+#' @description This function takes a nested list object containing data table
+#' results from multiple subsetted tests with matching column names and condenses
+#' it down into one single excel file with each sheet as a separate regression model.
+#' This is an internal function specifically used to reconstruct the summary
+#' outputs for the AABV and PSLR functions.The function is ideal only when
+#' subsetted tests of variables are performed.
+#'
+#' @param AABV.summary Either an AABV or PSLR function output.
+#'
+#' @param write.results Logical value whether to summarize the results to a
+#' readable Excel files. Each model containing the associated regression results will
+#' be a separate Excel file with each regression result as a separate Excel sheet.
+#' Default is TRUE.
+#'
+#' @param key Character string. Identifier for output files and directories.
+#' Default is NULL.
+#'
+#' @details This function takes either an AABV or PSLR object that has the argument
+#' restructure.models set to FALSE (this argument automatically performs this function).
+#' The function is ideal when subsetted tests of variables are performed. The function
+#' will iterate over each regression model/hypothesis and each unique regression test.
+#' If the regression test has subsetted variables that were each separately subject
+#' to regression tests, the function will combine each subsetted test into a single
+#' excel sheet within an excel file for that regression model/hypothesis.
+#'
+#' @returns a nested list object containing each overall regression hypothesis/model
+#' as a nested list of individual, subsetted regression tests.
+#'
+#' @author Keeling et al., 2025
+#'
+#' @importFrom writexl write_xlsx
+#' @importFrom dplyr filter mutate
+#' @importFrom utils write.csv
+#'
+#' @export
+#'
+#' @import geomorph writexl readxl
+#'
+#' @examples
+#'
+#' #' \dontrun{
+#'
+#' # Scenario Question: How much of symphyseal shape variance can be explained
+#' #   by a linear regression of the cross-sectional properties of the posterior corpus?
+#'
+#' # Posterior corpus in this example refers to the following cross-sections:
+#'
+#' # LM1M2 - interdental junction of the left side first and second molars.
+#' # LP3P4 - interdental junction of the left side third and fourth premolars.
+#' # RP3P4 - interdental junction of the right side third and fourth premolars.
+#' # RM1M2 - interdental junction of the right side first and second molars.
+#'
+#' # Import data sample of mandibular corpus: Corpus_Land
+#' # Import data sample of mandibular corpus data table: Biomechanics
+#'
+#' data(Corpus_Land)
+#' data(Biomechanics)
+#'
+#'
+#' # Create a data analysis model
+#'
+#' Models <- list('Regression_Model' =
+#'                   list(
+#'                        'Symphysis_Shape ~ LM1M2' = list(
+#'                          'Symphysis_Shape' = Corpus_Land[241:360,,], # symphyseal landmarks
+#'                          'LM1M2' = Biomechanics %>% filter(Region = "LM1M2") # LM1M2 filtered data
+#'                          ),
+#'                        'Symphysis_Shape ~ LP3P4' = list(
+#'                          'Symphysis_Shape' = Corpus_Land[241:360,,],
+#'                          'LM1M2' = Biomechanics %>% filter(Region = "LM1M2")
+#'                          ),
+#'                        'Symphysis_Shape ~ RP3P4' = list(
+#'                          'Symphysis_Shape' = Corpus_Land[241:360,,],
+#'                          'LM1M2' = Biomechanics %>% filter(Region = "LM1M2")
+#'                          ),
+#'                        'Symphysis_Shape ~ RM1M2' = list(
+#'                          'Symphysis_Shape' = Corpus_Land[241:360,,],
+#'                          'LM1M2' = Biomechanics %>% filter(Region = "LM1M2")
+#'                          ),
+#'                        )
+#'                )
+#'
+#'
+#' # Let's subset the filtered data tables by cross-sectional property types:
+#' \itemize{
+#'   \item{Dimensions}{Variables 1:3, 5:8, 10:15}
+#'   \item{Orientation}{Variables 9, 24}
+#'   \item{Cortical Thickness}{Variables 4, 16:18, 30:60}
+#'   \item{Bending Resistance}{Variables 19:23}
+#'   \item{Breaking Strength}{Variables 25:29}
+#' }
+#'
+#' # Create the point_set argument model for subsetted variables.
+#' # IMPORTANT: If no subsets are desired for either the response or predictor data
+#' # all variables must be inputted in point_set subsets. For example:
+#'
+#' point_set <- list('Regression' =
+#'                      list(
+#'                        'Symphysis_Shape ~ LM1M2' = list(
+#'                          'Symphysis_Shape' = list(
+#'                               'Subset_1' = c(1:120), # symphysis has 120 total landmarks
+#'                               'Subset_2' = c(1:120),
+#'                               'Subset_3' = c(1:120),
+#'                               'Subset_4' = c(1:120),
+#'                               'Subset_5' = c(1:120)
+#'                               ),
+#'
+#'                          'LM1M2' = list(
+#'                               'Dimensions' = c(1:3, 5:8, 10:15),
+#'                               'Orientation' = c(9, 24),
+#'                               'Cortical Thickness' = c(4, 16:18, 30:60),
+#'                               'Bending Resistance' = c(19:23),
+#'                               'Breaking Strength' = c(25:29)
+#'                               )
+#'                          ),
+#'                        'Symphysis_Shape ~ LP3P4' = list(
+#'                          'Symphysis_Shape' = list(
+#'                               'Subset_1' = c(1:120), # symphysis has 120 total landmarks
+#'                               'Subset_2' = c(1:120),
+#'                               'Subset_3' = c(1:120),
+#'                               'Subset_4' = c(1:120),
+#'                               'Subset_5' = c(1:120)
+#'                               ),
+#'
+#'                          'LP3P4' = list(
+#'                               'Dimensions' = c(1:3, 5:8, 10:15),
+#'                               'Orientation' = c(9, 24),
+#'                               'Cortical Thickness' = c(4, 16:18, 30:60),
+#'                               'Bending Resistance' = c(19:23),
+#'                               'Breaking Strength' = c(25:29)
+#'                               )
+#'                          ),
+#'                         'Symphysis_Shape ~ RP3P4' = list(
+#'                          'Symphysis_Shape' = list(
+#'                               'Subset_1' = c(1:120), # symphysis has 120 total landmarks
+#'                               'Subset_2' = c(1:120),
+#'                               'Subset_3' = c(1:120),
+#'                               'Subset_4' = c(1:120),
+#'                               'Subset_5' = c(1:120)
+#'                               ),
+#'
+#'                          'RP3P4' = list(
+#'                               'Dimensions' = c(1:3, 5:8, 10:15),
+#'                               'Orientation' = c(9, 24),
+#'                               'Cortical Thickness' = c(4, 16:18, 30:60),
+#'                               'Bending Resistance' = c(19:23),
+#'                               'Breaking Strength' = c(25:29)
+#'                               )
+#'                          ),
+#'                         'Symphysis_Shape ~ RM1M2' = list(
+#'                          'Symphysis_Shape' = list(
+#'                               'Subset_1' = c(1:120), # symphysis has 120 total landmarks
+#'                               'Subset_2' = c(1:120),
+#'                               'Subset_3' = c(1:120),
+#'                               'Subset_4' = c(1:120),
+#'                               'Subset_5' = c(1:120)
+#'                               ),
+#'
+#'                          'RM1M2' = list(
+#'                               'Dimensions' = c(1:3, 5:8, 10:15),
+#'                               'Orientation' = c(9, 24),
+#'                               'Cortical Thickness' = c(4, 16:18, 30:60),
+#'                               'Bending Resistance' = c(19:23),
+#'                               'Breaking Strength' = c(25:29)
+#'                               )
+#'                          )
+#'                       )
+#'                   )
+#'
+#' # Run the PSLR function to conduct parallel regressions.
+#'
+#' output <- PSLR(Models, # the regression model created above
+#'                subset = TRUE, # there are subsets in this regression test
+#'                paired_subsets = FALSE, # Since response variable contains no unique subsets, this is not necessary
+#'                point_set, # this is the subset model that was created above
+#'                key = "Corpus", # Name for the output file folder.
+#'                restructured.results = FALSE # The function restructure_models performs this
+#'                ) # keep everything else as default
+#'
+#'
+#' }
+#'
+#' # Restructure the results
+#'
+#' output <- restructure_models(output)
+#'
+#' # View the results
+#'
+#' view(output[[1]][[1]]) # view the first set of regression tests from the first model
+
+restructure_models <- function(AABV.summary,
+                               write.results = TRUE,
+                               key = NULL) {
+  Dir = getwd()
+  if(!is.null(key)) {
+    path = paste("AABV_Restructured-", key)
+    path = file.path(Dir, path)
+    if(!dir.exists(path)) {
+      dir.create(path)
+    }
+
+  } else {
+    path = file.path(Dir, "AABV_Restructured")
+    if(!dir.exists("AABV_Restructured")) {
+      dir.create("AABV_Restructured")
+    }
+  }
+  setwd(path)
+
+  # Initialize a new list to store the restructured data
+  restructured_output <- list()
+
+  # Loop through each model in the output list
+  for (model_name in names(AABV.summary)) {
+    # Estimate model structure
+    num_comparisons <- length(AABV.summary[[model_name]])
+    num_subsets <- nrow(AABV.summary[[model_name]][[1]])
+    # Initialize the model's list in the restructured output
+    restructured_output[[model_name]] <- vector("list", num_subsets)
+
+    # Initialize empty dataframes for each subset
+    for (subset in 1:num_subsets) {
+      restructured_output[[model_name]][[subset]] <- data.frame(matrix(nrow = num_comparisons, ncol = ncol(AABV.summary[[model_name]][[1]])))
+      colnames(restructured_output[[model_name]][[subset]]) <- colnames(AABV.summary[[model_name]][[1]])
+    }
+    # Loop through each comparison
+    for (comparison in 1:num_comparisons) {
+      # Get the dataframe for the current comparison
+      comparison_df <- AABV.summary[[model_name]][[comparison]]
+      if (!is.data.frame(comparison_df)) {
+        stop("The data structure is not as expected. Each comparison should be a dataframe.")
+      }
+      # Loop through each subset
+      for (subset in 1:num_subsets) {
+        # Place the corresponding row of the comparison dataframe into the correct position
+        restructured_output[[model_name]][[subset]][comparison, ] <- comparison_df[subset, ]
+      }
+    }
+    # Name the list elements for each model
+    names(restructured_output[[model_name]]) <- paste0("Subset_", 1:num_subsets)
+  }
+  if(isTRUE(write.results)) {
+    for(m in seq_along(restructured_output)) {
+      write_xlsx(restructured_output[[m]], path = paste("Restructured AABV_Summary of Model_",m,".xlsx", sep = ""))
+    }
+  }
+  return(restructured_output)
+}
 

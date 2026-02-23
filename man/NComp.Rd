@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{NComp}
 \alias{NComp}
-\title{Calculate best number of latent variables for a Partial Least Squares Analysis}
+\title{NComp: Calculate best number of latent variables for a Partial Least Squares Analysis}
 \usage{
 NComp(
   model,

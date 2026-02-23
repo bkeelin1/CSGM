@@ -50,11 +50,10 @@ The function handles multiple categorical variables by:
 }
 \examples{
 \dontrun{
-# Create example data
-set.seed(123)
+# Example data
 n <- 100
 
-# Generate sample data
+# Generated sample data
 observed_data <- data.frame(
   var1 = factor(sample(c("A", "B", "C"), n, replace = TRUE)),
   var2 = factor(sample(c("0", "1"), n, replace = TRUE))

@@ -91,18 +91,18 @@
 #'     \itemize{
 #'        \item{r:    Mantel/Canonical correlation statistic}
 #'        \item{p:    Statistical significance}
-#'        \item{I:    Mean squared correlation (overall correlation strength)}
-#'        \item{I_x:    Within-set mean squared correlation for predictor variables}
-#'        \item{I_y:    Within-set mean squared correlation for response variables}
+#'        \item{IC:    Mean squared correlation (overall correlation strength)}
+#'        \item{IC_x:    Within-set mean squared correlation for predictor variables}
+#'        \item{IC_y:    Within-set mean squared correlation for response variables}
 #'     }
 #'   }
 #'   \item{Cor.subset.Mantels:   Nested list structure of Mantel test results of subsetted data including:
 #'     \itemize{
 #'        \item{r:    Mantel/Canonical correlation statistic}
 #'        \item{p:    Statistical significance}
-#'        \item{I:    Mean squared correlation (overall correlation strength)}
-#'        \item{I_x:    Within-set mean squared correlation for predictor variables}
-#'        \item{I_y:    Within-set mean squared correlation for response variables}
+#'        \item{IC:    Mean squared correlation (overall correlation strength)}
+#'        \item{IC_x:    Within-set mean squared correlation for predictor variables}
+#'        \item{IC_y:    Within-set mean squared correlation for response variables}
 #'     }
 #'   }
 #' }
@@ -159,9 +159,9 @@
 #'         \itemize{
 #'              \item{r:    Mantel/Canonical correlation statistic}
 #'              \item{p:    Statistical significance}
-#'              \item{I:    Mean squared correlation (overall correlation strength)}
-#'              \item{I_x:    Within-set mean squared correlation for predictor variables}
-#'              \item{I_y:    Within-set mean squared correlation for response variables}
+#'              \item{IC:    Mean squared correlation (overall correlation strength)}
+#'              \item{IC_x:    Within-set mean squared correlation for predictor variables}
+#'              \item{IC_y:    Within-set mean squared correlation for response variables}
 #'        }
 #'     }
 #'     \item{Cor.subset.Mantels:    Optional when point_set is provided
@@ -169,8 +169,8 @@
 #'              \item{r:    Mantel/Canonical correlation statistic}
 #'              \item{p:    Statistical significance}
 #'              \item{I:    Mean squared correlation (overall correlation strength)}
-#'              \item{I_x:    Within-set mean squared correlation for predictor variables}
-#'              \item{I_y:    Within-set mean squared correlation for response variables}
+#'              \item{IC_x:    Within-set mean squared correlation for predictor variables}
+#'              \item{IC_y:    Within-set mean squared correlation for response variables}
 #'        }
 #'     }
 #'   }
@@ -348,7 +348,6 @@ cor.bio <- function(Models,
                     core_choice = "detect",
                     ...) {
 
-  set.seed(1)
   #___________________________________________________________________________________________________________________________
   Dir = getwd()
   if(!dir.exists("Correlations_Bio")) {
@@ -363,10 +362,6 @@ cor.bio <- function(Models,
   subset = if(is.null(point_set)) FALSE else TRUE
   #___________________________________________________________________________________________________________________________
   for(m in seq_along(Models)) {
-
-    #cor.all = vector("list", length(Models[[m]]))
-    #cor.subset = vector("list", length(Models[[m]]))
-    #trim.subset = vector("list", length(Models[[m]]))
     Cor.subset.Mantels = vector("list", length(Models[[m]]))
     Cor.all.Mantels = vector("list", length(Models[[m]]))
     cam = list()
@@ -375,13 +370,9 @@ cor.bio <- function(Models,
 
     if(isTRUE(subset)) {
       for(i in seq_along(Models[[m]])) {
-        #cor.subset[[i]] <- vector("list", length(point_set[[m]][[i]][[2]]))
-        #trim.subset[[i]] <- vector("list", length(point_set[[m]][[i]][[2]]))
         Cor.subset.Mantels[[i]] <- vector("list", length(point_set[[m]][[i]][[2]]))
         if(length(point_set[[m]][[i]][[2]]) == 1) {
           p_subset <- 1
-          #cor.subset[[i]] <- vector("list", p_subset)
-          #trim.subset[[i]] <- vector("list", p_subset)
           Cor.subset.Mantels[[i]] <- vector("list", p_subset)
         } else {
           if(isTRUE(paired_subsets)) {
@@ -391,8 +382,6 @@ cor.bio <- function(Models,
                                   Predictor = rep(1:length(point_set[[m]][[i]][[2]]))
             )
           }
-         # cor.subset[[i]] <- vector("list", nrow(p_subset))
-         # trim.subset[[i]] <- vector("list", nrow(p_subset))
           Cor.subset.Mantels[[i]] <- vector("list", nrow(p_subset))
         }
       }
@@ -470,19 +459,28 @@ cor.bio <- function(Models,
 
        if(length(dim(Response)) == 3) {
          y = as.matrix.data.frame(geomorph::two.d.array(Response))
-         I_y = mean(cor(y)^2)
+
+         I_y = cor(y, use = "complete.obs")^2
+         diag(I_y) <- NA
+         I_y = mean(I_y, na.rm = TRUE)
          y = as.matrix.data.frame(geomorph::gm.prcomp(y)$x %>% if(ncol(.) < 10) . else .[,1:10])
        } else {
          y = as.matrix.data.frame(Response)
-         I_y = mean(cor(y)^2)
+         I_y = cor(y, use = "complete.obs")^2
+         diag(I_y) <- NA
+         I_y = mean(I_y, na.rm = TRUE)
        }
        if(length(dim(Predictor)) == 3) {
          x = as.matrix.data.frame(geomorph::two.d.array(Predictor))
-         I_x = mean(cor(x)^2)
+         I_x = cor(x, use = "complete.obs")^2
+         diag(I_x) <- NA
+         I_x = mean(I_x, na.rm = TRUE)
          x = as.matrix.data.frame(geomorph::gm.prcomp(x)$x %>% if(ncol(.) < 10) . else .[,1:10])
        } else {
          x = as.matrix.data.frame(Predictor)
-         I_x = mean(cor(x)^2)
+         I_x = cor(x, use = "complete.obs")^2
+         diag(I_x) <- NA
+         I_x = mean(I_x, na.rm = TRUE)
        }
        corr_results <- Hmisc::rcorr(x,y)
        cor_matrix <- corr_results$r
@@ -490,34 +488,44 @@ cor.bio <- function(Models,
        p_matrix <- corr_results$P
        p_matrix[is.na(p_matrix)] <- 0.99
        corr_mask <- p_matrix <= 0.05
-       #cor.all <- corr_results
        if(ncol(x) == ncol(y)) {
          cam <- vegan::mantel(cor(x), cor(y))
-         Cor.all.Mantels <- data.frame(r = cam$statistic, p = cam$signif, I = I, I_x = I_x, I_y = I_y)
+         Cor.all.Mantels <- data.frame(r = cam$statistic, p = cam$signif, IC = I, IC_x = I_x, IC_y = I_y)
        } else {
            cam = PMA::CCA.permute(x, y, "standard", "standard")
            cam = PMA::CCA.permute(x, y, "standard", "standard",cam$bestpenaltyx, cam$bestpenaltyz)
-           cam = data.frame(r = mean(cam$corperms, na.rm = TRUE), p = mean(cam$pvals, na.rm = TRUE),I = I, I_x = I_x, I_y = I_y)
+           cam = data.frame(r = mean(cam$corperms, na.rm = TRUE), p = mean(cam$pvals, na.rm = TRUE),IC = I, IC_x = I_x, IC_y = I_y)
            Cor.all.Mantels <- cam
        }
 
-       if(ncol(x) > 100){
+       if(ncol(x) >= 100){
          nsize = 0.1
-         tsize = 0.25
+         tsize = 0.15
          lsize = 0.3
-       }else if(ncol(x) > 60) {
+       }else if(ncol(x) >= 60) {
          nsize = 0.2
-         tsize = 0.3
+         tsize = 0.25
          lsize = 0.4
-       }else if(ncol(x) > 50) {
+       }else if(ncol(x) >= 50) {
          nsize = 0.25
          tsize = 0.35
          lsize = 0.5
-       } else if(ncol(x) < 50) {
+       } else if(ncol(x) <= 49) {
          nsize = 0.4
          tsize = 0.4
          lsize = 0.6
        }
+
+       # Correlation Network Plot
+       cn_matrix = cor_matrix
+       cn_matrix[p_matrix <= 0.05] <- 0
+       if(identical(x,y)) {
+         diag(cn_matrix) <- 0
+       }
+       cn(cn_matrix,
+          g1name = names(Models[[m]][[i]])[1],
+          g2name = names(Models[[m]][[i]])[2],
+          threshold = 0.5)
 
        # Call an image then save it to the created directory
        grDevices::png(paste(path,"/", names(Models[[m]][[i]])[1], "-", names(Models[[m]][[i]])[2], ".png", sep = ""),
@@ -569,19 +577,27 @@ cor.bio <- function(Models,
 
            if(length(dim(Response)) == 3) {
              y = as.matrix.data.frame(two.d.array(Response))
-             I_y = mean(cor(y)^2)
+             I_y = cor(y, use = "complete.obs")^2
+             diag(I_y) <- NA
+             I_y = mean(I_y, na.rm = TRUE)
              y = as.matrix.data.frame(gm.prcomp(y)$x %>% if(ncol(.) < 10) . else .[,1:10])
            } else {
              y = as.matrix.data.frame(Response)
-             I_y = mean(cor(y)^2)
+             I_y = cor(y, use = "complete.obs")^2
+             diag(I_y) <- NA
+             I_y = mean(I_y, na.rm = TRUE)
            }
            if(length(dim(Predictor)) == 3) {
              x = as.matrix.data.frame(two.d.array(Predictor))
-             I_x = mean(cor(x)^2)
+             I_x = cor(x, use = "complete.obs")^2
+             diag(I_x) <- NA
+             I_x = mean(I_x, na.rm = TRUE)
              x = as.matrix.data.frame(gm.prcomp(x)$x %>% if(ncol(.) < 10) . else .[,1:10])
            } else {
              x = as.matrix.data.frame(Predictor)
-             I_x = mean(cor(x)^2)
+             I_x = cor(x, use = "complete.obs")^2
+             diag(I_x) <- NA
+             I_x = mean(I_x, na.rm = TRUE)
            }
 
            corr_results <- Hmisc::rcorr(x,y)
@@ -590,38 +606,46 @@ cor.bio <- function(Models,
            p_matrix <- corr_results$P
            p_matrix[is.na(p_matrix)] <- 0.99
            corr_mask <- p_matrix <= 0.05
-           #cor.subset[[j]] <- corr_results
-           #remove_var <- findCorrelation(cor_matrix, cutoff = 0.7, names = TRUE)
-           #trim.subset[[j]] <- cor_matrix[(rownames(cor_matrix) %in% remove_var), (colnames(cor_matrix) %in% remove_var)]
 
            if(identical(x,y)) {
              cdm <- mantel(cor(x), cor(y))
-             Cor.subset.Mantels[[i]][[j]] <- data.frame(r = cdm$statistic, p = cdm$signif, I = I, I_x = I_x, I_y = I_y)
+             Cor.subset.Mantels[[i]][[j]] <- data.frame(r = cdm$statistic, p = cdm$signif, IC = I, IC_x = I_x, IC_y = I_y)
            } else {
                cam = PMA::CCA.permute(x,y, "standard", "standard")
                cam = PMA::CCA.permute(x,y, "standard", "standard",cam$bestpenaltyx, cam$bestpenaltyz)
-               cam = data.frame(r = mean(cam$corperms, na.rm = TRUE), p = mean(cam$pvals, na.rm = TRUE),I = I, I_x = I_x, I_y = I_y)
+               cam = data.frame(r = mean(cam$corperms, na.rm = TRUE), p = mean(cam$pvals, na.rm = TRUE),IC = I, IC_x = I_x, IC_y = I_y)
                Cor.subset.Mantels[[i]][[j]] <- cam
            }
            cdm = list()
 
-           if(ncol(x) > 100){
+           if(ncol(x) >= 100){
              nsize = 0.1
-             tsize = 0.25
+             tsize = 0.15
              lsize = 0.3
-           }else if(ncol(x) > 60) {
+           }else if(ncol(x) >= 60) {
              nsize = 0.2
-             tsize = 0.3
+             tsize = 0.25
              lsize = 0.4
-           }else if(ncol(x) > 50) {
+           }else if(ncol(x) >= 50) {
              nsize = 0.25
              tsize = 0.35
              lsize = 0.5
-           } else if(ncol(x) < 50) {
+           } else if(ncol(x) <= 49) {
              nsize = 0.4
              tsize = 0.4
              lsize = 0.6
            }
+
+           # Correlation Network Plot
+           cn_matrix = cor_matrix[-c(1:ncol(x)), c(1:(ncol(x)))]
+           cn_matrix[p_matrix[-c(1:ncol(x)), c(1:(ncol(x)))] > 0.05] <- 0
+           if(identical(x,y)) {
+             diag(cn_matrix) <- 0
+           }
+           cn(cn_matrix,
+              g1name = names(point_set[[m]][[i]][[1]])[[p_subset[j,1]]],
+              g2name = names(point_set[[m]][[i]][[2]])[[p_subset[j,2]]],
+              threshold = 0.5)
 
            # Call an image then save it to the created directory
            grDevices::png(paste(path,"/", names(Models[[m]])[i], "_", "Subsets", "_",
@@ -686,28 +710,26 @@ cor.bio <- function(Models,
       } else {
         var_boot = c("Cor.all.Mantels")
         booted.list = vector("list", length(var_boot))
+        booted.list = vector("list", length(var_boot))
         boot_temp = vector("list", nrow(parallels))
         for(b in 1:nrow(parallels)) {
-          boot_temp[[b]] <- unlist(parallels[b,v], recursive = FALSE)
+          boot_temp[[b]] <- unlist(parallels[b,1], recursive = FALSE)
           boot_temp[[b]] <- Filter(function(x) !is.null(x), boot_temp[[b]])
           boot_temp[[b]] <- unlist(boot_temp[[b]], recursive = FALSE)
 
         }
-        booted.list[[v]] <- boot_temp
-      }
-      names(booted.list) <- var_boot
-      list2env(booted.list, envir = environment())
-    }
+        booted.list[[1]] <- boot_temp
+        names(booted.list) <- var_boot
+        list2env(booted.list, envir = environment())
+      } # end of subsets or not
+    } # end of one or more hypothesis models
 
     #___________________________________________________________________________________________________________________________
 
-    #cor.bio[[m]]$Correlations <- cor.all
     cor.bio[[m]]$Cor.all.Mantels <- Cor.all.Mantels
 
     if(isTRUE(subset)) {
       cor.bio[[m]]$Cor.subset.Mantels <- cor.subset.Mantels
-      #cor.bio[[m]]$Cor.subsets <- cor.subset
-      #cor.bio[[m]]$Trim.subset <- trim.subset
     }
 
     names(cor.bio) <- names(Models)

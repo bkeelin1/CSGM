@@ -11,7 +11,7 @@
 #' @param Data_PCA a list object resembling or formed by the *pca_variances* function output.
 #'
 #' @param k an integer indicating the number of dimensions in the landmark configuration
-#' prior to data transformation via PCA. Default value is 3.
+#' prior to data transformation via PCA. k = 1 is for non-landmark data. Default value is 3.
 #'
 #' @param PCA_var an object from the *pca_variances* function output.
 #'
@@ -79,6 +79,7 @@
 #' @seealso \code{plotly} \code{hullgen}
 #'
 #' @importFrom plotly plot_ly add_trace layout
+#' @importFrom geomorph arrayspecs
 #' @importFrom grDevices png dev.off
 #' @importFrom RColorBrewer brewer.pal
 #' @importFrom dplyr filter
@@ -181,7 +182,6 @@
 #' }
 
 lolligen <- function(Data_PCA,
-                     PCs = 2,
                      k = 3,
                      PCA_var = NULL,
                      ID = NULL,
@@ -194,8 +194,17 @@ lolligen <- function(Data_PCA,
 
   if(is.null(PCA_var)) {
     PCA_var = PCA_variances(Data_PCA)
-    PCs <- as.numeric(PCA_var$PCs)
-    PCA_var <- data.frame(PCA_var$PCA_var)
+    Data_PCA = PCA_var$PCA_Data
+    PCs = as.numeric(PCA_var$PCs)
+    PCA_var = data.frame(PCA_var$PCA_var)
+  } else {
+    PCs = as.numeric(PCA_var$PCs)
+    Data_PCA = PCA_var$PCA_Data
+    PCA_var = data.frame(PCA_var$PCA_var)
+  }
+
+  if(as.numeric(PCs) <= 2) {
+    PCs = 2
   }
 
   if (is.null(ID)) {
@@ -203,8 +212,12 @@ lolligen <- function(Data_PCA,
   }
 
   if (is.null(coord_name)) {
-    n_point = length(Data_PCA$center) / k
-    coord_name = as.character(rep(1:n_point))
+    if(is.character(rownames(Data_PCA$rotation))){
+      coord_name = rownames(Data_PCA$rotation)
+    } else {
+      n_point = length(Data_PCA$center) / k
+      coord_name = as.character(rep(1:n_point))
+    }
   }
   if(!is.null(Group)) {
     if(!"list" %in% class(Group)) {
@@ -264,27 +277,27 @@ lolligen <- function(Data_PCA,
 
     if (n_pcs == 2) {
       # 2D plot
-      title <- sprintf("PCA Plot of Principal Components %d-%d (%.4f%%)",
+      title <- sprintf("Principal Components %d-%d (%.4f%%)",
                        pcs[1], pcs[2], PCA_var[pcs[2], 3])
 
       axis_labels <- list(
-        x = sprintf("Principal Component %d (%.4f%%)",
+        x = sprintf("PC %d (%.4f%%)",
                     pcs[1], PCA_var[pcs[1], 2]),
-        y = sprintf("Principal Component %d (%.4f%%)",
+        y = sprintf("PC %d (%.4f%%)",
                     pcs[2], PCA_var[pcs[2], 2])
       )
 
     } else if (n_pcs == 3) {
       # 3D plot
-      title <- sprintf("PCA Plot of Principal Components %d-%d-%d (%.4f%%)",
+      title <- sprintf("Principal Components %d-%d-%d (%.4f%%)",
                        pcs[1], pcs[2], pcs[3], PCA_var[pcs[3], 3])
 
       axis_labels <- list(
-        x = sprintf("Principal Component %d (%.4f%%)",
+        x = sprintf("PC %d (%.4f%%)",
                     pcs[1], PCA_var[pcs[1], 2]),
-        y = sprintf("Principal Component %d (%.4f%%)",
+        y = sprintf("PC %d (%.4f%%)",
                     pcs[2], PCA_var[pcs[2], 2]),
-        z = sprintf("Principal Component %d (%.4f%%)",
+        z = sprintf("PC %d (%.4f%%)",
                     pcs[3], PCA_var[pcs[3], 2])
       )
     }
@@ -292,7 +305,238 @@ lolligen <- function(Data_PCA,
     return(list(title = title, axis_labels = axis_labels))
   }
 
+#___________________________________________________________________________________________________________________
+
   #___________________________________________________________________________________________________________________
+  if (k == 1) { # Non-landmark data (Standard PCA Analysis)
+
+    # Initialize Lists
+    PCA_list = list()        # For Score Plots (Individuals)
+    lollipop_PCs = list()    # For Loading Plots (Variables)
+    lollipops$PCA_group <- list()
+
+    scores_df <- as.data.frame(Data_PCA$x)
+    colnames(scores_df) <- paste0("Comp", 1:ncol(scores_df))
+    scores_df$ID <- as.character(ID)
+
+    loadings_df <- as.data.frame(Data_PCA$rotation)
+    colnames(loadings_df) <- paste0("Comp", 1:ncol(loadings_df))
+
+    loadings_df$VarName <- as.character(coord_name)
+
+    # 3. Handle Subsetting (Grouping variables for colors)
+    if (!is.null(subset)) {
+      if (length(subset) == nrow(loadings_df)) {
+        loadings_df$Subset <- as.factor(subset)
+      } else {
+        warning("Subset length does not match number of variables. Grouping ignored.")
+        loadings_df$Subset <- "All Variables"
+      }
+    } else {
+      loadings_df$Subset <- "All Variables"
+    }
+
+    #===========================================================================
+    # PART A: PCA_list (Score Plots - Individuals)
+    #===========================================================================
+
+    if (class(Group) == "list") {
+      PCA_group <- list()
+      lollipops$PCA_group <- vector("list", length(Group))
+
+      for (i in seq_along(Group)) {
+        for (pc_name in names(pc_sets)) {
+          pc_set <- pc_sets[[pc_name]]
+          # Check dimensions based on available scores
+          if (ncol(scores_df) >= pc_set$min_dim && PCs >= pc_set$min_dim) {
+
+            # hullgen expects a matrix/df with specific columns.
+            # We select the necessary columns and pass them.
+            hull_data <- scores_df[, 1:max(pc_set$pcs)]
+
+            PCA_group[[pc_name]] <- hullgen(
+              Data_PCs = hull_data,
+              select_PC = pc_set$pcs,
+              Group = Group[[i]],
+              color = NULL,
+              ID = ID,
+              PCA_var = PCA_var,
+              sym = TRUE
+            )
+          }
+        }
+        lollipops$PCA_group[[i]] <- PCA_group
+      }
+      names(lollipops$PCA_group) <- names(Group)
+    }
+
+    for (pc_name in names(pc_sets)) {
+      pc_set <- pc_sets[[pc_name]]
+      pcs <- pc_set$pcs
+      labels <- create_plot_labels(pcs, PCA_var)
+
+      if (length(pcs) == 2) {
+        plot <- plotly::plot_ly(data = scores_df,
+                                x = as.formula(sprintf("~Comp%d", pcs[1])),
+                                y = as.formula(sprintf("~Comp%d", pcs[2])),
+                                type = 'scatter',
+                                mode = 'markers',
+                                text = ~ID,
+                                marker = list(size = 9, opacity = 0.7)) %>%
+          plotly::layout(title = labels$title,
+                         xaxis = list(title = labels$axis_labels$x),
+                         yaxis = list(title = labels$axis_labels$y))
+      } else if (length(pcs) == 3) {
+        plot <- plotly::plot_ly(data = scores_df,
+                                x = as.formula(sprintf("~Comp%d", pcs[1])),
+                                y = as.formula(sprintf("~Comp%d", pcs[2])),
+                                z = as.formula(sprintf("~Comp%d", pcs[3])),
+                                type = 'scatter3d',
+                                mode = 'markers',
+                                text = ~ID,
+                                marker = list(size = 9, opacity = 0.7)) %>%
+          plotly::layout(title = labels$title,
+                         scene = list(xaxis = list(title = labels$axis_labels$x),
+                                      yaxis = list(title = labels$axis_labels$y),
+                                      zaxis = list(title = labels$axis_labels$z)))
+      }
+      PCA_list[[pc_name]] <- plot
+    }
+    lollipops$PCA_list <- PCA_list
+
+    #===========================================================================
+    # PART B: lollipop_PCs (Loading Plots - Variables)
+    #===========================================================================
+    for (pc_name in names(pc_sets)) {
+      pc_set <- pc_sets[[pc_name]]
+      pcs <- pc_set$pcs
+
+      if (ncol(scores_df) < pc_set$min_dim || PCs < pc_set$min_dim) next
+
+      # Initialize Plot
+      p <- plotly::plot_ly()
+
+      # Groups for Legend (based on 'subset')
+      groups <- unique(loadings_df$Subset)
+      colors <- if(length(groups) <= 8) RColorBrewer::brewer.pal(max(3, length(groups)), "Set2") else rainbow(length(groups))
+      shapes <- c("circle", "square", "diamond", "cross", "x", "triangle-up", "star")
+
+      for(g_idx in seq_along(groups)) {
+        grp <- groups[g_idx]
+        sub_dat <- loadings_df[loadings_df$Subset == grp, ]
+        col <- colors[(g_idx - 1) %% length(colors) + 1]
+        shp <- shapes[(g_idx - 1) %% length(shapes) + 1]
+
+        # --- VECTOR CONSTRUCTION ---
+        n_rows <- nrow(sub_dat)
+
+        # Helper to create lines from (0,0,0) to (x,y,z)
+        make_vec <- function(val_col) {
+          if(is.null(val_col)) return(NULL)
+          v <- numeric(n_rows * 3)
+          v[seq(1, n_rows*3, 3)] <- 0          # Start at 0
+          v[seq(2, n_rows*3, 3)] <- val_col    # Go to Value
+          v[seq(3, n_rows*3, 3)] <- NA         # Break line
+          return(v)
+        }
+
+        # 2D Logic
+        if (length(pcs) == 2) {
+
+          # Add Vectors (Lines)
+          x_vals <- sub_dat[[paste0("Comp", pcs[1])]]
+          y_vals <- sub_dat[[paste0("Comp", pcs[2])]]
+          line_x <- make_vec(x_vals)
+          line_y <- make_vec(y_vals)
+
+          if(!is.null(line_x)) {
+            p <- p %>% plotly::add_trace(
+              x = line_x, y = line_y,
+              type = 'scatter', mode = 'lines',
+              line = list(color = col, width = 1),
+              hoverinfo = "none",
+              showlegend = FALSE,
+              legendgroup = grp
+            )
+          }
+
+          # Add Markers + Text (Variables)
+          p <- p %>% plotly::add_trace(
+            data = sub_dat,
+            x = as.formula(sprintf("~Comp%d", pcs[1])),
+            y = as.formula(sprintf("~Comp%d", pcs[2])),
+            type = 'scatter', mode = 'markers+text',
+            text = ~VarName, # Explicitly mapped from character column
+            textposition = "top center",
+            marker = list(color = col, symbol = shp, size = 10),
+            name = grp,
+            legendgroup = grp,
+            hovertemplate = paste("<b>%{text}</b><br>Comp", pcs[1], ": %{x:.3f}<br>Comp", pcs[2], ": %{y:.3f}")
+          )
+
+          labels <- create_plot_labels(pcs, PCA_var)
+          p <- p %>% plotly::layout(
+            title = paste("Variable Loadings:", labels$title),
+            xaxis = list(title = labels$axis_labels$x, zeroline = TRUE),
+            yaxis = list(title = labels$axis_labels$y, zeroline = TRUE)
+          )
+
+          # 3D Logic
+        } else if (length(pcs) == 3) {
+
+          # Add Vectors (Lines)
+          x_vals <- sub_dat[[paste0("Comp", pcs[1])]]
+          y_vals <- sub_dat[[paste0("Comp", pcs[2])]]
+          z_vals <- sub_dat[[paste0("Comp", pcs[3])]]
+          line_x <- make_vec(x_vals)
+          line_y <- make_vec(y_vals)
+          line_z <- make_vec(z_vals)
+
+          if(!is.null(line_x)) {
+            p <- p %>% plotly::add_trace(
+              x = line_x, y = line_y, z = line_z,
+              type = 'scatter3d', mode = 'lines',
+              line = list(color = col, width = 2),
+              hoverinfo = "none",
+              showlegend = FALSE,
+              legendgroup = grp
+            )
+          }
+
+          # Add Markers + Text (Variables)
+          p <- p %>% plotly::add_trace(
+            data = sub_dat,
+            x = as.formula(sprintf("~Comp%d", pcs[1])),
+            y = as.formula(sprintf("~Comp%d", pcs[2])),
+            z = as.formula(sprintf("~Comp%d", pcs[3])),
+            type = 'scatter3d', mode = 'markers+text',
+            text = ~VarName, # Explicitly mapped from character column
+            textposition = "top center",
+            marker = list(color = col, symbol = shp, size = 5),
+            name = grp,
+            legendgroup = grp,
+            hovertemplate = paste("<b>%{text}</b><br>Comp", pcs[1], ": %{x:.3f}<br>Comp", pcs[2], ": %{y:.3f}<br>Comp", pcs[3], ": %{z:.3f}")
+          )
+
+          labels <- create_plot_labels(pcs, PCA_var)
+          p <- p %>% plotly::layout(
+            title = paste("Variable Loadings:", labels$title),
+            scene = list(
+              xaxis = list(title = labels$axis_labels$x),
+              yaxis = list(title = labels$axis_labels$y),
+              zaxis = list(title = labels$axis_labels$z)
+            )
+          )
+        }
+      }
+
+      lollipop_PCs[[pc_name]] <- p
+    }
+
+    # Store results in the output lists
+    lollipops$lollipop_PCs <- lollipop_PCs
+  }
+
   if (k == 2) {   # For PCA of landmark configuration with 2 dimensions
     PCA_graph = list()
     PCA_list = list()
@@ -335,19 +579,19 @@ lolligen <- function(Data_PCA,
       # Create base plot
       if (length(pcs) == 2) {
         # 2D plot
-        plot <- plot_ly(data = data,
+        plot <- plotly::plot_ly(data = data,
                         x = as.formula(sprintf("~Comp%d", pcs[1])),
                         y = as.formula(sprintf("~Comp%d", pcs[2])),
                         type = 'scatter',
                         mode = 'markers',
                         text = ID,
                         marker = list(size = 9)) %>%
-          layout(title = labels$title,
+          plotly::layout(title = labels$title,
                  xaxis = list(title = labels$axis_labels$x),
                  yaxis = list(title = labels$axis_labels$y))
       } else if (length(pcs) == 3) {
         # 3D plot
-        plot <- plot_ly(data = data,
+        plot <- plotly::plot_ly(data = data,
                         x = as.formula(sprintf("~Comp%d", pcs[1])),
                         y = as.formula(sprintf("~Comp%d", pcs[2])),
                         z = as.formula(sprintf("~Comp%d", pcs[3])),
@@ -355,7 +599,7 @@ lolligen <- function(Data_PCA,
                         mode = 'markers',
                         text = ID,
                         marker = list(size = 9)) %>%
-          layout(title = labels$title,
+          plotly::layout(title = labels$title,
                  scene = list(
                    xaxis = list(title = labels$axis_labels$x),
                    yaxis = list(title = labels$axis_labels$y),
@@ -370,7 +614,7 @@ lolligen <- function(Data_PCA,
 
     if (isFALSE(no.shape)) {
       # Account for PCs with landmark data that is only two-dimensional
-      mean_shape = arrayspecs(t(data.frame(Data_PCA$center)), length(Data_PCA$center)/2, 2)
+      mean_shape = geomorph::arrayspecs(t(data.frame(Data_PCA$center)), length(Data_PCA$center)/2, 2)
       PC_shape_list = get_extreme_shapes(Data_PCA, k = 2, PCs)
 
       lollipops$PC_min_max_mean <- PC_shape_list
@@ -384,9 +628,9 @@ lolligen <- function(Data_PCA,
           lollipops$PC_mean_max_min[[i]] <- list(mean_shape, pos_shape, neg_shape)
 
           # Initialize the Plotly graph with Mean shape points
-          PCA_graph <- plot_ly()
+          PCA_graph <- plotly::plot_ly()
           PCA_graph <- PCA_graph %>%
-            add_trace(data = mean_shape,
+            plotly::add_trace(data = mean_shape,
                       x = ~X, y = ~Y,
                       type = 'scatter', mode = 'markers', text = coord_name,
                       marker = list(size = 2, color = "black"),
@@ -397,7 +641,7 @@ lolligen <- function(Data_PCA,
 
           # Add a single trace for all positive shape lines
           PCA_graph <- PCA_graph %>%
-            add_trace(x = x_vals, y = y_vals,
+            plotly::add_trace(x = x_vals, y = y_vals,
                       type = 'scatter', mode = 'lines', text = coord_name,
                       line = list(color = "blue", width = 2),
                       name = 'Positive Shape')
@@ -407,14 +651,14 @@ lolligen <- function(Data_PCA,
 
           # Add a single trace for all negative shape lines
           PCA_graph <- PCA_graph %>%
-            add_trace(x = x_vals, y = y_vals,
+            plotly::add_trace(x = x_vals, y = y_vals,
                       type = 'scatter', mode = 'lines', text = coord_name,
                       line = list(color = "orange", width = 2),
                       name = 'Negative Shape')
 
           # Add a title to the plot
           PCA_graph <- PCA_graph %>%
-            layout(title = paste("PCA Lollipop of Shape Changes along Principal Component", i,
+            plotly::layout(title = paste("PCA Lollipop of Shape Changes along Principal Component", i,
                                  "(", round(PCA_var[i,2],4), ")"), scene = list(
                                    xaxis = list(showgrid = FALSE, zeroline = FALSE,
                                                 showticklabels = FALSE, title = list(text = "")),
@@ -439,12 +683,12 @@ lolligen <- function(Data_PCA,
             for (i in seq_along(regions)) {
               region_data <- filter(data, subset == regions[i])
               graph <- graph %>%
-                add_trace(data = region_data,
+                plotly::add_trace(data = region_data,
                           x = ~X, y = ~Y,
                           type = 'scatter3d', mode = 'markers', text = ~coord_name,
                           marker = list(size = 4, color = base_color),
                           name = paste(group_name, regions[i]))
-              graph <- graph %>% layout(title = paste("PCA Lollipop of Shape Changes along Principal Component", j,
+              graph <- graph %>% plotly::layout(title = paste("PCA Lollipop of Shape Changes along Principal Component", j,
                                                       "(", round(PCA_var[j,2],4), ")"), scene = list(
                                                         xaxis = list(showgrid = FALSE, zeroline = FALSE,
                                                                      showticklabels = FALSE, title = list(text = "")),
@@ -457,7 +701,7 @@ lolligen <- function(Data_PCA,
             return(graph)
           }
 
-          PCA_graph = plot_ly()
+          PCA_graph = plotly::plot_ly()
           # Add traces for each main group and its subgroups
           PCA_graph <- add_group_traces(PCA_graph, mean_shape, 'Mean Shape', "black", j = i, PCA_var)
 
@@ -516,19 +760,19 @@ lolligen <- function(Data_PCA,
       # Create base plot
       if (length(pcs) == 2) {
         # 2D plot
-        plot <- plot_ly(data = data,
+        plot <- plotly::plot_ly(data = data,
                         x = as.formula(sprintf("~Comp%d", pcs[1])),
                         y = as.formula(sprintf("~Comp%d", pcs[2])),
                         type = 'scatter',
                         mode = 'markers',
                         text = ID,
                         marker = list(size = 9)) %>%
-          layout(title = labels$title,
+          plotly::layout(title = labels$title,
                  xaxis = list(title = labels$axis_labels$x),
                  yaxis = list(title = labels$axis_labels$y))
       } else if (length(pcs) == 3) {
         # 3D plot
-        plot <- plot_ly(data = data,
+        plot <- plotly::plot_ly(data = data,
                         x = as.formula(sprintf("~Comp%d", pcs[1])),
                         y = as.formula(sprintf("~Comp%d", pcs[2])),
                         z = as.formula(sprintf("~Comp%d", pcs[3])),
@@ -536,7 +780,7 @@ lolligen <- function(Data_PCA,
                         mode = 'markers',
                         text = ID,
                         marker = list(size = 9)) %>%
-          layout(title = labels$title,
+          plotly::layout(title = labels$title,
                  scene = list(
                    xaxis = list(title = labels$axis_labels$x),
                    yaxis = list(title = labels$axis_labels$y),
@@ -552,7 +796,7 @@ lolligen <- function(Data_PCA,
     if (isFALSE(no.shape)) {
 
       PC_mean_max_min = list() # Object to store the shape extremes and mean shape of each meaningful PC
-      mean = arrayspecs(t(data.frame(Data_PCA$center)), (length(Data_PCA$center)/3), 3)
+      mean = geomorph::arrayspecs(t(data.frame(Data_PCA$center)), (length(Data_PCA$center)/3), 3)
       PC_shape_list = get_extreme_shapes(Data_PCA, k = 3, PCs)
 
       for (i in 1:PCs) { # Necessary for wrangling data into a format that plot_ly can graph
@@ -567,24 +811,24 @@ lolligen <- function(Data_PCA,
 
           # Initialize the Plotly graph with Mean shape points
 
-          PCA_graph <- plot_ly()
+          PCA_graph <- plotly::plot_ly()
 
           PCA_graph <- PCA_graph %>%
-            add_trace(data = mean_shape,
+            plotly::add_trace(data = mean_shape,
                       x = ~X, y = ~Y, z = ~Z,
                       type = 'scatter3d', mode = 'markers', text = coord_name,
                       marker = list(size = 4, color = "black"),
                       name = 'Mean Shape')
 
           PCA_graph <- PCA_graph %>%
-            add_trace(data = pos_shape,
+            plotly::add_trace(data = pos_shape,
                       x = ~X, y = ~Y, z = ~Z,
                       type = 'scatter3d', mode = 'markers', text = coord_name,
                       marker = list(size = 4, color = "blue"),
                       name = 'Positive Shape')
 
           PCA_graph <- PCA_graph %>%
-            add_trace(data = neg_shape,
+            plotly::add_trace(data = neg_shape,
                       x = ~X, y = ~Y, z = ~Z,
                       type = 'scatter3d', mode = 'markers', text = coord_name,
                       marker = list(size = 4, color = "orange"),
@@ -596,7 +840,7 @@ lolligen <- function(Data_PCA,
 
           # Add each line trace for positive shape
           PCA_graph <- PCA_graph %>%
-            add_trace(x = x_pos_vals, y = y_pos_vals, z = z_pos_vals,
+            plotly::add_trace(x = x_pos_vals, y = y_pos_vals, z = z_pos_vals,
                       type = 'scatter3d', mode = 'lines', name = 'Pos Shape Line',
                       line = list(color = "blue", width = 2))
 
@@ -606,13 +850,13 @@ lolligen <- function(Data_PCA,
 
 
           PCA_graph <- PCA_graph %>%
-            add_trace(x = x_neg_vals, y = y_neg_vals, z = z_neg_vals,
+            plotly::add_trace(x = x_neg_vals, y = y_neg_vals, z = z_neg_vals,
                       type = 'scatter3d', mode = 'lines', name = 'Neg Shape Line',
                       line = list(color = "orange", width = 2))
 
           # Layout configuration
           PCA_graph <- PCA_graph %>%
-            layout(title = paste("PCA Lollipop of Shape Changes along Principal Component", i,
+            plotly::layout(title = paste("PCA Lollipop of Shape Changes along Principal Component", i,
                                  "(", round(PCA_var[i,2],4), ")"), scene = list(
                                    xaxis = list(showgrid = FALSE, zeroline = FALSE,
                                                 showticklabels = FALSE, title = list(text = "")),
@@ -639,12 +883,12 @@ lolligen <- function(Data_PCA,
             for (i in seq_along(regions)) {
               region_data <- filter(data, subset == regions[i])
               graph <- graph %>%
-                add_trace(data = region_data,
+                plotly::add_trace(data = region_data,
                           x = ~X, y = ~Y, z = ~Z,
                           type = 'scatter3d', mode = 'markers', text = ~coord_name,
                           marker = list(size = 4, color = base_color),
                           name = paste(group_name, regions[i]))
-              graph <- graph %>% layout(title = paste("PCA Lollipop of Shape Changes along Principal Component", j,
+              graph <- graph %>% plotly::layout(title = paste("PCA Lollipop of Shape Changes along Principal Component", j,
                                                       "(", round(PCA_var[j,2],4), ")"), scene = list(
                                                         xaxis = list(showgrid = FALSE, zeroline = FALSE,
                                                                      showticklabels = FALSE, title = list(text = "")),
@@ -657,7 +901,7 @@ lolligen <- function(Data_PCA,
             return(graph)
           }
 
-          PCA_graph = plot_ly()
+          PCA_graph = plotly::plot_ly()
           # Add traces for each main group and its subgroups
           PCA_graph <- add_group_traces(PCA_graph, mean_shape, 'Mean Shape', "black", j = i, PCA_var)
 

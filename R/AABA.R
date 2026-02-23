@@ -282,7 +282,6 @@ AABA <- function(Models,
                  print_progress = TRUE,
                  ...) {
 
-  set.seed(1)
   AABA_Output = list()
 
   if (isTRUE(print_progress)) {

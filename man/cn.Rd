@@ -2,94 +2,57 @@
 % Please edit documentation in R/utils.R
 \name{cn}
 \alias{cn}
-\title{Correlation Network Plot Generator}
+\title{Create and Save a Correlation Network Plot}
 \usage{
 cn(
   matrix,
-  g1name = "Group1",
-  g2name = "Group2",
-  title = "Correlation Network Plot",
-  threshold = 0.7,
-  colors = c("#FF8C00", "#1E90FF"),
+  g1name = "Group 1",
+  g2name = "Group 2",
+  title = "Correlation Network Plot Comparison",
+  threshold = 0.6,
+  colors = c("orange", "royalblue"),
   res = 600,
-  width = 1920,
-  height = 1080
+  width = 10,
+  height = 8
 )
 }
 \arguments{
-\item{matrix}{A numeric matrix containing correlations between
-variables from two groups. Should be a cross-correlation matrix where
-rows represent variables from group 1 and columns represent variables
-from group 2.}
+\item{matrix}{A numeric matrix where rows represent variables in Group 1 and
+columns represent variables in Group 2.}
 
-\item{g1name}{Character string specifying the name for the first group
-of variables (row variables). Default is "Group1".}
+\item{g1name}{A character string. The label for the first group (rows). Defaults to "Group 1".}
 
-\item{g2name}{Character string specifying the name for the second group
-of variables (column variables). Default is "Group2".}
+\item{g2name}{A character string. The label for the second group (columns). Defaults to "Group 2".}
 
-\item{title}{Character string for the plot title.
-Default is "Enhanced Correlation Network".}
+\item{title}{A character string. The main title of the plot. Defaults to
+'Correlation Network Plot Comparison'.}
 
-\item{threshold}{Numeric value between 0 and 1 specifying the minimum
-absolute correlation value to display as edges in the network.
-Correlations below this threshold will be filtered out. Default is 0.3.}
+\item{threshold}{A numeric value. The absolute correlation coefficient cutoff.
+Edges with weights below this value are excluded. If the threshold is higher
+than the maximum observed correlation, it is automatically lowered to the maximum.
+Defaults to 0.7.}
 
-\item{colors}{Character vector of length 2 specifying colors for the two
-groups. First color for group1, second color for group2.
-Default is c("#FF8C00", "#1E90FF") (orange and blue).}
+\item{colors}{A character vector of length 2. Hex codes or names for the node
+colors (Group 1, Group 2). Defaults to c("#FF8C00", "#1E90FF").}
 
-\item{res}{Numeric value specifying the resolution (DPI) for the
-output PNG file. Default is 600.}
+\item{res}{Numeric. The resolution (DPI) for the saved PNG. Defaults to 600.}
 
-\item{width}{Numeric value specifying the width of the output image in pixels.
-Default is 4000.}
+\item{width}{Numeric. The width of the saved image in inches. Defaults to 10.}
 
-\item{height}{Numeric value specifying the height of the output image in pixels.
-Default is 3000.}
+\item{height}{Numeric. The height of the saved image in inches. Defaults to 8.}
 }
 \value{
-A file of the correlation network in your working directory.
+A \code{ggplot} object representing the network graph.
 }
 \description{
-Create Enhanced Correlation Network Visualization
-
-Creates a publication-ready network visualization from a correlation matrix,
-displaying correlations between two groups of variables as a network graph
-with automatically adjusted visual parameters based on data size.
+This function generates a network visualization of correlations between two groups
+of variables (rows and columns of the input matrix). It automatically filters
+weak correlations, adjusts visual parameters based on network density, and saves
+a high-resolution PNG image.
 }
-\details{
-This function creates a network visualization where:
-\itemize{
-\item Nodes represent variables from each group
-\item Edges represent correlations above the specified threshold
-\item Edge thickness is proportional to correlation strength
-\item Node size and label size automatically adjust based on the number of variables
-\item Different colors distinguish between the two groups
+\section{Side Effects}{
+
+Saves a PNG file to the working directory with the naming convention:
+\code{Cor_Network_[Group1]_vs_[Group2].png}.
 }
 
-The function automatically optimizes visual parameters:
-\itemize{
-\item ≤30 variables: point size 12, label size 0.8
-\item ≤60 variables: point size 8, label size 0.6
-\item ≤100 variables: point size 6, label size 0.5
-\item >100 variables: point size 4, label size 0.4
-}
-
-Output files are automatically named using the pattern:
-"enhanced_network_group1_vs_group2.png" to prevent overwrites.
-}
-\note{
-Requires the \code{igraph} package. The function will stop with an error
-if igraph is not available.
-}
-\references{
-Csardi, G., & Nepusz, T. (2006). The igraph software package for complex
-network research. InterJournal, Complex Systems, 1695.
-}
-\seealso{
-\code{\link[igraph]{graph_from_data_frame}}, \code{\link[igraph]{layout_with_fr}}
-}
-\author{
-Keeling et al., 2025
-}

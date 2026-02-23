@@ -1,39 +1,27 @@
-# *CSGM* - A Toolkit to Conduct Cross-Sectional Geometric Morphometric Analyses
+# *CSGM* - A Toolkit to Conduct Cross-Sectional Geometry(ics) Morphometric Analyses
 
 ## Description
 
-Cross-sectional geometric morphometrics (CSGM) is an interdisciplinary method in biological anthropology to study the relationships between shape and biomechanical function in contexts such as developmental biology, behavioral plasticity, and evolutionary morphology. As such, CSGM research compares complex, multidimensional shape data from multiple skeletal regions to multivariate, and often multicollinear, biomechanical variables. Thus, we developed the CSGM package in R to provide a statistically holistic framework and rigorous hypothesis model testing approach to facilitate a complete statistical data analysis of biological data. 
+Cross-sectional Geometry and Morphometrics (CSGM) analysis consists of two popular interdisciplinary methods in biological anthropology to study the relationships between shape and biomechanical function in contexts such as developmental biology, behavioral plasticity, and evolutionary morphology. As such, the integration of these two research methods involve the comparisons of complex, multidimensional shape data from multiple skeletal regions to multivariate, and often multicollinear, biomechanical variables. Thus, we developed the CSGM package in R to provide a statistically holistic framework and rigorous nested hypothesis model testing approach to facilitate a complete statistical data analysis. 
 
-The CSGM package offers an innovative and comprehensive toolkit to automate an entire geometric morphometric and biological analysis from start to finish. This package addresses the data complexity issues within CSGM studies which often require repetitive analyses and inter/intra-bone analyses by providing a holistic statistical approach to functionally test hypotheses and analyze complex multivariate data with only a few functions. This multimodal approach combines geometric morphometric analysis, correlation, covariation, and regression analyses to offer novel insights into the relationships between complex geometric and biological data. By applying a hypothesis model approach, the CSGM package allows researchers to organize multiple hypothesis testing across multivariate dataset comparisons. The functions within this package also offer accessible and interactive visualizations to easily interpret data relationships. Therefore, this package offers numerous ways to accessibly study geometric morphometrics and interpret complex data relationships needed to answer complex questions in human biology.
+The CSGM package offers an innovative and comprehensive toolkit to automate an entire geometric morphometric and inferential statistical analysis from start to finish. This package addresses the data complexity issues within CSGM studies which often require repetitive analyses and inter/intra-bone analyses by providing a holistic statistical approach to functionally test hypotheses and analyze complex multivariate data with only a few functions. This multimodal approach combines geometric morphometric analysis, correlation, covariation, and regression analyses to offer novel insights into the relationships between complex geometric and biological data. By applying a hypothesis model approach, the CSGM package allows researchers to organize multiple hypothesis testing across multivariate dataset comparisons. The functions within this package also offer accessible and interactive visualizations to easily interpret data relationships. Therefore, this package offers numerous ways to accessibly study geometric morphometrics and interpret complex data relationships needed to answer complex questions in human biology.
 
 # Installation Instructions:
 
 ------------------------------------------------------------------------
 
-## NOTE: Due to dependency concerns, you will need to install additional packages prior to installing CSGM. Please copy and paste these lines of code to install these necessary packages:
+## Install the `devtools` package to install Github package repositories like CSGM
 
 ```{r}
 install.packages("devtools") # to install GitHub packages
 ```
 
-```{r}
-#NOTE: Be sure to update your R packages prior to installation!
-install.packages("BiocManager") # To install Bio Manager package
-```
+## Now Install the `CSGM` package from GitHub! 
 
 ```{r}
-#NOTE: Be sure to update your R packages prior to installation!
-BiocManager::install("BiocParallel") # To install required dependency 1
-
-BiocManager::install("mixOmics") # To install required dependency 2
-```
-
-## Now Install the CSGM package from GitHub! :D
-
-```{r}
-devtools::install_github("bkeelin1/CSGM", # The GitHub Location
-                         build_vignettes = TRUE, # To have the package vignette
-                         dependencies = TRUE) # To install all dependencies
+devtools::install_github("bkeelin1/CSGM",
+                         build_vignettes = TRUE, 
+                         dependencies = TRUE) 
 ```
 
 ## Follow along in RStudio or Posit Cloud and use this README through the vignette CSGM-Workflow
@@ -51,15 +39,9 @@ Note: When the Vignette opens, please look in the Script (top left) Panel and cl
 
 # Visualizing the CSGM Workflow
 
-![CSGM Workflow](vignettes/images/CSGM_Workflow.png)
+![](images/clipboard-1066059136.png)
 
-```{r}
-library(CSGM)
-```
-
-# Step 1: Data Import and Transformation
-
-## 
+# Step 1: Importing Example Data
 
 ### Load the landmark array, and helper indices
 
@@ -104,7 +86,12 @@ output <- GMA(Corpus_Land,  # Complete landmark configuration
               ID,  # Specimen identifiers
               Group = Group,  # Grouping variable
               coord_name = dimnames(Corpus_Land)[[1]],  # Landmark names
-              subset = paste(rep(c("LM1M2", "LP3P4", "Symphysis", "RP3P4", "RM1M2"), each = 118)),
+              subset = paste(rep(c("LM1M2", 
+                                   "LP3P4", 
+                                   "Symphysis", 
+                                   "RP3P4", 
+                                   "RM1M2"), 
+                                 each = 118)),
               phy = NULL, # We do not have a phylogeny for this data
               bilat_sym = TRUE,  # We will also conduct a bilateral symmmetry test
               land.pairs = cbind(left = c(1:236), right = c(355:590)), # separate the left and right cross-sections
@@ -122,7 +109,7 @@ output <- GMA(Corpus_Land,  # Complete landmark configuration
 
 ## Procrustes Shape Variation
 
-### View morphoplots on Procrustes Residuals
+### View morphoplots on Procrustes Residuals (in Folder as well)
 
 ```{r Morphotrees,echo=TRUE,eval=FALSE}
 
@@ -210,8 +197,10 @@ allo$Group_shape
 Group_shapes = SCG(output,
                    Group,
                    coord_name = dimnames(Corpus_Land)[[1]],
-                   subset = paste(rep(c("LM1M2", "LP3P4", "Symphysis", 
-                                        "RP3P4", "RM1M2"), each = 118)),
+                   subset = paste(rep(c("LM1M2", "LP3P4",
+                                        "Symphysis", 
+                                        "RP3P4", "RM1M2"), 
+                                      each = 118)),
                    key = "Group Shapes")
 
 # View the Group Differences

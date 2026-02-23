@@ -374,7 +374,7 @@ DT <- function(Response = NULL,
 
           } else if (startsWith(transform, "2D")) {
             #print(paste("No Dataset transformation of a 3D Dataset array selected.","To avoid rescaling, make columns names contain: Dist, .X, Dim, CS, or Land."))
-            Dataset <- data.frame(two.d.array(Dataset))
+            Dataset <- data.frame(geomorph::two.d.array(Dataset))
             if(any(grepl("Comp", colnames(Dataset))) | any(grepl("Dist", colnames(Dataset))) |
                any(grepl(".X", colnames(Dataset))) | any(grepl("Dim", colnames(Dataset))) |
                any(grepl("Land", colnames(Dataset))) | any(grepl("CS", colnames(Dataset))) |
@@ -399,7 +399,7 @@ DT <- function(Response = NULL,
             if(method == "mahalanobis") {
               Dataset = data.frame(Dataset)
               if (ncol(Dataset) >= nrow(Dataset)) {
-                PCA = gm.prcomp(Dataset)
+                PCA = geomorph::gm.prcomp(Dataset)
                 PCA$A = Dataset
                 if(is.null(ncomp)){
                   npc = PCA_variances(PCA)
@@ -415,14 +415,14 @@ DT <- function(Response = NULL,
                 Dataset = as.dist(Dataset_dist)
 
               } else {
-                Euc_dist = vegdist(Dataset, method = method)
+                Euc_dist = vegan::vegdist(Dataset, method = method)
                 Dataset_dist = Euc_dist
                 Dataset = as.dist(Dataset_dist)
               }
             } # end of mahalanobis distances
 
             if(method != "procdist" & method != "mahalanobis") {
-              Euc_dist = vegdist(Dataset, method = method)
+              Euc_dist = vegan::vegdist(Dataset, method = method)
               Dataset_dist = Euc_dist
               Dataset = as.dist(Dataset_dist)
               #colnames(Dataset) <- paste(rep("Dist",ncol(Dataset)), rep(1:ncol(Dataset)), sep = ".")
@@ -445,7 +445,7 @@ DT <- function(Response = NULL,
             Res_o = Dataset
             Res_dim = dim(Dataset)[2]
             Res_p = dim(Dataset)[1]
-            Res_pca <- gm.prcomp(Dataset)
+            Res_pca <- geomorph::gm.prcomp(Dataset)
             Res_rot = Res_pca$rotation
             Res_pca_center = Res_pca$center
             Res_pca_scores = data.frame(Res_pca$x)
@@ -526,7 +526,7 @@ DT <- function(Response = NULL,
             } # end of mahalanobis distances
 
             if(method != "procdist" & method != "mahalanobis") {
-              Euc_dist = vegdist(Dataset, method = method)
+              Euc_dist = vegan::vegdist(Dataset, method = method)
               Dataset_dist = Euc_dist
               Dataset = as.dist(Dataset_dist)
               #colnames(Dataset) <- paste(rep("Dist",ncol(Dataset)), rep(1:ncol(Dataset)), sep = ".")
@@ -547,7 +547,7 @@ DT <- function(Response = NULL,
             Res_o = data.frame(Dataset)
             Res_dim = dim(Dataset)[2]
             Res_p = dim(Dataset)[1]
-            Res_pca <- gm.prcomp(Dataset)
+            Res_pca <- geomorph::gm.prcomp(Dataset)
             Res_rot = Res_pca$rotation
             Res_pca_scores = data.frame(Res_pca$x)
             Res_pca_center = Res_pca$center
@@ -603,7 +603,7 @@ DT <- function(Response = NULL,
             if(method == "mahalanobis") {
               Dataset = data.frame(Dataset)
               if (ncol(Dataset) >= nrow(Dataset)) {
-                PCA = gm.prcomp(Dataset)
+                PCA = geomorph::gm.prcomp(Dataset)
                 PCA$A = Dataset
                 if(is.null(ncomp)){
                   npc = PCA_variances(PCA)
@@ -626,7 +626,7 @@ DT <- function(Response = NULL,
             } # end of mahalanobis distances
 
             if(method != "procdist" & method != "mahalanobis") {
-              Euc_dist = vegdist(Dataset, method = method)
+              Euc_dist = vegan::vegdist(Dataset, method = method)
               Dataset_dist = Euc_dist
               Dataset = as.dist(Dataset_dist)
               #colnames(Dataset) <- paste(rep("Dist",ncol(Dataset)), rep(1:ncol(Dataset)), sep = ".")
@@ -649,7 +649,7 @@ DT <- function(Response = NULL,
             Res_o = Dataset
             Res_dim = dim(Dataset)[2]
             Res_p = dim(Dataset)[1]
-            Res_pca <- gm.prcomp(Dataset)
+            Res_pca <- geomorph::gm.prcomp(Dataset)
             Res_rot = Res_pca$rotation
             Res_pca_scores = data.frame(Res_pca$x)
             Res_pca_center = Res_pca$center

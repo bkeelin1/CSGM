@@ -19,7 +19,7 @@ import_land(
 \item{pattern}{File pattern to match (e.g., "\\.csv", "\\.tps")}
 
 \item{format}{Character string specifying the file format. One of "dragonfly",
-"tps", "morphologika", "nts", "avizo", "mimics", or "simple_csv"}
+"tps", "morphologika", "nts", "avizo", "mimics", "fcsv", or "simple_csv"}
 
 \item{dims}{Integer specifying dimensions (2 or 3)}
 
@@ -34,7 +34,7 @@ A list containing:
 \description{
 Imports landmark data from various common formats used in geometric morphometrics
 and medical imaging. Supports multiple file formats including Dragonfly, TPS,
-Morphologika, NTS (Viewbox), Avizo, Mimics, and CSV files. Can handle both
+Morphologika, NTS (Viewbox), Avizo, Mimics, fcsv, and CSV files. Can handle both
 2D and 3D landmarks and provides options for processing curves and contours.
 
 \itemize{Supported file formats:
@@ -45,6 +45,7 @@ Morphologika, NTS (Viewbox), Avizo, Mimics, and CSV files. Can handle both
 \item {avizo:           Avizo landmark ASCII format}
 \item {mimics:          Mimics Medical landmark format}
 \item {simple_csv:      Simple CSV with coordinates and optional landmark names}
+\item {fcsv:            3D Slicer Fudicial CSV file format}
 }
 }
 \details{
@@ -105,7 +106,15 @@ landmarks <- import_land(
 landmarks <- import_land(
   directory = path = file.path(.libPaths("CSGM"), "CSGM", "Example", "NTS"),
   pattern = "\\\\.nts$",
-  format = "tps",
+  format = "nts",
+  dims = 3
+)
+
+# Import fcsv files
+landmarks <- import_land(
+  directory = path = file.path(.libPaths("CSGM"), "CSGM", "Example", "fcsv"),
+  pattern = "\\\\.fcsv$",
+  format = "fcsv",
   dims = 3
 )
 }

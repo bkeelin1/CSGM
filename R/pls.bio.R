@@ -254,7 +254,6 @@
 #'
 #' @author Brian Anthony Keeling
 #'
-#' @importFrom mixOmics spls tune.spls
 #' @importFrom pls mvr plsr
 #' @importFrom plsdepot plsreg2
 #' @importFrom caret createDataPartition
@@ -449,7 +448,6 @@ pls.bio <- function(Models = NULL,
                     core_choice = "detect",
                     ...) {
 
-  set.seed(1)
   output = vector("list", length(Models))
 
   Dir = getwd()
@@ -610,14 +608,14 @@ pls.bio <- function(Models = NULL,
             if(vip_method == "spls") {
 
               ncomp <- NComp(model = list(Response = Response, Predictor = Predictor), vip_method = vip_method)
-              reg <- mixOmics::spls(Predictor, Response, ncomp = ncomp, mode = "regression", near.zero.var = TRUE)
+              reg <- spls(Predictor, Response, ncomp = ncomp, mode = "regression", near.zero.var = TRUE)
               reg$model <- list(Y = Response, X = Predictor)
               keepX = rep(ncol(VIP(reg, Scores = FALSE, ncomp = ncomp, vip_threshold = lv_method)),ncomp)
-              reg <- mixOmics::spls(Response, Predictor, ncomp = ncomp, mode = "regression", near.zero.var = TRUE)
+              reg <- spls(Response, Predictor, ncomp = ncomp, mode = "regression", near.zero.var = TRUE)
               reg$model <- list(Y = Predictor, X = Response)
               keepY = rep(ncol(VIP(reg, Scores = FALSE, ncomp = ncomp, vip_threshold = lv_method)),ncomp)
 
-              reg <- mixOmics::spls(Predictor, Response, ncomp = ncomp, keepX = keepX[1:ncomp], keepY = keepY[1:ncomp], mode = "regression", near.zero.var = TRUE)
+              reg <- spls(Predictor, Response, ncomp = ncomp, keepX = keepX[1:ncomp], keepY = keepY[1:ncomp], mode = "regression", near.zero.var = TRUE)
               reg$model <- list(Y = Response, X = Predictor)
               scores <- data.frame(VIP(reg, Scores = TRUE, ncomp = ncomp, vip_threshold = "NULL"))
               plots.vip[[i]][[j]]$scores <- scores
@@ -766,14 +764,14 @@ pls.bio <- function(Models = NULL,
           if(vip_method == "spls") {
 
             ncomp <- NComp(model = list(Response = Response, Predictor = Predictor), vip_method = vip_method)
-            reg <- mixOmics::spls(Predictor, Response, ncomp = ncomp, mode = "regression", near.zero.var = TRUE)
+            reg <- spls(Predictor, Response, ncomp = ncomp, mode = "regression", near.zero.var = TRUE)
             reg$model <- list(Y = Response, X = Predictor)
             keepX = rep(ncol(VIP(reg, Scores = FALSE, ncomp = ncomp, vip_threshold = lv_method)),ncomp)
-            reg <- mixOmics::spls(Response, Predictor, ncomp = ncomp, mode = "regression", near.zero.var = TRUE)
+            reg <- spls(Response, Predictor, ncomp = ncomp, mode = "regression", near.zero.var = TRUE)
             reg$model <- list(Y = Predictor, X = Response)
             keepY = rep(ncol(VIP(reg, Scores = FALSE, ncomp = ncomp, vip_threshold = lv_method)),ncomp)
 
-            reg <- mixOmics::spls(Predictor, Response, ncomp = ncomp, keepX = keepX[1:ncomp], keepY = keepY[1:ncomp], mode = "regression", near.zero.var = TRUE)
+            reg <- spls(Predictor, Response, ncomp = ncomp, keepX = keepX[1:ncomp], keepY = keepY[1:ncomp], mode = "regression", near.zero.var = TRUE)
             reg$model <- list(Y = Response, X = Predictor)
             scores <- data.frame(VIP(reg, Scores = TRUE, ncomp = ncomp, vip_threshold = "NULL"))
             plots.vip.all[[i]]$scores <- scores
@@ -1161,21 +1159,27 @@ pls.bio <- function(Models = NULL,
           if(length(dim(Models[[m]][[i]][[1]])) == 3){
             dt_parameters = modifyList(dt_parameters, list(Response = Models[[m]][[i]][[1]],
                                                            Predictor = Models[[m]][[i]][[2]],
-                                                           Res_transform = "NULL")
-                                        ) %>% .[intersect(names(.), dt_params)]
+                                                           Res_transform = "NULL",
+                                                           Res_point_set = NULL,
+                                                           Pred_point_set = NULL)
+            ) %>% .[intersect(names(.), dt_params)]
 
 
           }
           if(length(dim(Models[[m]][[i]][[2]])) == 3) {
             dt_parameters = modifyList(dt_parameters, list(Response = Models[[m]][[i]][[1]],
                                                            Predictor = Models[[m]][[i]][[2]],
-                                                           Pred_transform = "NULL")
-                                        ) %>% .[intersect(names(.), dt_params)]
+                                                           Pred_transform = "NULL",
+                                                           Res_point_set = NULL,
+                                                           Pred_point_set = NULL)
+            ) %>% .[intersect(names(.), dt_params)]
           }
           if(length(dim(Models[[m]][[i]][[1]])) != 3 & length(dim(Models[[m]][[i]][[2]])) != 3) {
             dt_parameters = modifyList(dt_parameters, list(Response = Models[[m]][[i]][[1]],
-                                                           Predictor = Models[[m]][[i]][[2]])
-                                        ) %>% .[intersect(names(.), dt_params)]
+                                                           Predictor = Models[[m]][[i]][[2]],
+                                                           Res_point_set = NULL,
+                                                           Pred_point_set = NULL)
+            ) %>% .[intersect(names(.), dt_params)]
           }
 
           Response = do.call(DT, dt_parameters)$Response

@@ -7,7 +7,7 @@
 pls_it(plsr.results, test_x = NULL, test_y = NULL)
 }
 \arguments{
-\item{plsr.results}{A PLS model object from either pls::plsr(), plsdepot::plsreg2(), or mixOmics::spls()}
+\item{plsr.results}{A PLS model object from either pls::plsr(), plsdepot::plsreg2(), or spls()}
 
 \item{test_x}{Optional matrix/data.frame of test set predictor variables}
 

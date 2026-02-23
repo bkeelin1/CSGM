@@ -13,17 +13,15 @@ vignette: >
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Visualizing the CSGM Workflow
+# CSGM – Cross-Sectional Geometry and Morphometrics
 
-![CSGM Workflow](images/CSGM_Workflow.png)
+![](images/clipboard-1066059136.png)
+
+# Step 1: Importing Example Data
 
 ```{r}
 library(CSGM)
 ```
-
-# Step 1: Data Import and Transformation
-
-## 
 
 ### Load the landmark array, and helper indices
 
@@ -63,25 +61,29 @@ Group = list(Collection = Corpus_Prop[1:50,]$Collection) # Skeletal Collection
 
 # Conduct the analysis
 
-output <- GMA(Corpus_Land,  # Complete landmark configuration
+output <- GMA(Corpus_Land,  
               k = 3,  # 3D data
               ID,  # Specimen identifiers
               Group = Group,  # Grouping variable
-              coord_name = dimnames(Corpus_Land)[[1]],  # Landmark names
-              subset = paste(rep(c("LM1M2", "LP3P4", "Symphysis", "RP3P4", "RM1M2"), each = 118)),
-              phy = NULL, # We do not have a phylogeny for this data
-              bilat_sym = TRUE,  # We will also conduct a bilateral symmmetry test
-              land.pairs = cbind(left = c(1:236), right = c(355:590)), # separate the left and right cross-sections
-              object.sym = TRUE, # needed for object symmetry (we are looking at a mandible)
+              # Landmark names
+              coord_name = dimnames(Corpus_Land)[[1]],  
+              # Landmark subsets
+              subset = paste(rep(c("LM1M2", 
+                                   "LP3P4", 
+                                   "Symphysis", 
+                                   "RP3P4", 
+                                   "RM1M2"), each = 118)),
+              bilat_sym = TRUE,  #bilateral symmmetry test
+              # left and right sides
+              land.pairs = cbind(left = c(1:236), 
+                                 right = c(355:590)), 
+              object.sym = TRUE, # object is symmetric
               ind = ID, # needed for bilateral symmetry
-              w_morpho_pca = TRUE, # We will weight our PCA analysis by individual Mahalanobis distances
+              w_morpho_pca = TRUE, # Dist weighted PCA
               key = "Mandibular_Corpus",
               curves = curves # add in curves matrix
               ) 
-
-
 # NOTE: Procrustes Outliers were individually checked and approved as representing real shape variation
-
 ```
 
 ## Procrustes Shape Variation
@@ -442,12 +444,12 @@ cor_hypothesize = cor.bio(Models, #Your hypothesis models
                           )
 ```
 
-Notes: Visualize the results of the correlograms in your directory under the folder "Correlations_Bio".
+Notes: Visualize the results of the correlograms and correlation networks in your directory under the folder "Correlations_Bio".
 
 #### Obtain summary statistics for cor.bio function
 
 ```{r Correlation_Summary,echo=TRUE,eval=FALSE}
-CSGM::summary(cor_hypothesize)
+summary(cor_hypothesize)
 ```
 
 Notes: The results of the correlation tests demonstrate a few important aspects of the relationships between shape and cross-sectional properties across the mandibular symphysis.
@@ -473,8 +475,7 @@ VIP_hypothesize = pls.bio(Models, # Your hypothesis models
 #### Obtain summary statistics for Bio.VIP function
 
 ```{r Covariation_summary,echo=TRUE,eval=FALSE}
-CSGM::summary(VIP_hypothesize)
-
+summary(VIP_hypothesize)
 ```
 
 Notes: The results of the Bio.VIP analysis are quite informative. Keep in mind our structure
@@ -513,7 +514,7 @@ PSLR_hypothesize = pslr.bio(Models, # Hypothesis model
 #### Obtain summary statistics for PSLR function
 
 ```{r PSLR_Summary,echo=TRUE,eval=FALSE}
-CSGM::summary(PSLR_hypothesize)
+summary(PSLR_hypothesize)
 ```
 
 Notes: The results of the PSLR regression test demonstrate the limits that linear regression has when handling multivariate data. As can be seen, the unbelievably high and low squared correlation coefficient (R2) is the result of model overfitting (for variables over 30) and linearity (as we already established there are non-linear relationships involved). However, Procrustes Shape Linear Regression was designed to work well with 3D shape data, as indicated in hypothesis tests 2 and 4. Here, while the VIP analysis performed better, we can still see that the right side is contributing much more variation than the left side.
@@ -552,16 +553,16 @@ for(i in seq_along(Models[[1]])) { # Since we know we have 1 hypothesis model
 
 ```{r MARS_Reg_Summary,echo=TRUE,eval=FALSE}
 # Hypothesis test 1
-CSGM::summary(pred_tests[[1]])
+summary(pred_tests[[1]])
 
 # Hypothesis test 2
-CSGM::summary(pred_tests[[2]])
+summary(pred_tests[[2]])
 
 # Hypothesis test 3
-CSGM::summary(pred_tests[[3]])
+summary(pred_tests[[3]])
 
 # Hypothesis test 4
-CSGM::summary(pred_tests[[4]])
+summary(pred_tests[[4]])
 ```
 
 Notes: As we can see, the MARS predictions outperformed the linear predictions, revealing the predictive strengths noted in the PLS analysis. Two very different methods converging on the same answer is a strong sign that the predictive strength of the model is accurately capturing real shape variation.

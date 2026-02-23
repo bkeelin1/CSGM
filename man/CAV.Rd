@@ -109,7 +109,7 @@ ID = unique(Biomechanics$ID)
 
 # Run the cluster analysis vizualization tool
 
-output = CAV(Data = table_corpus_land,
+output = CAV(Data = corpus_land,
              Group = Group,
              ID = ID,
              nboot = 1000,

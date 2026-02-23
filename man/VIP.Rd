@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{VIP}
 \alias{VIP}
-\title{Estimate Variable Importance in Projections}
+\title{VIP: Estimate Variable Importance in Projections}
 \usage{
 VIP(plsr.results, ncomp, Scores = FALSE, vip_threshold = "NULL")
 }

@@ -106,7 +106,7 @@ mantel_sym <- function(x,
     if(!"ind" %in% names(dots)) {
       dots$ind <- seq_len(dim(x)[3])
     }
-    x = do.call(bilat.symmetry,
+    x = do.call(geomorph::bilat.symmetry,
                 c(list(A = x,
                        land.pairs = pairs,
                        print.progress = FALSE),
@@ -126,7 +126,7 @@ mantel_sym <- function(x,
   left_vcv_asym = left_var_asym * left_cor_asym
 
   # Compute the Mantel Test of the left VCV matrices of the symmetric and asymmetric shape components
-  mantel_test_left <- mantel(left_cov_sym, left_cov_asym, method = method, permutations = perm, na.rm = TRUE)
+  mantel_test_left <- vegan::mantel(left_cov_sym, left_cov_asym, method = method, permutations = perm, na.rm = TRUE)
   mantel_test_left
 
   # Second, calculate the VCV matrices for the right side symmetric and asymmetric components
@@ -143,7 +143,7 @@ mantel_sym <- function(x,
   right_vcv_asym = right_var_asym * right_cor_asym
 
   # Compute the Mantel Test of the right VCV matrices of the symmetric and asymmetric shape components
-  mantel_test_right <- mantel(right_cov_sym, right_cov_asym, method = method, permutations = perm, na.rm = TRUE)
+  mantel_test_right <- vegan::mantel(right_cov_sym, right_cov_asym, method = method, permutations = perm, na.rm = TRUE)
   mantel_test_right
 
   Mantel_results$combined <- rbind(mantel_test_left, mantel_test_right)

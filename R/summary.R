@@ -81,7 +81,7 @@ summary <- function(object,
             Cor.all.Mantels = t(Cor.all.Mantels)
           }
           Cor_Output[[m]][[i]] = Cor.all.Mantels
-          colnames(Cor_Output[[m]][[i]]) = c("r","p-value","I","Ix","Iy")
+          colnames(Cor_Output[[m]][[i]]) = c("r","p-value","IC","IC_x","IC_y")
           rownames(Cor_Output[[m]][[i]])[1] = paste("Overall_Test_", i, sep = "")
 
           if("Cor.subset.Mantels" %in% names(object_cor[[m]])) {
@@ -90,7 +90,7 @@ summary <- function(object,
               if(ncol(Cor.subset.Mantels) < 4) {
                 Cor.subset.Mantels = t(Cor.subset.Mantels)
               }
-              colnames(Cor.subset.Mantels) = c("r","p-value","I","Ix","Iy")
+              colnames(Cor.subset.Mantels) = c("r","p-value","IC","IC_x","IC_y")
               Cor_Output[[m]][[i]] <- rbind(Cor_Output[[m]][[i]],Cor.subset.Mantels)
               rownames(Cor_Output[[m]][[i]])[j+1] = paste("Test_", i, "_Subset_", j, sep = "")
             }
@@ -278,7 +278,7 @@ summary <- function(object,
     }
     return(Output)
 
-  } else if ("Bio.VIP" %in% class(object)) {
+  } else if ("pls.bio" %in% class(object)) {
     print("Summary Statistics from Bio.VIP")
     Output = vector("list", length(object))
     names(Output) = paste(rep("Hypothesis Model", length(object)), rep(1:length(object)),sep = "_")
@@ -322,7 +322,7 @@ summary <- function(object,
     }# M loop
     return(Output)
 
-  } else if ("PSLR" %in% class(object)) {
+  } else if ("pslr.bio" %in% class(object)) {
     print("Summary Statistics from PSLR")
     m_length = length(object)
     Output = vector("list", m_length)

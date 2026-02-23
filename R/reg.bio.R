@@ -202,29 +202,10 @@ reg.bio <- function(Response,
                  print_progress = TRUE,
                  ...) {
 
-  set.seed(1) # seed for reproducibility
   closeAllConnections() # stop all background processes
   args = list(...) # create list for extra arguments
   output = list() # create function return object
   #__________________________________________________________________________________
-
-  install_and_load <- function(package) {
-    if (!require(package, character.only = TRUE, quietly = TRUE)) {
-      install.packages(package, quietly = TRUE)
-    } else {
-      require(package, character.only = TRUE, quietly = TRUE)
-    }
-    suppressPackageStartupMessages(library(package, character.only = TRUE))
-  }
-  packages = c("shapes", "e1071", "caret", "doParallel", "foreach", "vegan", "glmnet", "randomForest", "tidyverse",
-               "tidyverse", "parallel", "progress", "geomorph", "Morpho", "progress", "FactoMineR", "factoextra")
-
-  # use of the function to load packages
-  for (i in 1:length(packages)) {
-    install_and_load(packages[i])
-  }
-
-  # Internal Function only for pred__________________________________________________________________________________
 
   get_coef <- function(coefficients, Predictor_names) {
 
@@ -462,7 +443,7 @@ reg.bio <- function(Response,
         } else {
           n = nrow(Response[,j])
           edf = if(!is.null(VIPS)) {length(VIPS)} else {
-            lasso <- cv.glmnet(x = as.matrix.data.frame(Predictor), y = Response[,j], alpha = 0.5, family = family)
+            lasso <- glmnet::cv.glmnet(x = as.matrix.data.frame(Predictor), y = Response[,j], alpha = 0.5, family = family)
             coef_lasso <- coef(lasso, s = lasso$lambda.min)
             length(which(coef_lasso[rownames(coef_lasso) != "(Intercept)"] != 0))
           }
@@ -543,7 +524,7 @@ reg.bio <- function(Response,
           coefs[j,colnames(place_coef)] <- place_coef
           coef_id = TRUE
         } else {
-          lasso <- cv.glmnet(x = as.matrix.data.frame(Predictor), y = Response[,j], alpha = 0.5, family = family)
+          lasso <- glmnet::cv.glmnet(x = as.matrix.data.frame(Predictor), y = Response[,j], alpha = 0.5, family = family)
           coef_lasso <- coef(lasso, s = lasso$lambda.min)
           coefs[j,] <- place_coef
           colnames(coefs) <- colnames(Predictor)
@@ -567,11 +548,11 @@ reg.bio <- function(Response,
   }
   #Add in Variable Importance in Projections or Variable Regulations_______________________________________________
 
-  if(is.null(VIPS)) { # using LASSO Regularization
+  if(is.null(VIPS)) { # using Elastic Net Regularization
     VIPS = numeric(0)
     lasso.coefs = list()
     for(j in 1:ncol(Response)) {
-      lasso <- cv.glmnet(x = as.matrix.data.frame(Predictor), y = Response[,j], alpha = 0.5, family = family)
+      lasso <- glmnet::cv.glmnet(x = as.matrix.data.frame(Predictor), y = Response[,j], alpha = 0.5, family = family)
       coef_lasso <- coef(lasso, s = lasso$lambda.min)
       lasso.coefs[[j]] = which(coef_lasso[rownames(coef_lasso) != "(Intercept)"] != 0)
     } # end of j for loop
@@ -664,7 +645,7 @@ reg.bio <- function(Response,
           } else {
             n = nrow(Response[,j])
             edf = if(!is.null(VIPS)) {length(VIPS)} else {
-              lasso <- cv.glmnet(x = as.matrix.data.frame(Predictor), y = Response[,j], alpha = 0.5, family = family)
+              lasso <- glmnet::cv.glmnet(x = as.matrix.data.frame(Predictor), y = Response[,j], alpha = 0.5, family = family)
               coef_lasso <- coef(lasso, s = lasso$lambda.min)
               length(which(coef_lasso[rownames(coef_lasso) != "(Intercept)"] != 0))
             }
@@ -745,7 +726,7 @@ reg.bio <- function(Response,
             coefs[j,colnames(place_coef)] <- place_coef
             coef_id = TRUE
           } else {
-            lasso <- cv.glmnet(x = as.matrix.data.frame(Predictor), y = Response[,j], alpha = 0.5, family = family)
+            lasso <- glmnet::cv.glmnet(x = as.matrix.data.frame(Predictor), y = Response[,j], alpha = 0.5, family = family)
             coef_lasso <- coef(lasso, s = lasso$lambda.min)
             coefs[j,] <- place_coef
             colnames(coefs) <- colnames(Predictor)
@@ -767,7 +748,7 @@ reg.bio <- function(Response,
   if(ncol(Predictor) >= nrow(Predictor) || ncol(Predictor) >= nrow(Predictor) * 0.9) {
     lasso.coefs = list()
     for(j in 1:ncol(Response)) {
-      lasso <- cv.glmnet(x = as.matrix.data.frame(Predictor), y = Response[,j], alpha = 0.5, family = family)
+      lasso <- glmnet::cv.glmnet(x = as.matrix.data.frame(Predictor), y = Response[,j], alpha = 0.5, family = family)
       coef_lasso <- coef(lasso, s = lasso$lambda.min)
       lasso.coefs[[j]] = which(coef_lasso[rownames(coef_lasso) != "(Intercept)"] != 0)
       reg.parameter[[j]] <- length(lasso.coefs[[j]])
@@ -872,7 +853,7 @@ reg.bio <- function(Response,
         } else {
           n = nrow(Response[,j])
           edf = if(!is.null(VIPS)) {length(VIPS)} else {
-            lasso <- cv.glmnet(x = as.matrix.data.frame(Predictor), y = Response[,j], alpha = 0.5, family = family)
+            lasso <- glmnet::cv.glmnet(x = as.matrix.data.frame(Predictor), y = Response[,j], alpha = 0.5, family = family)
             coef_lasso <- coef(lasso, s = lasso$lambda.min)
             length(which(coef_lasso[rownames(coef_lasso) != "(Intercept)"] != 0))
           }
@@ -953,7 +934,7 @@ reg.bio <- function(Response,
           perm_coefs[j,colnames(place_coef)] <- place_coef
           coef_id = TRUE
         } else {
-          lasso <- cv.glmnet(x = as.matrix.data.frame(Predictor), y = Response[,j], alpha = 0.5, family = family)
+          lasso <- glmnet::cv.glmnet(x = as.matrix.data.frame(Predictor), y = Response[,j], alpha = 0.5, family = family)
           coef_lasso <- coef(lasso, s = lasso$lambda.min)
           perm_coefs[j,] <- place_coef
           colnames(perm_coefs) <- colnames(Predictor)
@@ -1172,7 +1153,7 @@ reg.bio <- function(Response,
                  } else {
                    n = nrow(Response[,j])
                    edf = if(!is.null(VIPS)) {length(VIPS)} else {
-                     lasso <- cv.glmnet(x = as.matrix.data.frame(Predictor), y = Response[,j], alpha = 0.5, family = family)
+                     lasso <- glmnet::cv.glmnet(x = as.matrix.data.frame(Predictor), y = Response[,j], alpha = 0.5, family = family)
                      coef_lasso <- coef(lasso, s = lasso$lambda.min)
                      length(which(coef_lasso[rownames(coef_lasso) != "(Intercept)"] != 0))
                    }
@@ -1253,7 +1234,7 @@ reg.bio <- function(Response,
                    coefs[j,colnames(place_coef)] <- place_coef
                    coef_id = TRUE
                  } else {
-                   lasso <- cv.glmnet(x = as.matrix.data.frame(Predictor), y = Response[,j], alpha = 0.5, family = family)
+                   lasso <- glmnet::cv.glmnet(x = as.matrix.data.frame(Predictor), y = Response[,j], alpha = 0.5, family = family)
                    coef_lasso <- coef(lasso, s = lasso$lambda.min)
                    coefs[j,] <- place_coef
                    colnames(coefs) <- colnames(Predictor)
@@ -1398,7 +1379,7 @@ reg.bio <- function(Response,
                } else {
                  n = nrow(Response[,j])
                  edf = if(!is.null(VIPS)) {length(VIPS)} else {
-                   lasso <- cv.glmnet(x = as.matrix.data.frame(Predictor), y = Response[,j], alpha = 0.5, family = family)
+                   lasso <- glmnet::cv.glmnet(x = as.matrix.data.frame(Predictor), y = Response[,j], alpha = 0.5, family = family)
                    coef_lasso <- coef(lasso, s = lasso$lambda.min)
                    length(which(coef_lasso[rownames(coef_lasso) != "(Intercept)"] != 0))
                  }
@@ -1479,7 +1460,7 @@ reg.bio <- function(Response,
                  coefs[j,colnames(place_coef)] <- place_coef
                  coef_id = TRUE
                } else {
-                 lasso <- cv.glmnet(x = as.matrix.data.frame(Predictor), y = Response[,j], alpha = 0.5, family = family)
+                 lasso <- glmnet::cv.glmnet(x = as.matrix.data.frame(Predictor), y = Response[,j], alpha = 0.5, family = family)
                  coef_lasso <- coef(lasso, s = lasso$lambda.min)
                  coefs[j,] <- place_coef
                  colnames(coefs) <- colnames(Predictor)
@@ -1729,7 +1710,7 @@ reg.bio <- function(Response,
             } else {
               n = nrow(Response[,j])
               edf = if(!is.null(VIPS)) {length(VIPS)} else {
-                lasso <- cv.glmnet(x = as.matrix.data.frame(Predictor), y = Response[,j], alpha = 0.5, family = family)
+                lasso <- glmnet::cv.glmnet(x = as.matrix.data.frame(Predictor), y = Response[,j], alpha = 0.5, family = family)
                 coef_lasso <- coef(lasso, s = lasso$lambda.min)
                 length(which(coef_lasso[rownames(coef_lasso) != "(Intercept)"] != 0))
               }
@@ -1810,7 +1791,7 @@ reg.bio <- function(Response,
               perm_coefs[j,colnames(place_coef)] <- place_coef
               coef_id = TRUE
             } else {
-              lasso <- cv.glmnet(x = as.matrix.data.frame(Predictor), y = Response[,j], alpha = 0.5, family = family)
+              lasso <- glmnet::cv.glmnet(x = as.matrix.data.frame(Predictor), y = Response[,j], alpha = 0.5, family = family)
               coef_lasso <- coef(lasso, s = lasso$lambda.min)
               perm_coefs[j,] <- place_coef
               colnames(perm_coefs) <- colnames(Predictor)

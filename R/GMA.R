@@ -489,6 +489,7 @@ GMA <- function(Landmarks,
 
   gpa_parameters = list(A = NULL,
                         curves = NULL,
+                        ProcD = TRUE,
                         approxBE = FALSE,
                         verbose = FALSE,
                         print.progress = FALSE
@@ -547,8 +548,8 @@ GMA <- function(Landmarks,
     Landmarks = arrayspecs(Landmarks, length(Landmarks)/k, k)
     land_origin = Landmarks
     gpa_parameters = modifyList(gpa_parameters, list(A = Landmarks))
-    GPA_data = do.call(gpagen, gpa_parameters)
-    Data = data.frame(two.d.array(GPA_data$coords))
+    GPA_data = do.call(geomorph::gpagen, gpa_parameters)
+    Data = data.frame(geomorph::two.d.array(GPA_data$coords))
     GMA_Output$GPA_data <- GPA_data
   } # End of data frame transformation
 
@@ -586,21 +587,21 @@ GMA <- function(Landmarks,
                            modifyList(., list(A = GPA_data,
                                               print.progress = FALSE)) %>%
                               .[intersect(names(.), bilat_params)]
-      sym_data = do.call(bilat.symmetry,bilat_parameters)
+      sym_data = do.call(geomorph::bilat.symmetry,bilat_parameters)
       # Mantel test calculation
       side = if(!is.null(bilat_parameters$side)) bilat_parameters$side else bilat_parameters$land.pairs
       Mantel_sym = mantel_sym(sym_data, side, perm = 1000)
       sym_data$Mantel_tests <- Mantel_sym
       # Dataset generation for PCA
-      Data_asym = data.frame(two.d.array(sym_data$asymm.shape))
+      Data_asym = data.frame(geomorph::two.d.array(sym_data$asymm.shape))
       GPA_data_asym = sym_data$asymm.shape
-      Data_sym = data.frame(two.d.array(sym_data$symm.shape))
+      Data_sym = data.frame(geomorph::two.d.array(sym_data$symm.shape))
       GPA_data_sym = sym_data$symm.shape
 
       # Procrustes Residuals
       residuals = Evomorph::GpaResiduals(land_origin, GPA_data$coords)
       residuals = geomorph::arrayspecs(data.frame(residuals$resid), ncol(data.frame(residuals$resid))/k, k)
-      sym_resid_data = modifyList(bilat_parameters, list(A = GPA_data)) %>% do.call(bilat.symmetry,.)
+      sym_resid_data = modifyList(bilat_parameters, list(A = GPA_data)) %>% do.call(geomorph::bilat.symmetry,.)
 
       sym_resid_data$Csize <- GPA_data$Csize
       sym_data$Csize <- GPA_data$Csize
@@ -630,7 +631,7 @@ GMA <- function(Landmarks,
 
   dimnames(GPA_data$coords)[[3]] <- ID
   resid_data = Evomorph::GpaResiduals(land_origin, GPA_data$coords)
-  GMA_Output$residuals = arrayspecs(resid_data$resid, dim(GPA_data$coords)[1], k)
+  GMA_Output$residuals = geomorph::arrayspecs(resid_data$resid, dim(GPA_data$coords)[1], k)
 
   CAV_parameters = modifyList(CAV_parameters, list(Data = data.frame(resid_data$resid), Dir_name = "Procrustes Residuals", Pred_ncomp = Pred_ncomp))
 
@@ -653,12 +654,12 @@ GMA <- function(Landmarks,
 
   if (bilat_sym == TRUE) { # Hierarchical cluster generation when bilateral symmetry analysis is desired
 
-    CAV_parameters = modifyList(CAV_parameters, list(Data = data.frame(two.d.array(resid_asym)), Dir_name = "Asymmetry"))
+    CAV_parameters = modifyList(CAV_parameters, list(Data = data.frame(geomorph::two.d.array(resid_asym)), Dir_name = "Asymmetry"))
     cluster = do.call(CAV, CAV_parameters)
     dendro_asym = cluster$dendro
     GMA_Output$morphotree$asym <- cluster
 
-    CAV_parameters = modifyList(CAV_parameters, list(Data = data.frame(two.d.array(resid_sym)), Dir_name = "Symmetry"))
+    CAV_parameters = modifyList(CAV_parameters, list(Data = data.frame(geomorph::two.d.array(resid_sym)), Dir_name = "Symmetry"))
     cluster = do.call(CAV, CAV_parameters)
     dendro_sym = cluster$dendro
     GMA_Output$morphotree$sym <- cluster
@@ -698,11 +699,11 @@ GMA <- function(Landmarks,
                                                      align.to.phy = align.to.phy,
                                                      GLS = GLS, transform = transform)) %>%
                      .[intersect(names(.), pca_params)]
-    Data_PCA = do.call(gm.prcomp, pca_parameters)
+    Data_PCA = do.call(geomorph::gm.prcomp, pca_parameters)
     pca_parameters = modifyList(pca_parameters, list(A = GPA_data_asym, phy = phy_asym))
-    Data_PCA_asym = do.call(gm.prcomp, pca_parameters)
+    Data_PCA_asym = do.call(geomorph::gm.prcomp, pca_parameters)
     pca_parameters = modifyList(pca_parameters, list(A = GPA_data_sym, phy = phy_sym))
-    Data_PCA_sym = do.call(gm.prcomp, pca_parameters)
+    Data_PCA_sym = do.call(geomorph::gm.prcomp, pca_parameters)
 
   } else {
 
@@ -718,7 +719,7 @@ GMA <- function(Landmarks,
                                                      align.to.phy = align.to.phy,
                                                      GLS = GLS, transform = transform)) %>%
                      .[intersect(names(.), pca_params)]
-    Data_PCA = do.call(gm.prcomp, pca_parameters)
+    Data_PCA = do.call(geomorph::gm.prcomp, pca_parameters)
 
   } # End of non-bilateral symmetric analysis
 
@@ -728,20 +729,20 @@ GMA <- function(Landmarks,
 
   #PCA results of original component
   PCA_variance = PCA_variances(Data_PCA = Data_PCA)
-  PCA_var = PCA_variance$PCA_var
+  PCA_var = PCA_variance
   PCs = PCA_variance$PCs
   GMA_Output$PCA <- PCA_variance
 
   if(bilat_sym == TRUE) { # If a PCA of bilateral symmetry was computed to summarize the a/symmetric variances
     # PCA results of asymmetric component
-    PCA_variance = PCA_variances(Data_PCA_asym, PCs = FALSE)
-    PCA_var_asym = PCA_variance$PCA_var
+    PCA_variance = PCA_variances(Data_PCA_asym)
+    PCA_var_asym = PCA_variance
     PCs_asym = PCs
     GMA_Output$PCA_asym <- PCA_variance
 
     # PCA results of symmetric component
-    PCA_variance = PCA_variances(Data_PCA_sym, PCs = FALSE)
-    PCA_var_sym = PCA_variance$PCA_var
+    PCA_variance = PCA_variances(Data_PCA_sym)
+    PCA_var_sym = PCA_variance
     PCs_sym = PCs
     GMA_Output$PCA_sym <- Data_PCA_sym
   }
@@ -750,19 +751,19 @@ GMA <- function(Landmarks,
     pb$tick(20, tokens = list(what = "Creating PCA Visuals"))
   }
 
-  lollipops <- lolligen(Data_PCA = Data_PCA, PCs = PCs, ID = ID, Group = Group, coord_name = coord_name, subset = subset, PCA_var = PCA_var, k = k)
+  lollipops <- lolligen(Data_PCA = Data_PCA, ID = ID, Group = Group, coord_name = coord_name, subset = subset, PCA_var = PCA_var, k = k)
   GMA_Output$PCA$PCA_plots <- lollipops$PCA_list
   GMA_Output$PCA$PCA_groups <- lollipops$PCA_group
   GMA_Output$PCA$lollipop_PCs <- lollipops$lollipop_PCs
 
   # Apply lollipop graphing function by whether bilateral symmetry is warranted or not
   if (bilat_sym == TRUE) {
-    lollipops_asym <- lolligen(Data_PCA_asym, PCs = PCs_asym, ID = ID, Group = Group, coord_name = coord_name, subset = subset, PCA_var = PCA_var_asym, k = k)
+    lollipops_asym <- lolligen(Data_PCA_asym, ID = ID, Group = Group, coord_name = coord_name, subset = subset, PCA_var = PCA_var_asym, k = k)
     GMA_Output$PCA_asym$asym_PCA_plots <- lollipops_asym$PCA_list
     GMA_Output$PCA_asym$asym_PCA_groups <- lollipops_asym$PCA_group
     GMA_Output$PCA_asym$asym_lollipop_PCs <- lollipops_asym$lollipop_PCs
 
-    lollipops_sym <- lolligen(Data_PCA_sym, PCs = PCs_sym, ID = ID, Group = Group, coord_name = coord_name, subset = subset, PCA_var = PCA_var_sym, k = k)
+    lollipops_sym <- lolligen(Data_PCA_sym, ID = ID, Group = Group, coord_name = coord_name, subset = subset, PCA_var = PCA_var_sym, k = k)
     GMA_Output$PCA_sym$sym_PCA_plots <- lollipops_sym$PCA_list
     GMA_Output$PCA_sym$sym_PCA_groups <- lollipops_sym$PCA_group
     GMA_Output$PCA_sym$sym_lollipop_PCs <- lollipops_sym$lollipop_PCs
@@ -773,15 +774,71 @@ GMA <- function(Landmarks,
   }
 
   calregs <- function(GPA_data) {
-    output <- list()
-    tryCatch({
-      GPA_data <<- GPA_data
-      size_formula <- as.formula("coords ~ log(Csize)")
-      output$Csize <- procD.lm(size_formula, data = GPA_data)
-      output$outliers <- unique(plotOutliers(GPA_data$coords, inspect.outliers = FALSE))
-      output$dimensions <- dim(GPA_data$coords)
-      }, error = function (e) {print("Centroid Size is the same in all individuals after Procrustes Registration. Please check the nature of the data.")}
-    )
+    output <- vector("list", 2)
+    names(output) <- c("centroid_size","outliers")
+
+    GPA_data <<- GPA_data
+    size_formula <- as.formula("coords ~ log(Csize)")
+    output$centroid_size <- geomorph::procD.lm(size_formula, data = GPA_data)$aov.table
+
+    if(is.null(GPA_data$procD)) {
+      # Calculate Mean Shape (Consensus)
+      mean_shape <- apply(GPA_data$coords, c(1, 2), mean)
+
+      # Calculate distance for each specimen: sqrt(sum((specimen - mean)^2))
+      GPA_data$procD <- apply(GPA_data$coords, 3, function(x) {
+        sqrt(sum((x - mean_shape)^2))
+      })
+    }
+
+    placeholder <-
+      tibble::tibble(
+                     ID = names(GPA_data$procD),
+                     Distance = GPA_data$procD
+                     ) %>%
+      dplyr::arrange(
+                     dplyr::desc(Distance)
+                     ) %>%
+      dplyr::mutate(
+                    Rank = 1:dplyr::n(),
+                    Median = median(Distance),
+                    UpperQ = quantile(Distance, 0.75),
+                    Is_Outlier = Distance > (UpperQ + IQR(Distance))
+                  )
+
+    output$outliers <- ggplot2::ggplot(placeholder, ggplot2::aes(x = Rank,
+                                                        y = Distance)) +
+                       ggplot2::geom_hline(yintercept = placeholder$Median[1],
+                                           color = "blue",
+                                           linetype = "solid") +
+                       ggplot2::geom_hline(yintercept = placeholder$UpperQ[1],
+                                           color = "blue",
+                                           linetype = "dashed") +
+                       ggplot2::annotate("text", x = max(placeholder$Rank),
+                                         y = placeholder$Median[1],label = "median",
+                                         vjust = -0.5, hjust = 1,
+                                         color = "blue", size = 3) +
+                       ggplot2::annotate("text", x = max(placeholder$Rank),
+                                         y = placeholder$UpperQ[1],
+                                         label = "upper quartile",
+                                         vjust = -0.5, hjust = 1,
+                                         color = "blue", size = 3) +
+                       ggplot2::geom_point(ggplot2::aes(color = Is_Outlier)) +
+                       ggplot2::geom_text(data = dplyr::filter(placeholder, Is_Outlier),
+                                          ggplot2::aes(label = ID),
+                                          hjust = -0.2, color = "red",
+                                          size = 3.5) +
+                       ggplot2::scale_color_manual(values = c("black","red")) +
+                       ggplot2::labs(title = "All Specimens",
+                                     y = "Procrustes Distance from Mean",
+                                     x = "Specimen Rank") +
+                       ggpubr::theme_pubclean() +
+                       ggplot2::theme(
+                                      legend.position = "none",
+                                      axis.text.x = ggplot2::element_blank(),
+                                      axis.ticks.x = ggplot2::element_blank()
+                                    )
+
     return(output)
   }
 

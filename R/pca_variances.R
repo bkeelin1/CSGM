@@ -79,58 +79,75 @@
 PCA_variances <- function(Data_PCA, PCs = TRUE) {
 
   if(is.null(Data_PCA$A)) {
-    scores <- Data_PCA$x
+    x <- Data_PCA$x
     loadings <- Data_PCA$rotation
+    variances <- Data_PCA$sdev^2
     center <- Data_PCA$center
     scale <- Data_PCA$scale
 
     # Reconstruct the original data
-    reconstructed_data <- scores %*% t(loadings)
+    reconstructed_data <- x %*% t(loadings)
 
     # Reverse scaling if it was applied
-    if (!is.null(scale)) {
+    if (!is.null(scale) && !isFALSE(scale)) {
       reconstructed_data <- sweep(reconstructed_data, 2, scale, '*')
     }
 
-    # Add the mean to reverse centering
-    if (!is.null(center)) {
+    # 3. Reverse centering (Handle cases where center might be FALSE)
+    if (!is.null(center) && !isFALSE(center)) {
       reconstructed_data <- sweep(reconstructed_data, 2, center, '+')
     }
 
     Data = reconstructed_data
 
-  } else {
+  } else if (!is.null(Data_PCA$A)) {
 
     if (length(dim(Data_PCA$A)) == 3) {
       Data = data.frame(two.d.array(Data_PCA$A))
+      variances = Data_PCA$sdev^2
+      Data_PCA$x <- Data_PCA$x
+      Data_PCA$loadings <- Data_PCA$rotation
+      Data_PCA$center <- Data_PCA$center
+      Data_PCA$scale <- Data_PCA$scale
+      Data_PCA$Data <- Data
+
     } else {
-      Data = Data_PCA$A
+       Data = data.frame(Data_PCA$A)
+       variances = Data_PCA$sdev^2
+       Data_PCA$x <- Data_PCA$x
+       Data_PCA$loadings <- Data_PCA$rotation
+       Data_PCA$center <- Data_PCA$center
+       Data_PCA$scale <- Data_PCA$scale
+       Data_PCA$Data <- Data
+
     }
+  } else if (!is.null(Data_PCA$var)) {
+    variances = Data_PCA$svd$vs
+    Data <- data.frame(Data_PCA$call$X)
+    Data_PCA$x <- Data_PCA$ind$coord
+    Data_PCA$loadings <- Data_PCA$var$coord
+    Data_PCA$center <- Data_PCA$call$centre
+    Data_PCA$scale <- Data_PCA$call$scale.unit
+    Data_PCA$Data <- Data
   }
 
   PCA_variances <- list()
 
   PCA_variances$PCA_Data <- Data_PCA
 
-  variances <- Data_PCA$sdev^2
   total_variance <- sum(variances)
   perc_var <- (variances / total_variance) * 100
   cum_var <- cumsum(perc_var)
 
   # Create a data frame
   PCA_var <- data.frame(PC = seq_along(perc_var),
-                        var = perc_var, cum_var = cum_var)
+                        Explained_Var = perc_var,
+                        Cum_Exp_Var = cum_var)
 
   PCA_variances$PCA_var <- PCA_var
 
-  PCA_variances$Scree <- plot(PCA_var$PC, PCA_var$var, type = "b", xlab = "Principal Component",
-                              ylab = "Percentage of Variance Explained", main = "Scree Plot")
-  if (length(dev.list()) > 0) {
-    graphics.off()
-  }
-
   if(isTRUE(PCs)) {
-    cumvar = min(which(PCA_var$cum_var >= 80))
+    cumvar = min(which(PCA_var$Cum_Exp_Var >= 80))
     parallel_which_PC = suppressMessages(suppressWarnings(psych::fa.parallel(Data, fa = "pc", n.iter = 1, plot = FALSE)))
 
     closeAllConnections()

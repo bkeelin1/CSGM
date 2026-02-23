@@ -94,18 +94,18 @@ A list containing correlation analysis results for each model:
 \itemize{
 \item{r:    Mantel/Canonical correlation statistic}
 \item{p:    Statistical significance}
-\item{I:    Mean squared correlation (overall correlation strength)}
-\item{I_x:    Within-set mean squared correlation for predictor variables}
-\item{I_y:    Within-set mean squared correlation for response variables}
+\item{IC:    Mean squared correlation (overall correlation strength)}
+\item{IC_x:    Within-set mean squared correlation for predictor variables}
+\item{IC_y:    Within-set mean squared correlation for response variables}
 }
 }
 \item{Cor.subset.Mantels:   Nested list structure of Mantel test results of subsetted data including:
 \itemize{
 \item{r:    Mantel/Canonical correlation statistic}
 \item{p:    Statistical significance}
-\item{I:    Mean squared correlation (overall correlation strength)}
-\item{I_x:    Within-set mean squared correlation for predictor variables}
-\item{I_y:    Within-set mean squared correlation for response variables}
+\item{IC:    Mean squared correlation (overall correlation strength)}
+\item{IC_x:    Within-set mean squared correlation for predictor variables}
+\item{IC_y:    Within-set mean squared correlation for response variables}
 }
 }
 }
@@ -116,9 +116,9 @@ A list of class "cor.bio" containing correlation analysis results organized by m
 \itemize{
 \item{r:    Mantel/Canonical correlation statistic}
 \item{p:    Statistical significance}
-\item{I:    Mean squared correlation (overall correlation strength)}
-\item{I_x:    Within-set mean squared correlation for predictor variables}
-\item{I_y:    Within-set mean squared correlation for response variables}
+\item{IC:    Mean squared correlation (overall correlation strength)}
+\item{IC_x:    Within-set mean squared correlation for predictor variables}
+\item{IC_y:    Within-set mean squared correlation for response variables}
 }
 }
 \item{Cor.subset.Mantels:    Optional when point_set is provided
@@ -126,8 +126,8 @@ A list of class "cor.bio" containing correlation analysis results organized by m
 \item{r:    Mantel/Canonical correlation statistic}
 \item{p:    Statistical significance}
 \item{I:    Mean squared correlation (overall correlation strength)}
-\item{I_x:    Within-set mean squared correlation for predictor variables}
-\item{I_y:    Within-set mean squared correlation for response variables}
+\item{IC_x:    Within-set mean squared correlation for predictor variables}
+\item{IC_y:    Within-set mean squared correlation for response variables}
 }
 }
 }
