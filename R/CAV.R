@@ -212,7 +212,7 @@ CAV <- function(Data,
       graphics.off()
     }
     cluster_plot_path <- paste(Directory,"/plot_cluster_", "K-medoids", ".png", sep = "")
-    grDevices::png(cluster_plot_path, width = 1920, height = 1080)
+    grDevices::png(cluster_plot_path, width = 1920, height = 1080, res = 150)
     # label used to be 8
     print(factoextra::fviz_cluster(pam_clust, pointsize = 5, repel = TRUE, alpha = 0.6, label = 8, main = "Results of K-Medoids Cluster Analysis", ggtheme = ggpubr::theme_pubclean()))
     dev.off()
@@ -355,22 +355,22 @@ CAV <- function(Data,
                             edge.color = edge_colors,
                             tip.color = Group_col,
                             edge.width = 3,
-                            cex = 0.7,
+                            cex = 0.9,
                             type = "fan",
                             main = "Fan of Morphometric Shape Distances")
 
       fan_plot_path <- paste0(Directory,"/plot_fan_", group_name, ".png", sep = "")
 
-      grDevices::png(fan_plot_path, width = 1920, height = 1080)
+      grDevices::png(fan_plot_path, width = 1920, height = 1080, res = 150)
         par(mar = c(1, 4, 1, 1))
         plot(dendro,
              edge.color = edge_colors,
              tip.color = Group_col,
              edge.width = 3,
-             cex = 0.7,
+             cex = 0.9,
              type = "fan",
              main = "Fan of Morphometric Shape Distances")
-        legend("topright", legend = group_val, col = palette, pch = 19, cex = 0.4)
+        legend("topright", legend = group_val, col = palette, pch = 19, cex = 0.8)
       dev.off()
 
       if (length(dev.list()) > 0) {
