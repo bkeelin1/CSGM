@@ -42,18 +42,20 @@ summary <- function(object,
     cat("\n")
     cat("\n")
     if(grepl("sym_data", names(object))) {
-      print("Summary of Bilateral Symmetry")
+      print("Summary of Bilateral (A)Symmetry")
       cat("\n")
-      print(object$sym_data)
+      print(object$sym_data$shape.anova)
       cat("\n")
       cat("\n")
     }
     print("PCA Summary")
-    print(head(object$PCA$PCA_var$PCA_var))
+    print(head(object$PCA$PCA_var))
     cat("\n")
     cat("\n")
     print("Plot 1: Morphometric Relationships")
-    plot(object$morphotree$resid$dendro)
+    do.call(ape::plot.phylo,object$morphotree$resid$agg_plot$Collection)
+    print("Plot 2: K-Medoids Clusters")
+    object$morphotree$resid$k_medoid_plot
     print("Plot 2: Principal Component Plot for PCs 1-3")
     object$PCA$PCA_plots$PCs_1_2_3
     print("Plot 3: Shape variation across PC 1")
@@ -264,7 +266,7 @@ summary <- function(object,
       names(Output[[m]]) = (paste(rep("Correlation Tests", length(object[[m]]$Cor.all.Mantels)), rep(1:length(object[[m]]$Cor.all.Mantels))))
       for(i in seq_along(object[[m]]$Cor.all.Mantels)) {
         Output[[m]][[i]] = data.frame(matrix(nrow = 1, ncol = length(object[[m]]$Cor.all.Mantels[[i]])))
-        colnames(Output[[m]][[i]]) = c("r","p-value","I","Ix","Iy")
+        colnames(Output[[m]][[i]]) = c("r","p-value","IC","IC_x","IC_y")
         Output[[m]][[i]][1,] = object[[m]]$Cor.all.Mantels[[i]]
         rownames(Output[[m]][[i]])[1] = paste("Overall_Test_", i, sep = "")
 

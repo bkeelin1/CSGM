@@ -191,6 +191,11 @@ ASCG <- function(GMA_object,
     path = file.path(Dir, temp.dir)
     setwd(path)
   }
+
+  if(!is.list(Groups)) {
+    Groups = list(Group = Groups)
+  }
+
   #_______________________________________________________________________
 
   if(class(GMA_object) == "GMA") {

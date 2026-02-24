@@ -170,20 +170,42 @@ allo$Group_shape
 
 ```
 
-### View Morphological shape changes by Collection
+### SCG: Visualize Morphological shape changes by Collection
 
 ```{r Group_Shape,echo=TRUE,eval=FALSE}
 Group_shapes = SCG(output,
-                   Group,
+                   Corpus_Prop$,
                    coord_name = dimnames(Corpus_Land)[[1]],
-                   subset = paste(rep(c("LM1M2", "LP3P4", "Symphysis", 
-                                        "RP3P4", "RM1M2"), each = 118)),
+                   subset = paste(rep(c("LM1M2", "LP3P4",
+                                        "Symphysis", 
+                                        "RP3P4", "RM1M2"), 
+                                      each = 118)),
                    key = "Group Shapes")
 
 # View the Group Differences
 
 Group_shapes[[1]]
 
+```
+
+### SCG: Vizualize Morphological shape changes by overall bending/torsional resistance
+
+```{r}
+
+average_resistance = Corpus_Prop %>% group_by(ID, Region) %>% reframe(across(where(is.numeric), mean, na.rm = TRUE))
+
+Group_shapes = SCG(output,
+                   Groups = Corpus_Prop$J,
+                   coord_name = dimnames(Corpus_Land)[[1]],
+                   subset = paste(rep(c("LM1M2", "LP3P4",
+                                        "Symphysis", 
+                                        "RP3P4", "RM1M2"), 
+                                      each = 118)),
+                   key = "Group Shapes")
+
+# View the Group Differences
+
+Group_shapes[[1]]
 ```
 
 ## Procrustes Shape (A)symmetry Analysis

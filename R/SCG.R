@@ -134,6 +134,8 @@ SCG <- function(Data,
   path = file.path(Dir, temp.dir)
   setwd(path)
 
+  on.exit(setwd(Dir))
+
   if(class(Data) == "GMA") {
     coords = Data$GPA$coords
     Center = Data$GPA$consensus
@@ -153,12 +155,15 @@ SCG <- function(Data,
   for (j in seq_along(Groups)) {
     if("character" %in% class(Groups[[j]][[1]]) || "factor" %in% class(Groups[[j]][[1]]) ||
        "logical" %in% class(Groups[[j]][[1]])) {
-      group_name <- names(Groups[[j]])
+      group_name <- names(Groups)[j]
+      if(is.null(group_name) || group_name == "") {
+        group_name <- paste0("Group_", j)
+      }
       dif_groups <- unlist(na.omit(unique(Groups[[j]])))
       split_groups = list()
       for(g in seq_along(unique(Groups[[j]]))) {
         index = which(Groups[[j]] == unique(Groups[[j]])[g])
-        split_groups[[g]] <- coords[,,index]
+        split_groups[[g]] <- coords[,,index,drop = FALSE]
       }
       split_groups <- Filter(function(x) !(is.array(x) && length(x) == 0), split_groups)
       split_groups <- lapply(na.omit(split_groups), geomorph::mshape)
@@ -170,19 +175,32 @@ SCG <- function(Data,
         }
       }
     } else {
-      group_name <- names(Groups[[j]])
+      group_name <- names(Groups)[j]
+      if(is.null(group_name) || group_name == "") {
+        group_name <- paste0("Group_", j)
+      }
       dif_groups <- c("Min", "Max")
       Min = which(Groups[[j]] == min(Groups[[j]], na.rm = TRUE))
       Max = which(Groups[[j]] == max(Groups[[j]], na.rm = TRUE))
-      split_groups <- list(Min = coords[,,Min], Max = coords[,,Max])
-      split_groups <- lapply(split_groups, function(coords) { array(coords, dim = c(dim(split_groups[[g]])[1],
-                                                                                    dim(split_groups[[g]])[2], 1))
+      split_groups <- list(Min = coords[,,Min,drop = FALSE], Max = coords[,,Maxdrop = FALSE])
+      split_groups <- lapply(split_groups, function(coords) { array(coords, dim = c(dim(split_groups[[1]])[1],
+                                                                                    dim(split_groups[[2]])[2], 1))
       })
+
+      split_groups <- lapply(split_groups, function(x) {
+        if(dim(x)[3] > 1) geomorph::mshape(x) else x[,,1]
+      })
+
+      split_groups <- lapply(split_groups, function(coords) {
+        array(coords, dim = c(dim(coords)[1], dim(coords)[2], 1))
+      })
+
+
       if(!is.null(Mesh)) {
         min.shape = geomorph::warpRefMesh(Center, split_groups$Min, mesh = Mesh)
-        Morpho::mesh2ply(min.shape, filename = paste("Min", "_Shape_", names(Group[[j]]), ".ply", sep = ""))
+        Morpho::mesh2ply(min.shape, filename = paste("Min", "_Shape_", group_name, ".ply", sep = ""))
         max.shape = geomorph::warpRefMesh(Center, split_groups$Max, mesh = Mesh)
-        Morpho::mesh2ply(max.shape, filename = paste("Max", "_Shape_", names(Group[[j]]), ".ply", sep = ""))
+        Morpho::mesh2ply(max.shape, filename = paste("Max", "_Shape_", group_name, ".ply", sep = ""))
       }
     }
     Group_shapes[[j]] <- lolshape(split_groups, ID = dif_groups, coord_name = coord_name, color = color,
