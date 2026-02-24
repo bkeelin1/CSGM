@@ -192,10 +192,21 @@ Group_shapes[[1]]
 
 ```{r}
 
-average_resistance = Corpus_Prop %>% group_by(ID, Region) %>% reframe(across(where(is.numeric), mean, na.rm = TRUE))
+left_resistance = Corpus_Prop %>% 
+  filter(Region == c("LM1M2","LP3P4")) %>%
+  group_by(ID) %>% 
+  reframe(across(where(is.numeric), mean, na.rm = TRUE))
+
+right_resistance = Corpus_Prop %>% 
+  filter(Region == c("RM1M2","RP3P4")) %>%
+  group_by(ID) %>% 
+  reframe(across(where(is.numeric), mean, na.rm = TRUE))
+
+SCG_Groups = list(Left_Resistance = left_resistance$J,
+                  Right_Resistance = right_resistance$J)
 
 Group_shapes = SCG(output,
-                   Groups = Corpus_Prop$J,
+                   Groups = SCG_Groups,
                    coord_name = dimnames(Corpus_Land)[[1]],
                    subset = paste(rep(c("LM1M2", "LP3P4",
                                         "Symphysis", 
@@ -203,7 +214,7 @@ Group_shapes = SCG(output,
                                       each = 118)),
                    key = "Group Shapes")
 
-# View the Group Differences
+# View the Differences in
 
 Group_shapes[[1]]
 ```

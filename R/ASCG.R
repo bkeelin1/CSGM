@@ -190,6 +190,7 @@ ASCG <- function(GMA_object,
     }
     path = file.path(Dir, temp.dir)
     setwd(path)
+    on.exit(setwd(Dir))
   }
 
   if(!is.list(Groups)) {
@@ -428,6 +429,5 @@ ASCG <- function(GMA_object,
   }
 
   #_____________________________________________________________________________
-  setwd(Dir)
   return(regressions)
 }

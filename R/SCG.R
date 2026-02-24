@@ -113,28 +113,37 @@ SCG <- function(Data,
                 coord_name = NULL,
                 subset = NULL,
                 key = NULL,
-                Mesh = NULL) {
+                Mesh = NULL,
+                save_plots = FALSE) {
 
-  Dir <- getwd()
-  if(!is.null(key)) {
-    if(!dir.exists(paste("Shape Differences Between Groups", key))) {
-      dir.create(paste("Shape Differences Between Groups", key))
-      temp.dir = paste("Shape Differences Between Groups", key)
+  if(isTRUE(save_plots)) {
+
+    Dir <- getwd()
+    if(!is.null(key)) {
+      if(!dir.exists(paste("Shape Differences Between Groups", key))) {
+        dir.create(paste("Shape Differences Between Groups", key))
+        temp.dir = paste("Shape Differences Between Groups", key)
+      } else {
+        temp.dir = paste("Shape Differences Between Groups", key)
+      }
     } else {
-      temp.dir = paste("Shape Differences Between Groups", key)
+      if(!dir.exists(paste("Shape Differences Between Groups"))) {
+        dir.create(paste("Shape Differences Between Groups"))
+        temp.dir = paste("Shape Differences Between Groups")
+      } else {
+        temp.dir = paste("Shape Differences Between Groups")
+      }
     }
-  } else {
-    if(!dir.exists(paste("Shape Differences Between Groups"))) {
-      dir.create(paste("Shape Differences Between Groups"))
-      temp.dir = paste("Shape Differences Between Groups")
-    } else {
-      temp.dir = paste("Shape Differences Between Groups")
-    }
+    path = file.path(Dir, temp.dir)
+    setwd(path)
+
+    on.exit(setwd(Dir))
+
   }
-  path = file.path(Dir, temp.dir)
-  setwd(path)
 
-  on.exit(setwd(Dir))
+  if(!is.list(Groups)) {
+    Groups = list(Group = Groups)
+  }
 
   if(class(Data) == "GMA") {
     coords = Data$GPA$coords
@@ -206,9 +215,10 @@ SCG <- function(Data,
     Group_shapes[[j]] <- lolshape(split_groups, ID = dif_groups, coord_name = coord_name, color = color,
                              title = paste("Shape Differences Between Means of Group:", group_name), subset = subset)
 
-    saveWidget(Group_shapes[[j]], file.path(path, paste0(group_name, ".html", collapse = "")), selfcontained = TRUE)
+    if(isTRUE(save_plots)){
+      saveWidget(Group_shapes[[j]], file.path(path, paste0(group_name, ".html", collapse = "")), selfcontained = TRUE)
+    }
   } # end of j for loop
 
-  setwd(Dir)
   return(Group_shapes)
 } # end of SCG function
