@@ -176,11 +176,12 @@ SCG <- function(Data,
       }
       split_groups <- Filter(function(x) !(is.array(x) && length(x) == 0), split_groups)
       split_groups <- lapply(na.omit(split_groups), geomorph::mshape)
+
       for(g in seq_along(split_groups)){
         split_groups[[g]] <- array(split_groups[[g]], dim = c(dim(split_groups[[g]])[1], dim(split_groups[[g]])[2], 1))
         if(!is.null(Mesh)) {
           shape = geomorph::warpRefMesh(Center, split_groups[[g]], mesh = Mesh)
-          Morpho::mesh2ply(shape, filename = paste(dif_groups[g], "_Shape_", names(Group[[j]]), ".ply", sep = ""))
+          Morpho::mesh2ply(shape, filename = paste(dif_groups[g], "_Shape_", group_name, ".ply", sep = ""))
         }
       }
     } else {
@@ -191,10 +192,7 @@ SCG <- function(Data,
       dif_groups <- c("Min", "Max")
       Min = which(Groups[[j]] == min(Groups[[j]], na.rm = TRUE))
       Max = which(Groups[[j]] == max(Groups[[j]], na.rm = TRUE))
-      split_groups <- list(Min = coords[,,Min,drop = FALSE], Max = coords[,,Maxdrop = FALSE])
-      split_groups <- lapply(split_groups, function(coords) { array(coords, dim = c(dim(split_groups[[1]])[1],
-                                                                                    dim(split_groups[[2]])[2], 1))
-      })
+      split_groups <- list(Min = coords[,,Min,drop = FALSE], Max = coords[,,Max,drop = FALSE])
 
       split_groups <- lapply(split_groups, function(x) {
         if(dim(x)[3] > 1) geomorph::mshape(x) else x[,,1]
@@ -203,7 +201,6 @@ SCG <- function(Data,
       split_groups <- lapply(split_groups, function(coords) {
         array(coords, dim = c(dim(coords)[1], dim(coords)[2], 1))
       })
-
 
       if(!is.null(Mesh)) {
         min.shape = geomorph::warpRefMesh(Center, split_groups$Min, mesh = Mesh)

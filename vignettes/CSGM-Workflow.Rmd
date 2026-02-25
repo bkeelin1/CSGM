@@ -40,12 +40,12 @@ data("Corpus_Prop")
 ## Create a curves matrix of the semilandmark array
 
 ```{r gencurves, echo=TRUE,eval=FALSE}
-curves = curves = gen_curves(10, # There are 10 total curves (5 external; 5 internal)
-                    6, # There are six anchor points (lingual x2, basal x2, buccal x2) for each curve
-                    590, # There are 590 total landmarks
-                    def_points = anchor_indices, # Landmark numbers which are anchor points
-                    def_semi = semiland_indices, # Landmark numbers which are semilandmark points
-                   )
+curves_new <- gen_curves(ncurves = 10, # 10 curves
+                         nsemiland = 590, # total semiland
+                         def_semi = semiland_indices, 
+                         def_points = anchor_indices, 
+                         closed = FALSE # no closed outlines
+                         )
 ```
 
 # Step 2: Exploratory Data Analysis
@@ -81,7 +81,7 @@ output <- GMA(Corpus_Land,
               ind = ID, # needed for bilateral symmetry
               w_morpho_pca = TRUE, # Dist weighted PCA
               key = "Mandibular_Corpus",
-              curves = curves # add in curves matrix
+              #curves = curves # add in curves matrix
               ) 
 # NOTE: Procrustes Outliers were individually checked and approved as representing real shape variation
 ```
@@ -174,7 +174,7 @@ allo$Group_shape
 
 ```{r Group_Shape,echo=TRUE,eval=FALSE}
 Group_shapes = SCG(output,
-                   Corpus_Prop$,
+                   Group,
                    coord_name = dimnames(Corpus_Land)[[1]],
                    subset = paste(rep(c("LM1M2", "LP3P4",
                                         "Symphysis", 
@@ -182,7 +182,7 @@ Group_shapes = SCG(output,
                                       each = 118)),
                    key = "Group Shapes")
 
-# View the Group Differences
+# View the Group Differences by collection (there are little)
 
 Group_shapes[[1]]
 
@@ -205,7 +205,7 @@ right_resistance = Corpus_Prop %>%
 SCG_Groups = list(Left_Resistance = left_resistance$J,
                   Right_Resistance = right_resistance$J)
 
-Group_shapes = SCG(output,
+Group_shapes = SCG(output$GPA$coords,
                    Groups = SCG_Groups,
                    coord_name = dimnames(Corpus_Land)[[1]],
                    subset = paste(rep(c("LM1M2", "LP3P4",
@@ -214,9 +214,10 @@ Group_shapes = SCG(output,
                                       each = 118)),
                    key = "Group Shapes")
 
-# View the Differences in
-
+# View Left corpus shape variation by Polar second moment of area (J)
 Group_shapes[[1]]
+# View Left corpus shape variation by Polar second moment of area (J)
+Group_shapes[[2]]
 ```
 
 ## Procrustes Shape (A)symmetry Analysis
