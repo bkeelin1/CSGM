@@ -9,7 +9,7 @@
 #'
 #' @param Predictor an array, matrix, or data table for the predictor(independent) variables.
 #'
-#' #' @param Res_transform Character string indicating which data transformation of the response
+#' @param Res_transform Character string indicating which data transformation of the response
 #' (i.e., landmark array) variable is desired. There are several acceptable options for data
 #' transformation of the response variable:
 #' \itemize{
