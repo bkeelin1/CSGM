@@ -16,7 +16,7 @@ The CSGM package offers an innovative and comprehensive toolkit to automate an e
 install.packages("devtools") # to install GitHub packages
 ```
 
-## Now Install the `CSGM` package from GitHub! 
+## Now Install the `CSGM` package from GitHub!
 
 ```{r}
 devtools::install_github("bkeelin1/CSGM",
