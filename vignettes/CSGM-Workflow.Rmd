@@ -304,39 +304,64 @@ Notes:
 
 ![Figure 2. Workflow for this hypothesis test that the posterior mandibular corpus is biomechanically integrated with the symphysis.](images/CSGM_Models.png)
 
-### Create the Hypothesis Model following the structure in Figure 2.
+The hypothesis model structure below highlights what is required to run any hypothesis function in CSGM. For this demonstration, we have one (1) singular hypothesis model and four (4) hypothesis tests. For these hypothesis testing functions, you can have any number of hypothesis models and hypothesis tests.
 
-```{r Data_Wrangling,echo=FALSE,eval=FALSE}
+Creating a hypothesis model object is simply creating a list object that defines a series of overarching hypotheses we have about our research question called a "hypothesis model". Within this list, users need to create a list object for every single hypothesis model. In this case, our hypothesis model called 'Symphysis_Shape \~ Posterior_Corpus_Properties'.
+
+Within the list object of a hypothesis model are hypothesis tests. These are pairwise dataset comparisons between a response (dependent) dataset and a predictor (independent) dataset. Within the hypothesis model, a hypothesis test list object needs to be created for each hypothesis test.
+
+In this demonstration, we have four (4) hypothesis tests within this singular hypothesis model, or four (4) pairwise dataset comparisons to list out. The code below makes a list object for each hypothesis test.
+
+Within each hypothesis test list object, the user needs to specify (in order) (1) a response dataset, (2) a predictor dataset, and (3) dt_parameters which list which contain any sort of dataset transformation procedures we want to do to the data prior to analysis. The dt_parameters is a list object to pass arguments for the DT function in the CSGM package.
+
+### Reshape Cross-sectional data for hypothesis testing
+
+```{r}
 library(tidyverse)
 
-#Data wrangle biomechanically relevant data for hypothesis testing
+#Data wrangle Cross-sectional properties for testing
 
 # Create a combined Posterior Corpus
-Corpus <- Corpus_Prop[,-c(2,4)] %>% # Get rid of variables Collection and BM3
-              filter(Region != "Symphysis") %>% # get rid of the symphysis
-              pivot_wider( # make redundant rows into columns
-                  id_cols = ID, # use specimen ID for data wrangling
-                  names_from = Region, # we want to separate columns by region
-                  values_from = -c(ID,Region)) %>%  # the values should be by specimen and region
-              .[,-1] # get rid of the ID column
+Corpus <- 
+  Corpus_Prop[,-c(2,4)] %>% # No Groups!
+    # Symphysis Only
+    filter(Region != "Symphysis") %>% 
+    pivot_wider( # make redundant rows into columns
+        id_cols = ID, # use specimen ID 
+        names_from = Region, # group columns
+        # the values should be by specimen and region
+        values_from = -c(ID,Region)) %>%  
+    .[,-1] # get rid of the ID column
 
 # Create the Left Posterior Corpus
-Left_Corpus <- Corpus_Prop[,-c(2,4)] %>% # Get rid of variables Collection and BM3
-                  filter(Region %in% c("LM1M2", "LP3P4")) %>% # only left side
-                  pivot_wider( # make redundant rows into columns
-                      id_cols = ID, # use specimen ID for data wrangling
-                      names_from = Region, # we want to separate columns by region
-                      values_from = -c(ID,Region)) %>%  # the values should be by specimen and region
-                  .[,-1] # get rid of the ID column
+Left_Corpus <- 
+  Corpus_Prop[,-c(2,4)] %>% # No Groups!
+    # Left Side Only
+    filter(Region %in% c("LM1M2", "LP3P4")) %>% 
+    pivot_wider( # make redundant rows into columns
+        id_cols = ID, # use specimen ID
+        names_from = Region, # group columns
+        values_from = -c(ID,Region)) %>%  
+        # the values should be by specimen and region
+    .[,-1] # get rid of the ID column
 
 # Create the Right Posterior Corpus
-Right_Corpus <- Corpus_Prop[,-c(2,4)] %>% # Get rid of variables Collection and BM3
-                  filter(Region %in% c("RM1M2", "RP3P4")) %>% # only right side
-                  pivot_wider( # make redundant rows into columns
-                      id_cols = ID, # use specimen ID for data wrangling
-                      names_from = Region, # we want to separate columns by region
-                      values_from = -c(ID,Region)) %>%  # the values should be by specimen and region
-                  .[,-1] # get rid of the ID column
+Right_Corpus <- 
+  Corpus_Prop[,-c(2,4)] %>% # No Groups!
+    # Left Side Only
+    filter(Region %in% c("RM1M2", "RP3P4")) %>% 
+    pivot_wider( # make redundant rows into columns
+        id_cols = ID, # use specimen ID
+        names_from = Region, # group columns
+        values_from = -c(ID,Region)) %>%  
+        # the values should be by specimen and region
+    .[,-1] # get rid of the ID column
+
+```
+
+### Create the Hypothesis Model following Figure 2.
+
+```{r Data_Wrangling,echo=FALSE,eval=FALSE}
 
 # Create the Hypothesis Model
 
@@ -344,51 +369,79 @@ Models <-
   list(
     'Symphysis_Shape ~ Posterior_Corpus_Properties' = # Hypothesis Model 1
         list(
-            'Symphyseal_Shape ~ Left_Corpus_Properties' = # Hypothesis Test 2
+            # Hypothesis Test 1
+            'Symphyseal_Shape ~ Left_Corpus_Properties' = 
                 list(
-                     Symphyseal_Shape = output$GPA$coords[c(237:354),,],
-                     Left_Corpus_Prop = Left_Corpus,
-                     dt_parameters = list(Res_transform = "NULL", 
-                                          dt_method = "procdist", # Procrustes Distances
-                                          Res_ncomp = 8, # we saw only 8 important PCs in factor analysis
-                                          Pred_transform = "NULL"
+                  # Response Dataset
+                  Symphyseal_Shape = 
+                       output$GPA$coords[c(237:354),,],
+                  # Predictor Dataset
+                  Left_Corpus_Prop = Left_Corpus,
+                  # Parameters for Both Datasets
+                  dt_parameters = list(
+                   # Procrustes distances + PCA
+                   Res_transform = "procdist+pca", 
+                   dt_method = "procdist", 
+                   Res_ncomp = 8, # 8 PCs
+                   Pred_transform = "NULL"
+                                      )
+                    ),
+              # Hypothesis Test 2
+              'Symphyseal_Shape ~ Left_Corpus_Shape' = 
+                list(
+                  # Response Dataset
+                  Symphyseal_Shape = 
+                   output$GPA$coords[c(237:354),,],
+                 # Predictor Dataset
+                 Left_Corpus_Shape = 
+                   output$GPA$coords[c(1:236),,],
+                 # Parameters for Both Datasets
+                 dt_parameters = 
+                   list(
+                     Res_transform = "procdist+pca", 
+                     dt_method = "procdist",
+                     Res_ncomp = 8, # 8 PCs
+                     Pred_transform = "procdist+pca",
+                     Pred_ncomp = 8 # 8 PCs
                                           )
                     ),
-              
-              'Symphyseal_Shape ~ Left_Corpus_Shape' = # Hypothesis Test 2
+              # Hypothesis Test 3
+              'Symphyseal_Shape ~ Right_Corpus_Properties' =  
                 list(
-                     Symphyseal_Shape = output$GPA$coords[c(237:354),,],
-                     Left_Corpus_Shape = output$GPA$coords[c(1:236),,],
-                     dt_parameters = list(Res_transform = "Procdist+PCA", 
-                                          dt_method = "procdist", # Procrustes Distances
-                                          Res_ncomp = 8, # we saw only 8 important PCs in factor analysis
-                                          Pred_transform = "procdist+pca",
-                                          Pred_ncomp = 8
-                                          )
-                    ),
-              
-              'Symphyseal_Shape ~ Right_Corpus_Properties' =  # Hypothesis Test 3
-                list(
-                     Symphyseal_Shape = output$GPA$coords[c(237:354),,],
-                     Right_Corpus_Prop = Right_Corpus,
-                     dt_parameters = list(Res_transform = "NULL", 
-                                          dt_method = "procdist", # Procrustes Distances
-                                          Res_ncomp = 8, # we saw only 8 important PCs in factor analysis
-                                          Pred_transform = "NULL"
-                                          )
-                    ),
-            
-              'Symphyseal_Shape ~ Right_Corpus_Shape' = # Hypothesis Test 2
+                  # Response Dataset
+                  Symphyseal_Shape = 
+                   output$GPA$coords[c(237:354),,],
+                 # Predictor Dataset
+                 Right_Corpus_Prop = 
+                   Right_Corpus,
+                 # Parameters for Both Datasets
+                 dt_parameters = 
                   list(
-                       Symphyseal_Shape = output$GPA$coords[c(237:354),,],
-                       Right_Corpus_Shape = output$GPA$coords[c(355:590),,],
-                       dt_parameters = list(Res_transform = "procdist+pca", 
-                                            dt_method = "procdist", # Procrustes Distances
-                                            Res_ncomp = 8, # we saw only 8 important PCs in factor analysis
-                                            Pred_transform = "procdist+pca",
-                                            Pred_ncomp = 8
-                                            )
-                      )
+                    Res_transform = "procdist+pca", 
+                    dt_method = "procdist", 
+                    Res_ncomp = 8, # 8 PCs
+                    Pred_transform = "NULL"
+                                        )
+                    ),
+              # Hypothesis Test 4
+              'Symphyseal_Shape ~ Right_Corpus_Shape' = 
+                list(
+                  # Response Dataset
+                  Symphyseal_Shape = 
+                    output$GPA$coords[c(237:354),,],
+                  # Predictor Dataset
+                  Right_Corpus_Shape = 
+                    output$GPA$coords[c(355:590),,],
+                  # Parameters for Both Datasets
+                  dt_parameters = 
+                    list(
+                      Res_transform = "procdist+pca", 
+                      dt_method = "procdist", 
+                      Res_ncomp = 8, # 8 PCs
+                      Pred_transform = "procdist+pca",
+                      Pred_ncomp = 8
+                                        )
+                    )
               )
     )
 
@@ -399,45 +452,67 @@ Models <-
 ```{r Hypothesis_Model,echo=TRUE,eval=FALSE}
 point_set <- 
   list(
-    'Symphysis_Shape ~ Posterior_Corpus_Properties' = # Hypothesis Model 1
+    
+    # Hypothesis Model 1
+    'Symphysis_Shape ~ Posterior_Corpus_Properties' = 
+      list(
+        
+    # Hypothesis Test 1
+    'Symphyseal_Shape ~ Left_Corpus_Properties' = 
         list(
-            'Symphyseal_Shape ~ Left_Corpus_Properties' = # Hypothesis Test 2
-                list(
-                     Symphyseal_Shape = list(Symphyseal_Shape
-                                             = 1:118, 
-                                     Symphyseal_Shape = 1:118, 
-                                     Symphyseal_Shape = 1:118, 
-                                     Symphyseal_Shape = 1:118),
-                     Left_Corpus_Prop = list(
-                                      Dimensions = c(1:6,9:16,19:30,17:18,47:48), 
-                                      Biomechanics = c(37:46,49:58),
-                                      Lingual_Thickness = c(59:118),
-                                      Buccal_Thickness = c(117:176))
-                    ),
-              'Symphyseal_Shape ~ Left_Corpus_Shape' = # Hypothesis Test 2
-                list(
-                     Symphyseal_Shape = list(Symphyseal_Shape = 1:118),
-                     Left_Corpus_Shape = list(Symphyseal_Shape = 1:118)
-                    ),
-              'Symphyseal_Shape ~ Right_Corpus_Properties' =  # Hypothesis Test 3
-                list(
-                     Symphyseal_Shape = list(Symphyseal_Shape
-                                             = 1:118, 
-                                     Symphyseal_Shape = 1:118, 
-                                     Symphyseal_Shape = 1:118, 
-                                     Symphyseal_Shape = 1:118),
-                     Right_Corpus_Prop = list(
-                                      Dimensions = c(1:6,9:16,19:30,17:18,47:48), 
-                                      Biomechanics = c(37:46,49:58),
-                                      Lingual_Thickness = c(59:118),
-                                      Buccal_Thickness = c(117:176))
-                    ),
-              'Symphyseal_Shape ~ Right_Corpus_Shape' = # Hypothesis Test 2
-                  list(
-                       Symphyseal_Shape = list(Symphyseal_Shape = 1:118),
-                       Right_Corpus_Shape = list(Symphyseal_Shape = 1:118)
-                      )
-              )
+          # Response Dataset Subsets
+          Symphyseal_Shape = list(Symphyseal_Shape
+                                     = 1:118, 
+                             Symphyseal_Shape = 1:118, 
+                             Symphyseal_Shape = 1:118, 
+                             Symphyseal_Shape = 1:118),
+          # Predictor Dataset Subsets   
+          Left_Corpus_Prop = list(
+                              Dimensions = c(1:6,9:16,
+                                             19:30,17:18,
+                                             47:48), 
+                              Biomechanics = c(37:46,49:58),
+                              Lingual_Thickness = c(59:118),
+                              Buccal_Thickness = c(117:176))
+            ),
+    
+    # Hypothesis Test 2
+    'Symphyseal_Shape ~ Left_Corpus_Shape' = 
+      list(
+        # Response Dataset Subsets
+        Symphyseal_Shape = list(Symphyseal_Shape = 1:118),
+        # Predictor Dataset Subsets
+        Left_Corpus_Shape = list(Symphyseal_Shape = 1:118)
+          ),
+    
+    # Hypothesis Test 3
+    'Symphyseal_Shape ~ Right_Corpus_Properties' = 
+      list(
+        # Response Dataset Subsets
+        Symphyseal_Shape = list(Symphyseal_Shape
+                                   = 1:118, 
+                           Symphyseal_Shape = 1:118, 
+                           Symphyseal_Shape = 1:118, 
+                           Symphyseal_Shape = 1:118),
+        # Predictor Dataset Subsets
+        Right_Corpus_Prop = list(
+                            Dimensions = c(1:6,9:16,
+                                           19:30,17:18,
+                                           47:48), 
+                            Biomechanics = c(37:46,49:58),
+                            Lingual_Thickness = c(59:118),
+                            Buccal_Thickness = c(117:176))
+          ),
+    
+    # Hypothesis Test 4
+    'Symphyseal_Shape ~ Right_Corpus_Shape' = 
+      list(
+         # Response Dataset Subsets
+         Symphyseal_Shape = list(Symphyseal_Shape = 1:118),
+         #Predictor Dataset Subsets
+         Right_Corpus_Shape = list(Symphyseal_Shape = 1:118)
+          )
+      )
     )
 ```
 
@@ -450,14 +525,14 @@ Note: Due to the robust operations within AABA, this may take a significant amou
 ```{r AABA,echo=TRUE,eval=FALSE}
 AABA_results = AABA(Models,
                    point_set, 
-                   paired_subsets = FALSE, # Don't do every combination
+                   paired_subsets = FALSE, # Not all combos
                    cors = TRUE, # Correlation analysis
-                   vips = TRUE, #Partial Leaast Squares (PLS) analysis
+                   vips = TRUE, #Partial Leaast Squares (PLS) 
                    covs = TRUE, # Shape specific 2B-PLS
-                   PSLR = TRUE, # Procrustes Shape Linear Regression
-                   regs = TRUE, # Conduct MARS nonlinear regression
+                   PSLR = TRUE, # Linear Regression
+                   regs = TRUE, # Conduct MARS Regression
                    VIP_trim = TRUE #trim regressions by VIPs
-                   ) # Keep defaults or change them. See '?AABA'
+                   ) # See '?AABA' for more details
 
 ```
 
