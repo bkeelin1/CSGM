@@ -1,8 +1,8 @@
-# *CSGM* - A Toolkit to Conduct Cross-Sectional Geometry(ics) Morphometric Analyses
+# *CSGM* - A Toolkit to Conduct Cross-Sectional Geometry and Geometric Morphometric Analyses
 
 ## Description
 
-Cross-sectional Geometry and Morphometrics (CSGM) analysis consists of two popular interdisciplinary methods in biological anthropology to study the relationships between shape and biomechanical function in contexts such as developmental biology, behavioral plasticity, and evolutionary morphology. As such, the integration of these two research methods involve the comparisons of complex, multidimensional shape data from multiple skeletal regions to multivariate, and often multicollinear, biomechanical variables. Thus, we developed the CSGM package in R to provide a statistically holistic framework and rigorous nested hypothesis model testing approach to facilitate a complete statistical data analysis. 
+Cross-sectional Geometric Morphometrics (CSGM) is a package that offers robust visualizations and statisitcal inferences to study the relationships between shape and biomechanical function in bone cross-sections. We developed the CSGM package in R to provide a statistically holistic framework and rigorous nested hypothesis model testing approach to facilitate a complete statistical data analysis. 
 
 The CSGM package offers an innovative and comprehensive toolkit to automate an entire geometric morphometric and inferential statistical analysis from start to finish. This package addresses the data complexity issues within CSGM studies which often require repetitive analyses and inter/intra-bone analyses by providing a holistic statistical approach to functionally test hypotheses and analyze complex multivariate data with only a few functions. This multimodal approach combines geometric morphometric analysis, correlation, covariation, and regression analyses to offer novel insights into the relationships between complex geometric and biological data. By applying a hypothesis model approach, the CSGM package allows researchers to organize multiple hypothesis testing across multivariate dataset comparisons. The functions within this package also offer accessible and interactive visualizations to easily interpret data relationships. Therefore, this package offers numerous ways to accessibly study geometric morphometrics and interpret complex data relationships needed to answer complex questions in human biology.
 
@@ -37,7 +37,7 @@ Note: When the Vignette opens, please look in the Script (top left) Panel and cl
 
 ------------------------------------------------------------------------
 
-# Visualizing the CSGM Workflow
+# Visualizing the CSGM Packages
 
 ![](images/clipboard-1066059136.png)
 

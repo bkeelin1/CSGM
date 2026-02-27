@@ -454,8 +454,8 @@ cor.bio <- function(Models,
                                                     Pred_transform = if(length(dim(Models[[m]][[i]][[2]])) == 3 & dt_parameters$Pred_transform == "NULL") "2D" else dt_parameters$Pred_transform)
      ) %>% .[intersect(names(.), dt_params)]
 
-       Response = data.frame(do.call(DT, dt_parameters)$Response)
-       Predictor = data.frame(do.call(DT, dt_parameters)$Predictor)
+       Response = do.call(DT, dt_parameters)$Response
+       Predictor = do.call(DT, dt_parameters)$Predictor
 
        if(length(dim(Response)) == 3) {
          y = as.matrix.data.frame(geomorph::two.d.array(Response))
@@ -572,8 +572,8 @@ cor.bio <- function(Models,
                                                           )
                                       ) %>% .[intersect(names(.), dt_params)]
 
-           Response = data.frame(do.call(DT, dt_parameters)$Response)
-           Predictor = data.frame(do.call(DT, dt_parameters)$Predictor)
+           Response = do.call(DT, dt_parameters)$Response
+           Predictor = do.call(DT, dt_parameters)$Predictor
 
            if(length(dim(Response)) == 3) {
              y = as.matrix.data.frame(two.d.array(Response))

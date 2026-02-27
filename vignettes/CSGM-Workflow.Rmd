@@ -13,7 +13,7 @@ vignette: >
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# CSGM – Cross-Sectional Geometry and Morphometrics
+# CSGM – Cross-Sectional Geometric Morphometrics
 
 ![](images/clipboard-1066059136.png)
 
@@ -348,7 +348,7 @@ Models <-
                 list(
                      Symphyseal_Shape = output$GPA$coords[c(237:354),,],
                      Left_Corpus_Prop = Left_Corpus,
-                     dt_parameters = list(Res_transform = "procdist+pca", 
+                     dt_parameters = list(Res_transform = "NULL", 
                                           dt_method = "procdist", # Procrustes Distances
                                           Res_ncomp = 8, # we saw only 8 important PCs in factor analysis
                                           Pred_transform = "NULL"
@@ -359,7 +359,7 @@ Models <-
                 list(
                      Symphyseal_Shape = output$GPA$coords[c(237:354),,],
                      Left_Corpus_Shape = output$GPA$coords[c(1:236),,],
-                     dt_parameters = list(Res_transform = "procdist+pca", 
+                     dt_parameters = list(Res_transform = "Procdist+PCA", 
                                           dt_method = "procdist", # Procrustes Distances
                                           Res_ncomp = 8, # we saw only 8 important PCs in factor analysis
                                           Pred_transform = "procdist+pca",
@@ -371,7 +371,7 @@ Models <-
                 list(
                      Symphyseal_Shape = output$GPA$coords[c(237:354),,],
                      Right_Corpus_Prop = Right_Corpus,
-                     dt_parameters = list(Res_transform = "procdist+pca", 
+                     dt_parameters = list(Res_transform = "NULL", 
                                           dt_method = "procdist", # Procrustes Distances
                                           Res_ncomp = 8, # we saw only 8 important PCs in factor analysis
                                           Pred_transform = "NULL"
@@ -403,10 +403,11 @@ point_set <-
         list(
             'Symphyseal_Shape ~ Left_Corpus_Properties' = # Hypothesis Test 2
                 list(
-                     Symphyseal_Shape = list(Set1 = 1:118, 
-                                     Set2 = 1:118, 
-                                     Set3 = 1:118, 
-                                     Set4 = 1:118),
+                     Symphyseal_Shape = list(Symphyseal_Shape
+                                             = 1:118, 
+                                     Symphyseal_Shape = 1:118, 
+                                     Symphyseal_Shape = 1:118, 
+                                     Symphyseal_Shape = 1:118),
                      Left_Corpus_Prop = list(
                                       Dimensions = c(1:6,9:16,19:30,17:18,47:48), 
                                       Biomechanics = c(37:46,49:58),
@@ -415,15 +416,16 @@ point_set <-
                     ),
               'Symphyseal_Shape ~ Left_Corpus_Shape' = # Hypothesis Test 2
                 list(
-                     Symphyseal_Shape = list(Set1 = 1:118),
-                     Left_Corpus_Shape = list(Set1 = 1:118)
+                     Symphyseal_Shape = list(Symphyseal_Shape = 1:118),
+                     Left_Corpus_Shape = list(Symphyseal_Shape = 1:118)
                     ),
               'Symphyseal_Shape ~ Right_Corpus_Properties' =  # Hypothesis Test 3
                 list(
-                     Symphyseal_Shape = list(Set1 = 1:118, 
-                                     Set2 = 1:118, 
-                                     Set3 = 1:118, 
-                                     Set4 = 1:118),
+                     Symphyseal_Shape = list(Symphyseal_Shape
+                                             = 1:118, 
+                                     Symphyseal_Shape = 1:118, 
+                                     Symphyseal_Shape = 1:118, 
+                                     Symphyseal_Shape = 1:118),
                      Right_Corpus_Prop = list(
                                       Dimensions = c(1:6,9:16,19:30,17:18,47:48), 
                                       Biomechanics = c(37:46,49:58),
@@ -432,8 +434,8 @@ point_set <-
                     ),
               'Symphyseal_Shape ~ Right_Corpus_Shape' = # Hypothesis Test 2
                   list(
-                       Symphyseal_Shape = list(Set1 = 1:118),
-                       Right_Corpus_Shape = list(Set1 = 1:118)
+                       Symphyseal_Shape = list(Symphyseal_Shape = 1:118),
+                       Right_Corpus_Shape = list(Symphyseal_Shape = 1:118)
                       )
               )
     )
@@ -472,7 +474,7 @@ CSGM::summary(AABA_results)
 ### *cor.bio*: Conduct a correlation analysis between the posterior corpus and symphysis
 
 ```{r Correlation,echo=TRUE,eval=FALSE}
-cor_hypothesize = cor.bio(Models, #Your hypothesis models
+cor_hypothesize2 = cor.bio(Models, #Your hypothesis models
                           point_set, # Your subsets
                           paired_subsets = FALSE #Not every subset combination
                           )
