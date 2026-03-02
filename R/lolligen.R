@@ -212,11 +212,12 @@ lolligen <- function(Data_PCA,
   }
 
   if (is.null(coord_name)) {
-    if(is.character(rownames(Data_PCA$rotation))){
+    if (k == 1 && is.character(rownames(Data_PCA$rotation))) {
       coord_name = rownames(Data_PCA$rotation)
     } else {
+      # For landmark data (k=2 or k=3), extract just the number of landmarks
       n_point = length(Data_PCA$center) / k
-      coord_name = as.character(rep(1:n_point))
+      coord_name = as.character(1:n_point)
     }
   }
   if(!is.null(Group)) {
