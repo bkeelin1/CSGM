@@ -32,7 +32,7 @@ summary.reg.bio <- function(object, ...) {
 summary.GMA <- function(object, ...) {
   print("Summary of the Geometric Morphometric Analysis:")
   cat("\n\n")
-  if(grepl("sym_data", names(object))) {
+  if("sym_data" %in% names(output)) {
     print("Summary of Bilateral (A)Symmetry")
     cat("\n")
     print(object$sym_data$shape.anova)
