@@ -11,7 +11,8 @@ SCG(
   coord_name = NULL,
   subset = NULL,
   key = NULL,
-  Mesh = NULL
+  Mesh = NULL,
+  save_plots = FALSE
 )
 }
 \arguments{

@@ -4,40 +4,18 @@
 \alias{gen_curves}
 \title{Generate a curve matrix for landmark data}
 \usage{
-gen_curves(
-  ncurves,
-  nfixland,
-  nsemiland,
-  def_points = NULL,
-  def_semi = NULL,
-  closed = FALSE
-)
+gen_curves(ncurves, nsemiland, def_semi, def_points, closed = FALSE)
 }
 \arguments{
-\item{ncurves}{A numeric value indicating the number of semilandmarks in your
-landmark configuration.}
+\item{ncurves}{Numeric. Total number of distinct curves (e.g., 10).}
 
-\item{nfixland}{A numeric value indicating the number of fixed landmarks that
-should not be slid}
+\item{nsemiland}{Numeric. Total number of landmarks in the dataset (e.g., 590).}
 
-\item{nsemiland}{A numeric value indicating the total number of semilandmarks,
-including semilandmark anchor points that form part of a curve. This value does not
-include landmarks in your configuration that are unrelated to a
-semilandmark curve.}
+\item{def_semi}{Numeric vector. Indices of the semi-landmarks.}
 
-\item{def_points}{An optional vector containing numerical string representing the
-landmark numbers associated with each fixed landmark point in your landmark
-configuration.}
+\item{def_points}{Numeric vector. Indices of the fixed landmarks (anchors).}
 
-\item{def_semi}{An optional vector containing a numerical string representing the
-landmark numbers associated with each semilandmark point in your landmark
-configuration (not anchor points in a semilandmark configuration).
-This argument is paired with def_points. Only applicable
-when the landmark configurations contain fixed points independent of
-the semilandmark curves.}
-
-\item{closed}{A logical TRUE/FALSE statement indicating whether the curve
-is closed in a loop.}
+\item{closed}{Logical. Whether INDIVIDUAL curves are closed loops.}
 }
 \value{
 This function returns a n x 3 landmark curve matrix where n is
@@ -63,72 +41,18 @@ configuration contains both semilandmarks and landmarks.
 \examples{
 \dontrun{
 # You should know the exact positions of your semilandmarks in your landmark configuration before using this function
-
-# **Simple Example 1**
-
-# In this example, we only have 1 semilandmark curve totaling 11 semilandmarks including three fixed landmark anchor points.
-
-Landmark_matrix <- gen_curves(ncurves = 1, # There is only 1 semilandmark curve
-                              nfixland = 3, # we have 3 anchor points
-                              nsemiland = 11, # we have 11 semilandmarks including the anchor points
-                              def_points = NULL,
-                              def_semi = NULL,
-                              closed = 0 # This is an open semilandmark configuration.
-                              )
-
-
- #**Simple Example 2**
-
-# In this example, we only have 10 type 1 landmarks followed by 20 semilandmarks with two anchor points (first and last)
-
-Landmark_matrix <- gen_curves(ncurves = 1, # There is only 1 semilandmark curve
-                              nfixland = 12, # we have 2 anchor points plus 10 fixed landmarks
-                              nsemiland = 20, # we have 20 semilandmarks including the anchor points
-                              def_points = c(1:10, # type 1 landmarks
-                                             11, 30, # Keep in mind that these are the anchor points for the open curve
-                                             ),
-                              def_semi = c(11:30), # You must include anchor points as well
-                              closed = 0 # There are no closed semilandmarks
-                              )
-
-
-# **Complex Example**
-
-# In this example, let's assume we have a landmark configuration mapping a human cranium:
-
-\itemize{
-  \item There are 32 type 1 landmarks.
-  \item There are 1 *closed* semilandmark curve of 30 points mapping the right temporalis muscle attachment site.
-  \item There is 1 *open* semilandmark curve of 11 points mapping the right superior temporal line.
-  \item Specficially,
-  \itemize{
-    \item Landmarks 1-16 are type 1 landmarks.
-    \item Landmarks 17 - 28 are open semilandmarks.
-    \item Landmarks 29 - 39 are type 1 landmarks.
-    \item Landmarks 40 - 70 are closed semilandmarks.
-    \item Landmarks 71 - 75 are type 1 landmarks.
-  }
-}
-
-
-Landmark_matrix <- gen_curves(ncurves = 2,
-                              nfixland = 32,
-                              nsemiland = 41,
-                              def_points = c(1:16, # type 1 landmarks
-                                             17, 22 ,28 # Keep in mind that these are the anchor points for the open curve
-                                             29:39, # type 1 landmarks
-                                             # Since the curve is close we don't include anchor points for the 2nd curve
-                                             71:75 # type 1 landmarks
-                                             ),
-                              def_semi = c(17:28, 40:70) # You must include anchor points as well,
-                              closed = 1 # There is only 1 closed semilandmark curve in this example. Default is 0.
-                              )
-
+data(semiland_indices)
+data(anchor_indices)
+gen_curves(ncurves = 10,
+           nsemiland = 590,
+           def_semi = semiland_indices,
+           def_points = anchor_indices,
+           closed = FALSE)
 }
 }
 \seealso{
 \pkg{\link{geomorph}}
 }
 \author{
-Keeling et al., 2025
+Keeling et al., 2026
 }
