@@ -55,12 +55,14 @@ curves_new <- gen_curves(ncurves = 10, # 10 curves
 ```{r GMA,echo=TRUE,eval=FALSE}
 # Let's make ID and Group arguments for the GMA analysis
 
+# Individual IDs
 ID = paste(1:50)
 
-Group = list(Collection = Corpus_Prop[1:50,]$Collection) # Skeletal Collection
+
+# Skeletal Collection
+Group = list(Collection = Corpus_Prop[1:50,]$Collection) 
 
 # Conduct the analysis
-
 output <- GMA(Corpus_Land,  
               k = 3,  # 3D data
               ID,  # Specimen identifiers
@@ -140,7 +142,8 @@ allo = ASCG(output, # GMA_object
             Group, # list object of grouping vectors
             coord_name = dimnames(Corpus_Land)[[1]], # names for the landmarks
             coord_subset = paste(rep(c("LM1M2", "LP3P4", "Symphysis", 
-                                       "RP3P4", "RM1M2"), each = 118)), 
+                                       "RP3P4", "RM1M2"), 
+                                     each = 118)), 
             key = "Allometric Shapes") 
 
 # View overall allometric influence on all individuals in the sample
@@ -190,7 +193,7 @@ Group_shapes[[1]]
 
 ### SCG: Vizualize Morphological shape changes by overall bending/torsional resistance
 
-```{r}
+```{r SCG,echo=TRUE,eval=FALSE}
 
 left_resistance = Corpus_Prop %>% 
   filter(Region == c("LM1M2","LP3P4")) %>%
@@ -316,7 +319,7 @@ Within each hypothesis test list object, the user needs to specify (in order) (1
 
 ### Reshape Cross-sectional data for hypothesis testing
 
-```{r}
+```{r Reshape,echo=TRUE,eval=FALSE}
 library(tidyverse)
 
 #Data wrangle Cross-sectional properties for testing

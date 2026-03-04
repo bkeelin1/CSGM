@@ -38,6 +38,7 @@ Imports:
     foreach,
     geometry,
     geomorph,
+    ggraph,
     ggplot2,
     ggpubr,
     glmnet,

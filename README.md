@@ -19,9 +19,7 @@ install.packages("devtools") # to install GitHub packages
 ## Now Install the `CSGM` package from GitHub!
 
 ```{r}
-devtools::install_github("bkeelin1/CSGM",
-                         build_vignettes = TRUE, 
-                         dependencies = TRUE) 
+devtools::install_github("bkeelin1/CSGM") 
 ```
 
 ## Follow along in RStudio or Posit Cloud and use this README through the vignette CSGM-Workflow
@@ -59,7 +57,7 @@ data("Corpus_Prop")
 
 ## Create a curves matrix of the semilandmark array
 
-```{r gencurves, echo=TRUE,eval=FALSE}
+```{r gencurves,echo=TRUE,eval=FALSE}
 curves = curves = gen_curves(10, # There are 10 total curves (5 external; 5 internal)
                     6, # There are six anchor points (lingual x2, basal x2, buccal x2) for each curve
                     590, # There are 590 total landmarks
@@ -169,7 +167,11 @@ allo = ASCG(output, # GMA_object
 allo$Allo.size.reg$table
 ## Shape
 allo$whole_shape
+```
 
+## Obtain Group Specific Statistics for Allometry
+
+```{r}
 # View allometric influence of study sample by skeletal collection
 
 # allo is the output
@@ -187,7 +189,6 @@ allo$Group_stats[[1]][[3]]$Collection.UP$table
 
 # all groups interactively
 allo$Group_shape
-
 
 ```
 
@@ -295,7 +296,7 @@ Notes:
 
 ### Reshape Cross-sectional data for hypothesis testing
 
-```{r}
+```{r Reshape,echo=TRUE,eval=FALSE}
 library(tidyverse)
 
 #Data wrangle Cross-sectional properties for testing
