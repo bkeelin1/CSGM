@@ -640,29 +640,63 @@ GMA <- function(Landmarks,
                tryCatch({
                  CAV_parameters = modifyList(CAV_parameters, list(Data = data.frame(geomorph::two.d.array(GPA_data$coords)),
                                                                   Dir_name = "Procrustes Residuals",
-                                                                  Pred_ncomp = Pred_ncomp, method = "euclidean")
+                                                                  Pred_ncomp = Pred_ncomp,
+                                                                  method = "euclidean")
                                              )
                  do.call(CAV,CAV_parameters)
+
                }, error = function (e) {
                 print("CAV Function Failed. Cannot perform cluster analysis with data that has a standard deviation of 0. Select different method")
                })
             })
 
-
-  dendro_resid = cluster$dendro
-  GMA_Output$morphotree$resid <- cluster
+  if(is.list(cluster)) {
+    dendro_resid = cluster$dendro
+    GMA_Output$morphotree$resid <- cluster
+  }
 
   if (bilat_sym == TRUE) { # Hierarchical cluster generation when bilateral symmetry analysis is desired
 
     CAV_parameters = modifyList(CAV_parameters, list(Data = data.frame(geomorph::two.d.array(resid_asym)), Dir_name = "Asymmetry"))
-    cluster = do.call(CAV, CAV_parameters)
-    dendro_asym = cluster$dendro
-    GMA_Output$morphotree$asym <- cluster
+
+    cluster = tryCatch({do.call(CAV, CAV_parameters)},
+                       error = function (e) {
+                         tryCatch({
+                           CAV_parameters = modifyList(CAV_parameters, list(Data = data.frame(geomorph::two.d.array(resid_asym)),
+                                                                            Dir_name = "Procrustes Residuals",
+                                                                            Pred_ncomp = Pred_ncomp,
+                                                                            method = "euclidean")
+                           )
+                           do.call(CAV,CAV_parameters)
+
+                         }, error = function (e) {
+                           print("Bilateral Asymmetry CAV Function Failed. Cannot perform cluster analysis with data that has a standard deviation of 0. Select different method")
+                         })
+                       })
+    if(is.list(cluster)) {
+      dendro_asym = cluster$dendro
+      GMA_Output$morphotree$asym <- cluster
+    }
 
     CAV_parameters = modifyList(CAV_parameters, list(Data = data.frame(geomorph::two.d.array(resid_sym)), Dir_name = "Symmetry"))
-    cluster = do.call(CAV, CAV_parameters)
-    dendro_sym = cluster$dendro
-    GMA_Output$morphotree$sym <- cluster
+    cluster = tryCatch({do.call(CAV, CAV_parameters)},
+                       error = function (e) {
+                         tryCatch({
+                           CAV_parameters = modifyList(CAV_parameters, list(Data = data.frame(geomorph::two.d.array(resid_sym)),
+                                                                            Dir_name = "Procrustes Residuals",
+                                                                            Pred_ncomp = Pred_ncomp,
+                                                                            method = "euclidean")
+                           )
+                           do.call(CAV,CAV_parameters)
+
+                         }, error = function (e) {
+                           print("Bilateral Symmetry CAV Function Failed. Cannot perform cluster analysis with data that has a standard deviation of 0. Select different method")
+                         })
+                       })
+    if(is.list(cluster)) {
+      dendro_sym = cluster$dendro
+      GMA_Output$morphotree$sym <- cluster
+    }
   }
 
   if(isTRUE(print_progress)){
