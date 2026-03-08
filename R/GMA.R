@@ -646,7 +646,7 @@ GMA <- function(Landmarks,
                  do.call(CAV,CAV_parameters)
 
                }, error = function (e) {
-                print("CAV Function Failed. Cannot perform cluster analysis with data that has a standard deviation of 0. Select different method")
+                print("CAV Function Failed. Cannot perform cluster analysis with data that has a standard deviation of 0. Select different distance method or set w_morpho_pca = FALSE.")
                })
             })
 
@@ -670,7 +670,7 @@ GMA <- function(Landmarks,
                            do.call(CAV,CAV_parameters)
 
                          }, error = function (e) {
-                           print("Bilateral Asymmetry CAV Function Failed. Cannot perform cluster analysis with data that has a standard deviation of 0. Select different method")
+                           print("Bilateral Asymmetry CAV Function Failed. Cannot perform cluster analysis with data that has a standard deviation of 0. Select different distance method or set w_morpho_pca = FALSE.")
                          })
                        })
     if(is.list(cluster)) {
@@ -690,7 +690,7 @@ GMA <- function(Landmarks,
                            do.call(CAV,CAV_parameters)
 
                          }, error = function (e) {
-                           print("Bilateral Symmetry CAV Function Failed. Cannot perform cluster analysis with data that has a standard deviation of 0. Select different method")
+                           print("Bilateral Symmetry CAV Function Failed. Cannot perform cluster analysis with data that has a standard deviation of 0. Select different distance method or set w_morpho_pca = FALSE.")
                          })
                        })
     if(is.list(cluster)) {
