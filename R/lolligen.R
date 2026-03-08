@@ -355,15 +355,22 @@ lolligen <- function(Data_PCA,
             # We select the necessary columns and pass them.
             hull_data <- scores_df[, 1:max(pc_set$pcs)]
 
-            PCA_group[[pc_name]] <- hullgen(
-              Data_PCs = hull_data,
-              select_PC = pc_set$pcs,
-              Group = Group[[i]],
-              color = NULL,
-              ID = ID,
-              PCA_var = PCA_var,
-              sym = TRUE
-            )
+            PCA_group[[pc_name]]
+
+            test_hull <- hullgen(
+                                  Data_PCs = hull_data,
+                                  select_PC = pc_set$pcs,
+                                  Group = Group[[i]],
+                                  color = NULL,
+                                  ID = ID,
+                                  PCA_var = PCA_var,
+                                  sym = TRUE
+                                )
+            if(is.null(test_hull)) {
+              test_hull = "Hullgen failed to define groups because they are too coplanar/too similar"
+            }
+
+            test_hull = PCA_group[[pc_name]]
           }
         }
         lollipops$PCA_group[[i]] <- PCA_group
