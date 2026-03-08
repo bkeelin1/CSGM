@@ -638,12 +638,12 @@ GMA <- function(Landmarks,
   cluster = tryCatch({do.call(CAV, CAV_parameters)},
              error = function (e) {
                tryCatch({
-                 CAV_parameters = modifyList(CAV_parameters, list(Data = data.frame(geomorph::two.d.array(GPA_data$coords)),
+                 CAV_parameters2 = modifyList(CAV_parameters, list(Data = data.frame(geomorph::two.d.array(GPA_data$coords)),
                                                                   Dir_name = "Procrustes Residuals",
                                                                   Pred_ncomp = Pred_ncomp,
                                                                   method = "euclidean")
                                              )
-                 do.call(CAV,CAV_parameters)
+                 do.call(CAV,CAV_parameters2)
 
                }, error = function (e) {
                 print("CAV Function Failed. Cannot perform cluster analysis with data that has a standard deviation of 0. Select different distance method or set w_morpho_pca = FALSE.")
@@ -653,6 +653,8 @@ GMA <- function(Landmarks,
   if(is.list(cluster)) {
     dendro_resid = cluster$dendro
     GMA_Output$morphotree$resid <- cluster
+  } else {
+    dendro_resid = NULL
   }
 
   if (bilat_sym == TRUE) { # Hierarchical cluster generation when bilateral symmetry analysis is desired
@@ -662,12 +664,12 @@ GMA <- function(Landmarks,
     cluster = tryCatch({do.call(CAV, CAV_parameters)},
                        error = function (e) {
                          tryCatch({
-                           CAV_parameters = modifyList(CAV_parameters, list(Data = data.frame(geomorph::two.d.array(resid_asym)),
+                           CAV_parameters3 = modifyList(CAV_parameters, list(Data = data.frame(geomorph::two.d.array(resid_asym)),
                                                                             Dir_name = "Procrustes Residuals",
                                                                             Pred_ncomp = Pred_ncomp,
                                                                             method = "euclidean")
                            )
-                           do.call(CAV,CAV_parameters)
+                           do.call(CAV,CAV_parameters3)
 
                          }, error = function (e) {
                            print("Bilateral Asymmetry CAV Function Failed. Cannot perform cluster analysis with data that has a standard deviation of 0. Select different distance method or set w_morpho_pca = FALSE.")
@@ -676,18 +678,20 @@ GMA <- function(Landmarks,
     if(is.list(cluster)) {
       dendro_asym = cluster$dendro
       GMA_Output$morphotree$asym <- cluster
+    } else {
+      dendro_asym = NULL
     }
 
     CAV_parameters = modifyList(CAV_parameters, list(Data = data.frame(geomorph::two.d.array(resid_sym)), Dir_name = "Symmetry"))
     cluster = tryCatch({do.call(CAV, CAV_parameters)},
                        error = function (e) {
                          tryCatch({
-                           CAV_parameters = modifyList(CAV_parameters, list(Data = data.frame(geomorph::two.d.array(resid_sym)),
+                           CAV_parameters4 = modifyList(CAV_parameters, list(Data = data.frame(geomorph::two.d.array(resid_sym)),
                                                                             Dir_name = "Procrustes Residuals",
                                                                             Pred_ncomp = Pred_ncomp,
                                                                             method = "euclidean")
                            )
-                           do.call(CAV,CAV_parameters)
+                           do.call(CAV,CAV_parameters4)
 
                          }, error = function (e) {
                            print("Bilateral Symmetry CAV Function Failed. Cannot perform cluster analysis with data that has a standard deviation of 0. Select different distance method or set w_morpho_pca = FALSE.")
@@ -696,6 +700,8 @@ GMA <- function(Landmarks,
     if(is.list(cluster)) {
       dendro_sym = cluster$dendro
       GMA_Output$morphotree$sym <- cluster
+    } else {
+      dendro_sym = NULL
     }
   }
 
