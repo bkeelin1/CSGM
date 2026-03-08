@@ -186,29 +186,39 @@ hullgen <- function(Data_PCs,
       Group_data2 <- Data_PCs[Group == current_group2, ]
       row.names(Group_data2) <- rep(1:nrow(Group_data2))
       colnames(Group_data2) <- c("x","y","z","Group","ID")
-      indices <- tryCatch({geometry::convhulln(Group_data2[,c("x","y","z")])}, error = function(e) {
-        tryCatch({geometry::convhulln(Data_save[,1:4])}, error = function(e) {
-          geometry::convhulln(Data_save[,1:5])
-        })
+
+      indices <- tryCatch(
+                    {geometry::convhulln(Group_data2[,c("x","y","z")])},
+                    error = function(e) {
+                        tryCatch({geometry::convhulln(Data_save[,1:4])},
+                                 error = function(e) {
+                                   tryCatch({geometry::convhulln(Data_save[,1:5])},
+                                            error = function(e) {return(NULL)}
+                                            )
+
+                                   })
       })
-      if(ncol(indices) > 3) {
-        indices = indices[,1:3]
+
+      # Only attempt to make convex hull if indices is not null (not coplanar)
+      if (!is.null(indices)) {
+        if(ncol(indices) > 3) {
+          indices = indices[,1:3]
+        }
+
+        hull <- data.frame(Group_data2[indices,])
+        index <- data.frame(x = indices[,1], y = indices[,2], z = indices[,3])
+
+        plot <- plot %>% add_mesh(x = hull$x, y = hull$y, z = hull$z,
+                                  name = paste("Hull", current_group2),
+                                  showlegend = TRUE,
+                                  type = 'mesh3d',
+                                  alphahull = 0,
+                                  inherit = FALSE,
+                                  opacity = 0.4,
+                                  facecolor = rep(paste(palette2[i,1]), times = nrow(hull)))
+      } else {
+        message(paste("Skipped 3D convex hull for group '", current_group2, "' - points are too collinear/coplanar."))
       }
-
-      hull <- data.frame(Group_data2[indices,])
-      index <- data.frame(x = indices[,1], y = indices[,2], z = indices[,3])
-      #palette[match(as.factor(Group), Group_names)]
-      #color_hull = palette[match(hull, Group_names)]
-
-      plot <- plot %>% add_mesh(x = hull$x, y = hull$y, z = hull$z,
-                                name = paste("Hull", current_group2),
-                                showlegend = TRUE,
-                                type = 'mesh3d',
-                                alphahull = 0,
-                                inherit = FALSE,
-                                opacity = 0.4,
-                                facecolor = rep(paste(palette2[i,1]), times = nrow(hull)))
-
     } # end of i for loop
     if (!is.null(PCA_var)) {
       PC_total = PCA_var[select_PC[1],2] + PCA_var[select_PC[2],2] + PCA_var[select_PC[3],2]
