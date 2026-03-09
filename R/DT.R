@@ -242,14 +242,20 @@ DT <- function(Response = NULL,
             if(method == "mahalanobis") {
               Dataset = data.frame(geomorph::two.d.array(Dataset))
               if (ncol(Dataset) >= nrow(Dataset)) {
-                PCA = gm.prcomp(Dataset)
+                PCA = geomorph::gm.prcomp(Dataset)
                 PCA$A = Dataset
 
                 if(is.null(ncomp)){
                   npc = PCA_variances(PCA)
                   npc = npc$PCs
+                  if(npc < 2) {
+                    npc = 2
+                  }
                   Dataset = PCA$x[,1:npc]
                 } else {
+                  if(ncomp > length(PCA$x)){
+                     ncomp = length(PCA$x)
+                  }
                   Dataset = PCA$x[,1:ncomp]
                 }
                 Mean = colMeans(Dataset)
@@ -404,6 +410,9 @@ DT <- function(Response = NULL,
                 if(is.null(ncomp)){
                   npc = PCA_variances(PCA)
                   npc = npc$PCs
+                  if(npc < 2) {
+                    npc = 2
+                  }
                   Dataset = PCA$x[,1:npc]
                 } else {
                   Dataset = PCA$x[,1:ncomp]
@@ -508,6 +517,9 @@ DT <- function(Response = NULL,
                 if(is.null(ncomp)){
                   npc = PCA_variances(PCA)
                   npc = npc$PCs
+                  if(npc < 2) {
+                    npc = 2
+                  }
                   Dataset = PCA$x[,1:npc]
                 } else {
                   Dataset = PCA$x[,1:ncomp]
@@ -608,6 +620,9 @@ DT <- function(Response = NULL,
                 if(is.null(ncomp)){
                   npc = PCA_variances(PCA)
                   npc = npc$PCs
+                  if(npc < 2) {
+                    npc = 2
+                  }
                   Dataset = PCA$x[,1:npc]
                 } else {
                   Dataset = PCA$x[,1:ncomp]

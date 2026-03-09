@@ -185,18 +185,26 @@ CAV <- function(Data,
 
   # K-Medoids Cluster Generation
   tryCatch({
-    if(length(ID) == 10) {
-      kchoice = numeric(9)
-    } else if (length(ID) < 10) {
-      kchoice = numeric(length(ID))
+    if(data.frame(table(Euc_dist))[1,1] == 0){
+      kchoice = length(unique(Group)) - 1
     } else {
-      kchoice = numeric(10)
+      if(length(ID) == 10) {
+        kchoice = numeric(9)
+      } else if (length(ID) < 10) {
+        kchoice = numeric(length(ID))
+      } else {
+        kchoice = numeric(10)
+      }
     }
 
     for(k in 2:length(kchoice)) {
       pam_clust = cluster::pam(Euc_dist, k = k, metric = method, nstart = 25, pamonce = TRUE, diss = TRUE)
       pam_clust$data <- as.matrix(Euc_dist)
-      kchoice[k] = pam_clust$silinfo$avg.width
+      if(is.null(pam_clust$silinfo$avg.width)){
+        kchoice[k] = 0
+      } else {
+        kchoice[k] = pam_clust$silinfo$avg.width
+      }
     }
     kchoice = which.max(kchoice)
     pam_clust = cluster::pam(Euc_dist, k = kchoice, metric = method, nstart = 25, pamonce = TRUE, diss = TRUE)

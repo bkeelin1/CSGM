@@ -58,8 +58,8 @@ data("Corpus_Prop")
 ## Create a curves matrix of the semilandmark array
 
 ```{r gencurves,echo=TRUE,eval=FALSE}
-curves = curves = gen_curves(10, # There are 10 total curves (5 external; 5 internal)
-                    6, # There are six anchor points (lingual x2, basal x2, buccal x2) for each curve
+curves = gen_curves(10, # 10 total curves (5 external; 5 internal)
+                    6, # Six anchor points (lingual x2, basal x2, buccal x2) for each curve
                     590, # There are 590 total landmarks
                     def_points = anchor_indices, # Landmark numbers which are anchor points
                     def_semi = semiland_indices, # Landmark numbers which are semilandmark points
@@ -96,8 +96,7 @@ output <- GMA(Corpus_Land,  # Complete landmark configuration
               object.sym = TRUE, # needed for object symmetry (we are looking at a mandible)
               ind = ID, # needed for bilateral symmetry
               w_morpho_pca = TRUE, # We will weight our PCA analysis by individual Mahalanobis distances
-              key = "Mandibular_Corpus",
-              curves = curves # add in curves matrix
+              key = "Mandibular_Corpus"
               ) 
 
 
