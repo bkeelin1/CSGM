@@ -19,7 +19,9 @@ install.packages("devtools") # to install GitHub packages
 ## Now Install the `CSGM` package from GitHub!
 
 ```{r}
-devtools::install_github("bkeelin1/CSGM") 
+devtools::install_github("bkeelin1/CSGM",
+                         dependencies = TRUE,
+                         build_vignettes = TRUE) 
 ```
 
 ## Follow along in RStudio or Posit Cloud and use this README through the vignette CSGM-Workflow
@@ -667,3 +669,4 @@ CSGM::summary(pred_tests[[4]])
 Notes: As we can see, the MARS predictions outperformed the linear predictions, revealing the predictive strengths noted in the PLS analysis. Two very different methods converging on the same answer is a strong sign that the predictive strength of the model is accurately capturing real shape variation.
 
 ## End of *CSGM* Package Demonstration
+
